@@ -16,7 +16,7 @@ if (!existsSync(releasesDir)) mkdirSync(releasesDir, { recursive: true })
 const version = {
   version: pkg.version,
   minVersion: pkg.version,
-  apkUrl: `https://mycompany.zlabs.com.br/${apkName}`,
+  apkUrl: `https://mycompany.zlabs.com.br/releases/${apkName}`,
   releaseNotes: ''
 }
 

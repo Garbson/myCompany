@@ -37,6 +37,8 @@ services:
     restart: always
     ports:
       - "8081:80"
+    volumes:
+      - ./releases:/usr/share/nginx/html/releases
     depends_on:
       - backend
     networks:

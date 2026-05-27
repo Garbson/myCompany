@@ -48,7 +48,7 @@ const showBanner = computed(() => updateAvailable.value && !updateMandatory.valu
 const showBlock = computed(() => updateMandatory.value)
 
 function download() {
-  const url = updateInfo.value?.apkUrl || 'https://mycompany.zlabs.com.br/myCompany.apk'
+  const url = updateInfo.value?.apkUrl || 'https://mycompany.zlabs.com.br/releases/myCompany.apk'
   // Tenta abrir no navegador do sistema (Capacitor)
   const w = window.open(url, '_system')
   // Fallback: se bloqueado, cria link e clica
