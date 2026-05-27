@@ -1,27 +1,12 @@
 <template>
-  <!-- Mobile overlay -->
-  <div
-    v-if="!collapsed"
-    class="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
-    @click="$emit('toggle')"
-  ></div>
-
-  <!-- Sidebar flutuante -->
+  <!-- Sidebar (somente desktop) -->
   <aside
-    class="fixed md:sticky inset-y-0 left-0 z-50 md:m-3 bg-gray-900 border border-gray-800 flex flex-col transition-all duration-300 ease-in-out overflow-hidden shadow-lg shadow-black/20"
-    :class="[
-      collapsed ? '-translate-x-full md:translate-x-0 md:w-14' : 'w-52',
-      collapsed ? 'md:rounded-2xl' : 'md:rounded-2xl',
-    ]"
+    class="hidden md:flex sticky inset-y-0 left-0 z-50 md:m-3 bg-gray-900 border border-gray-800 flex-col transition-all duration-300 ease-in-out overflow-hidden shadow-lg shadow-black/20 md:rounded-2xl"
+    :class="collapsed ? 'md:w-14' : 'w-52'"
     style="
-      top: env(safe-area-inset-top, 0px);
+      top: var(--safe-top);
       height: 100dvh;
-      height: 100vh;
-      padding-bottom: max(
-        env(safe-area-inset-bottom, 0px),
-        var(--safe-bottom, 0px),
-        0.5rem
-      );
+      padding-bottom: max(var(--safe-bottom), 0.5rem);
     "
     @mouseenter="onHover(true)"
     @mouseleave="onHover(false)"
@@ -126,32 +111,6 @@
     </div>
   </aside>
 
-  <!-- Mobile toggle -->
-  <button
-    @click="$emit('toggle')"
-    class="fixed z-30 md:hidden bg-gray-950/70 backdrop-blur-sm border border-gray-700/50 text-gray-400 p-1.5 rounded-full hover:text-white hover:border-gray-500 transition-all shadow-lg"
-    style="
-      top: calc(env(safe-area-inset-top, 0px) + 0.5rem);
-      left: calc(env(safe-area-inset-left, 0px) + 0.5rem);
-    "
-  >
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        v-if="collapsed"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M4 6h16M4 12h16M4 18h16"
-      />
-      <path
-        v-else
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M6 18L18 6M6 6l12 12"
-      />
-    </svg>
-  </button>
 </template>
 
 <script setup>

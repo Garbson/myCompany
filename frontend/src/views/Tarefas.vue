@@ -1,14 +1,26 @@
 <template>
   <div>
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-xl font-bold text-white">Tarefas</h1>
+    <div class="flex items-center justify-between mb-4 md:mb-6">
+      <h1 class="hidden md:block text-xl font-bold text-white">Tarefas</h1>
       <button
         @click="openCreate"
-        class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+        class="hidden md:inline-flex px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors ml-auto"
       >
         + Nova tarefa
       </button>
     </div>
+
+    <!-- FAB mobile -->
+    <button
+      @click="openCreate"
+      class="md:hidden fixed z-30 right-4 bg-blue-600 text-white rounded-full shadow-xl shadow-blue-600/30 hover:bg-blue-500 active:scale-95 transition-all flex items-center justify-center w-14 h-14"
+      style="bottom: calc(var(--safe-bottom) + 5rem)"
+      aria-label="Nova tarefa"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+    </button>
 
     <!-- Frase motivacional -->
     <div v-if="isGarbson" class="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-4 text-center">
@@ -43,55 +55,54 @@
       <div
         v-for="task in filteredTasks"
         :key="task.id"
-        class="flex items-center gap-3 px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-700 cursor-pointer transition-colors group"
+        class="flex items-center gap-3 px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-700 active:bg-gray-800/60 cursor-pointer transition-colors group"
         @click="editTask(task)"
       >
         <!-- Status checkbox -->
         <button
           @click.stop="toggleStatus(task)"
-          class="w-5 h-5 rounded-full border-2 shrink-0 transition-colors"
+          class="w-6 h-6 rounded-full border-2 shrink-0 transition-colors flex items-center justify-center"
           :class="task.status === 'done' ? 'bg-green-500 border-green-500' : 'border-gray-600 hover:border-blue-500'"
+          :aria-label="task.status === 'done' ? 'Marcar como pendente' : 'Concluir'"
         >
-          <svg v-if="task.status === 'done'" class="w-3 h-3 mx-auto text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-if="task.status === 'done'" class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
           </svg>
         </button>
 
         <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2">
-            <p class="text-sm text-gray-200" :class="{ 'line-through opacity-50': task.status === 'done' }">
+          <div class="flex items-start md:items-center gap-2 flex-wrap">
+            <p class="text-sm text-gray-200 break-words" :class="{ 'line-through opacity-50': task.status === 'done' }">
               {{ task.title }}
             </p>
             <span v-if="task.dependency_id && task.dependency_status !== 'done'" class="text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 shrink-0" :title="'Depende de: ' + task.dependency_title">
               🔗 {{ task.dependency_title }}
             </span>
           </div>
-          <div class="flex items-center gap-2 mt-0.5">
-            <p v-if="task.description" class="text-xs text-gray-500 truncate max-w-md">
-              {{ task.description }}
-            </p>
+          <div class="flex items-center gap-2 mt-1 flex-wrap">
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-medium" :class="difficultyBadge(task.difficulty)">
+              {{ difficultyLabel(task.difficulty) }}
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-medium" :class="statusBadge(task.status)">
+              {{ statusLabel(task.status) }}
+            </span>
             <span v-if="task.project_name" class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400">
               {{ task.project_name }}
             </span>
+            <p v-if="task.description" class="hidden md:block text-xs text-gray-500 truncate max-w-md">
+              {{ task.description }}
+            </p>
           </div>
         </div>
 
-        <span class="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0" :class="difficultyBadge(task.difficulty)">
-          {{ difficultyLabel(task.difficulty) }}
-        </span>
-
-        <span class="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0" :class="statusBadge(task.status)">
-          {{ statusLabel(task.status) }}
-        </span>
-
-        <div v-if="task.assigned_name" class="flex items-center gap-1.5 shrink-0">
+        <div v-if="task.assigned_name" class="hidden sm:flex items-center gap-1.5 shrink-0">
           <div class="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-[10px] font-medium text-gray-300">
             {{ task.assigned_name.charAt(0).toUpperCase() }}
           </div>
         </div>
 
-        <!-- Quick actions -->
-        <div class="hidden group-hover:flex items-center gap-1 shrink-0">
+        <!-- Quick actions (somente desktop) -->
+        <div class="hidden md:group-hover:flex items-center gap-1 shrink-0">
           <button
             v-if="task.status !== 'todo'"
             @click.stop="moveTask(task, 'todo')"

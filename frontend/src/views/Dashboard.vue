@@ -1,12 +1,12 @@
 <template>
   <div v-if="isGarbson">
     <!-- Dashboard pessoal - frase + relógio -->
-    <div class="flex items-stretch gap-3 mb-6">
+    <div class="flex flex-col-reverse md:flex-row md:items-stretch gap-3 mb-4 md:mb-6">
       <div class="flex-1 bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col justify-center">
         <p class="text-sm text-gray-300 italic">"{{ currentQuote.text }}"</p>
         <p class="text-xs text-gray-500 mt-1">— {{ currentQuote.author }}</p>
       </div>
-      <div class="bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 font-mono text-2xl font-bold text-white tabular-nums tracking-[0.2em] flex items-center shrink-0">
+      <div class="bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 font-mono text-xl md:text-2xl font-bold text-white tabular-nums tracking-[0.2em] flex items-center justify-center shrink-0">
         {{ clock.now }}
       </div>
     </div>

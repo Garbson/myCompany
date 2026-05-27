@@ -4,14 +4,15 @@
     <div
       v-if="showBanner"
       class="fixed top-0 left-0 right-0 z-[100] bg-blue-600 text-white px-4 py-2.5 flex items-center justify-between gap-3 shadow-lg"
-      style="padding-top: calc(env(safe-area-inset-top, 0px) + 0.625rem)"
+      style="padding-top: calc(var(--safe-top) + 0.625rem)"
     >
       <p class="text-sm">Nova versão {{ updateInfo?.version }} disponível</p>
       <button
         @click="download"
-        class="shrink-0 bg-white text-blue-600 text-xs font-semibold px-3 py-1 rounded-lg hover:bg-blue-50 transition"
+        :disabled="downloading"
+        class="shrink-0 bg-white text-blue-600 text-xs font-semibold px-3 py-1 rounded-lg hover:bg-blue-50 transition disabled:opacity-60"
       >
-        Atualizar
+        {{ downloading ? 'Abrindo…' : 'Atualizar' }}
       </button>
     </div>
 
@@ -29,9 +30,10 @@
         </p>
         <button
           @click="download"
-          class="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-blue-500 transition"
+          :disabled="downloading"
+          class="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-blue-500 transition disabled:opacity-60"
         >
-          Baixar atualização
+          {{ downloading ? 'Abrindo…' : 'Baixar atualização' }}
         </button>
       </div>
     </div>
@@ -39,25 +41,36 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useVersionCheck } from '../services/versionCheck'
 
 const { updateAvailable, updateMandatory, updateInfo } = useVersionCheck()
 
 const showBanner = computed(() => updateAvailable.value && !updateMandatory.value)
 const showBlock = computed(() => updateMandatory.value)
+const downloading = ref(false)
 
-function download() {
+async function download() {
+  if (downloading.value) return
+  downloading.value = true
   const url = updateInfo.value?.apkUrl || 'https://mycompany.zlabs.com.br/releases/myCompany.apk'
-  // Tenta abrir no navegador do sistema (Capacitor)
-  const w = window.open(url, '_system')
-  // Fallback: se bloqueado, cria link e clica
-  if (!w || w.closed) {
+  try {
+    if (window.Capacitor?.isNativePlatform?.()) {
+      const { Browser } = await import('@capacitor/browser')
+      await Browser.open({ url, windowName: '_system' })
+    } else {
+      window.open(url, '_blank', 'noopener')
+    }
+  } catch {
     const a = document.createElement('a')
     a.href = url
     a.target = '_blank'
     a.rel = 'noopener'
+    document.body.appendChild(a)
     a.click()
+    a.remove()
+  } finally {
+    downloading.value = false
   }
 }
 </script>

@@ -2,29 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Safe area for mobile system bars */
-/* iOS uses env(safe-area-inset-*), Android uses --safe-area-inset-bottom from Capacitor + --safe-bottom from JS */
+/* Safe area insets
+ * --sai-* são injetadas pelo MainActivity.java (Android) via WindowInsetsCompat.
+ * iOS usa env(safe-area-inset-*) nativamente. Combinamos os dois com max(). */
+:root {
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--sai-top, 0px));
+  --safe-right: max(env(safe-area-inset-right, 0px), var(--sai-right, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--sai-bottom, 0px));
+  --safe-left: max(env(safe-area-inset-left, 0px), var(--sai-left, 0px));
+}
+
 html, body {
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: max(
-    env(safe-area-inset-bottom, 0px),
-    var(--safe-area-inset-bottom, 0px),
-    var(--safe-bottom, 0px)
-  );
+  background: #030712;
 }
 
-/* Utility class for bottom safe area */
-.safe-bottom {
-  padding-bottom: max(
-    env(safe-area-inset-bottom, 0px),
-    var(--safe-area-inset-bottom, 0px),
-    var(--safe-bottom, 0px)
-  );
+/* Utility classes */
+.pt-safe { padding-top: var(--safe-top); }
+.pb-safe { padding-bottom: var(--safe-bottom); }
+.pl-safe { padding-left: var(--safe-left); }
+.pr-safe { padding-right: var(--safe-right); }
+
+.mt-safe { margin-top: var(--safe-top); }
+.mb-safe { margin-bottom: var(--safe-bottom); }
+
+.top-safe { top: var(--safe-top); }
+.bottom-safe { bottom: var(--safe-bottom); }
+
+.h-screen-safe {
+  height: 100dvh;
+  height: calc(100dvh);
 }
 
-/* Mobile-only: status bar safe area */
+/* Mobile-only helper */
 @media (max-width: 767px) {
-  .safe-pt-mobile {
-    padding-top: env(safe-area-inset-top, 0px);
-  }
+  .safe-pt-mobile { padding-top: var(--safe-top); }
+  .safe-pb-mobile { padding-bottom: var(--safe-bottom); }
 }
