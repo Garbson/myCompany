@@ -7,6 +7,7 @@
     />
     <main
       class="flex-1 min-w-0 p-4 md:p-3 overflow-auto safe-pt-mobile h-screen md:h-[calc(100vh-1.5rem)]"
+      style="padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px), var(--safe-bottom, 0px), 1rem)"
     >
       <router-view />
     </main>
@@ -14,7 +15,7 @@
   <div
     v-else
     class="bg-gray-950 min-h-screen"
-    style="padding-top: env(safe-area-inset-top, 0px)"
+    style="padding-top: env(safe-area-inset-top, 0px); padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px), var(--safe-bottom, 0px), 1rem)"
   >
     <router-view />
   </div>
