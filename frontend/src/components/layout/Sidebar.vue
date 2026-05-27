@@ -23,8 +23,9 @@
         0.5rem
       );
     "
+    @mouseenter="onHover(true)"
+    @mouseleave="onHover(false)"
   >
-    @mouseenter="onHover(true)" @mouseleave="onHover(false)" >
     <!-- Logo -->
     <div
       class="px-2.5 py-3 border-b border-gray-800 flex items-center gap-2 min-h-[56px]"
