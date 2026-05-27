@@ -158,31 +158,20 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 
-const appVersion = ref("...");
+const appVersion = ref("");
 
-async function loadVersion() {
+onMounted(async () => {
   try {
-    const { App } = await import("@capacitor/app");
-    const info = await App.getInfo();
-    appVersion.value = `v${info.version}`;
+    const r = await fetch("/version.json", { cache: "no-cache" });
+    const d = await r.json();
+    const isNative = !!window.Capacitor?.isNativePlatform?.();
+    appVersion.value = isNative ? `app v${d.version}` : `web v${d.version}`;
   } catch {
-    try {
-      const r = await fetch("/version.json", { cache: "no-cache" });
-      const d = await r.json();
-      appVersion.value = `v${d.version}`;
-    } catch {
-      appVersion.value = "";
-    }
+    appVersion.value = "v1.0.3";
   }
-}
-
-onMounted(() => loadVersion());
-
-const versionText = computed(() => {
-  if (!appVersion.value) return "";
-  const isNative = !!window.Capacitor?.isNativePlatform?.();
-  return isNative ? `app ${appVersion.value}` : `web ${appVersion.value}`;
 });
+
+const versionText = computed(() => appVersion.value);
 
 const props = defineProps({ collapsed: Boolean });
 const emit = defineEmits(["toggle"]);
