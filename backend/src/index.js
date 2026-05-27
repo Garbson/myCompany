@@ -10,6 +10,7 @@ import subtaskRoutes from './routes/subtasks.js'
 import commentRoutes from './routes/comments.js'
 import attachmentRoutes from './routes/attachments.js'
 import projectFlowRoutes from './routes/projectFlows.js'
+import { startReminderLoop } from './services/reminders.js'
 
 dotenv.config()
 
@@ -30,4 +31,5 @@ app.use('/api', projectFlowRoutes)
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`API rodando na porta ${PORT}`)
+  startReminderLoop()
 })

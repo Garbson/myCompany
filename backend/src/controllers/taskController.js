@@ -1,16 +1,20 @@
 import pool from '../database.js'
 
+const TASK_SELECT = `
+  SELECT t.id, t.title, t.description, t.status, t.priority, t.difficulty,
+    DATE_FORMAT(t.due_date, '%Y-%m-%d') AS due_date,
+    t.user_id, t.project_id, t.dependency_id, t.company_id, t.created_at, t.updated_at,
+    u.name AS assigned_name, p.name AS project_name,
+    d.title AS dependency_title, d.status AS dependency_status
+  FROM tasks t
+  LEFT JOIN users u ON t.user_id = u.id
+  LEFT JOIN projects p ON t.project_id = p.id
+  LEFT JOIN tasks d ON t.dependency_id = d.id
+`
+
 export async function list(req, res) {
   const { project_id } = req.query
-  let query = `
-    SELECT t.*, u.name as assigned_name, p.name as project_name,
-      d.title as dependency_title, d.status as dependency_status
-    FROM tasks t
-    LEFT JOIN users u ON t.user_id = u.id
-    LEFT JOIN projects p ON t.project_id = p.id
-    LEFT JOIN tasks d ON t.dependency_id = d.id
-    WHERE t.company_id = ?
-  `
+  let query = `${TASK_SELECT} WHERE t.company_id = ?`
   const params = [req.companyId]
   if (project_id) {
     query += ' AND t.project_id = ?'
@@ -22,34 +26,25 @@ export async function list(req, res) {
 }
 
 export async function create(req, res) {
-  const { title, description, status, priority, difficulty, user_id, project_id, dependency_id } = req.body
+  const { title, description, status, priority, difficulty, due_date, user_id, project_id, dependency_id } = req.body
   if (!title) {
     return res.status(400).json({ error: 'Título é obrigatório' })
   }
-  // Prevent setting dependency on completed task
   if (dependency_id && status === 'done') {
     return res.status(400).json({ error: 'Não é possível concluir uma tarefa que depende de outra' })
   }
   const assignedTo = user_id || req.userId
   const [result] = await pool.query(
-    'INSERT INTO tasks (title, description, status, priority, difficulty, user_id, project_id, dependency_id, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [title, description || null, status || 'todo', priority || 'medium', difficulty || 'medium', assignedTo, project_id || null, dependency_id || null, req.companyId]
+    'INSERT INTO tasks (title, description, status, priority, difficulty, due_date, user_id, project_id, dependency_id, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [title, description || null, status || 'todo', priority || 'medium', difficulty || 'medium', due_date || null, assignedTo, project_id || null, dependency_id || null, req.companyId]
   )
-  const [rows] = await pool.query(`
-    SELECT t.*, u.name as assigned_name, p.name as project_name,
-      d.title as dependency_title, d.status as dependency_status
-    FROM tasks t
-    LEFT JOIN users u ON t.user_id = u.id
-    LEFT JOIN projects p ON t.project_id = p.id
-    LEFT JOIN tasks d ON t.dependency_id = d.id
-    WHERE t.id = ?
-  `, [result.insertId])
+  const [rows] = await pool.query(`${TASK_SELECT} WHERE t.id = ?`, [result.insertId])
   res.status(201).json(rows[0])
 }
 
 export async function update(req, res) {
   const { id } = req.params
-  const fields = ['title', 'description', 'status', 'priority', 'difficulty', 'user_id', 'project_id', 'dependency_id']
+  const fields = ['title', 'description', 'status', 'priority', 'difficulty', 'due_date', 'user_id', 'project_id', 'dependency_id']
   const sets = []
   const values = []
 
@@ -77,15 +72,7 @@ export async function update(req, res) {
 
   values.push(id, req.companyId)
   await pool.query(`UPDATE tasks SET ${sets.join(', ')} WHERE id = ? AND company_id = ?`, values)
-  const [rows] = await pool.query(`
-    SELECT t.*, u.name as assigned_name, p.name as project_name,
-      d.title as dependency_title, d.status as dependency_status
-    FROM tasks t
-    LEFT JOIN users u ON t.user_id = u.id
-    LEFT JOIN projects p ON t.project_id = p.id
-    LEFT JOIN tasks d ON t.dependency_id = d.id
-    WHERE t.id = ?
-  `, [id])
+  const [rows] = await pool.query(`${TASK_SELECT} WHERE t.id = ?`, [id])
   res.json(rows[0])
 }
 

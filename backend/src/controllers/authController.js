@@ -20,7 +20,7 @@ export async function login(req, res) {
   }
 
   const token = jwt.sign({ id: user.id, company_id: user.company_id }, process.env.JWT_SECRET, { expiresIn: '7d' })
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email, company_id: user.company_id } })
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email, company_id: user.company_id, avatar_url: user.avatar_url } })
 }
 
 export async function register(req, res) {

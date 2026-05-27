@@ -107,6 +107,16 @@
             <span class="text-[10px] px-2 py-0.5 rounded-full font-medium" :class="statusBadge(task.status)">
               {{ statusLabel(task.status) }}
             </span>
+            <span
+              v-if="task.due_date && task.status !== 'done'"
+              class="text-[10px] px-2 py-0.5 rounded-full font-medium inline-flex items-center gap-1"
+              :class="dueBadgeClass(task.due_date)"
+            >
+              <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {{ dueLabel(task.due_date) }}
+            </span>
             <span v-if="task.project_name" class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 truncate max-w-[50%]">
               {{ task.project_name }}
             </span>
@@ -199,6 +209,19 @@
             <option v-for="t in availableDeps" :key="t.id" :value="t.id">{{ t.title }}</option>
           </select>
         </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Data de entrega</label>
+          <input
+            v-model="form.due_date"
+            type="date"
+            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
+          />
+          <p v-if="form.due_date" class="text-[10px] text-gray-500 mt-1">
+            Você recebe lembrete no WhatsApp no dia da entrega (configure em
+            <router-link to="/configuracoes" class="text-blue-400 hover:underline">Configurações</router-link>)
+          </p>
+        </div>
+
         <div class="grid grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Dificuldade</label>
@@ -296,7 +319,7 @@ const isGarbson = computed(() => auth.user?.email === 'garbsonsouza@gmail.com')
 const currentQuote = ref(getQuote('quote-tasks'))
 
 const form = reactive({
-  title: '', description: '', priority: 'medium', difficulty: 'medium', status: 'todo', user_id: null, project_id: null, dependency_id: null
+  title: '', description: '', priority: 'medium', difficulty: 'medium', due_date: '', status: 'todo', user_id: null, project_id: null, dependency_id: null
 })
 
 const availableDeps = computed(() => {
@@ -334,6 +357,34 @@ const filteredTasks = computed(() => {
   return tasks
 })
 
+function daysUntil(dateStr) {
+  if (!dateStr) return null
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const due = new Date(dateStr + 'T00:00:00')
+  return Math.round((due - today) / (1000 * 60 * 60 * 24))
+}
+
+function dueLabel(dateStr) {
+  const days = daysUntil(dateStr)
+  if (days === null) return ''
+  if (days < 0) return `Atrasada ${Math.abs(days)}d`
+  if (days === 0) return 'Hoje'
+  if (days === 1) return 'Amanhã'
+  if (days <= 7) return `${days}d`
+  const d = new Date(dateStr + 'T00:00:00')
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+}
+
+function dueBadgeClass(dateStr) {
+  const days = daysUntil(dateStr)
+  if (days === null) return ''
+  if (days < 0) return 'bg-red-500/20 text-red-300 ring-1 ring-red-500/30'
+  if (days === 0) return 'bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/30 animate-pulse'
+  if (days <= 2) return 'bg-yellow-500/20 text-yellow-300'
+  return 'bg-white/5 text-gray-400'
+}
+
 function difficultyBadge(d) {
   return { easy: 'bg-green-500/20 text-green-400', medium: 'bg-yellow-500/20 text-yellow-400', hard: 'bg-red-500/20 text-red-400' }[d] || ''
 }
@@ -349,7 +400,7 @@ function statusLabel(s) {
 
 function openCreate() {
   editing.value = null
-  Object.assign(form, { title: '', description: '', priority: 'medium', difficulty: 'medium', status: 'todo', user_id: null, project_id: null, dependency_id: null })
+  Object.assign(form, { title: '', description: '', priority: 'medium', difficulty: 'medium', due_date: '', status: 'todo', user_id: null, project_id: null, dependency_id: null })
   showModal.value = true
 }
 
@@ -360,6 +411,7 @@ function editTask(task) {
     description: task.description || '',
     priority: task.priority,
     difficulty: task.difficulty || 'medium',
+    due_date: task.due_date || '',
     status: task.status,
     user_id: task.user_id,
     project_id: task.project_id,
@@ -371,7 +423,7 @@ function editTask(task) {
 function closeModal() { showModal.value = false; editing.value = null }
 
 async function save() {
-  const payload = { ...form, project_id: form.project_id || null, dependency_id: form.dependency_id || null }
+  const payload = { ...form, project_id: form.project_id || null, dependency_id: form.dependency_id || null, due_date: form.due_date || null }
   try {
     if (editing.value) {
       await taskStore.update(editing.value.id, payload)

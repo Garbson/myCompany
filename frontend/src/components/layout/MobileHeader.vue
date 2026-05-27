@@ -14,8 +14,9 @@
         class="shrink-0 flex items-center gap-2 px-1 py-1 rounded-full hover:bg-white/5 transition"
         aria-label="Abrir menu da conta"
       >
-        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-semibold text-white">
-          {{ userInitial }}
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-semibold text-white overflow-hidden ring-1 ring-white/10">
+          <img v-if="user?.avatar_url" :src="user.avatar_url" alt="" class="w-full h-full object-cover" />
+          <span v-else>{{ userInitial }}</span>
         </div>
       </button>
     </div>
@@ -58,7 +59,16 @@
                 <p class="text-xs text-gray-400 truncate">{{ user?.email }}</p>
               </div>
             </div>
-            <div class="px-2 pb-2">
+            <div class="px-2 pb-2 space-y-0.5">
+              <button
+                @click="goConfig"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-200 hover:bg-white/5 active:bg-white/10 transition-colors"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span class="text-sm font-medium">Configurações</span>
+              </button>
               <button
                 @click="confirmLogout"
                 class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 active:bg-red-500/15 transition-colors"
@@ -107,7 +117,8 @@ const titles = {
   '/tarefas': 'Tarefas',
   '/projetos': 'Projetos',
   '/leads': 'Leads',
-  '/freelas': 'Freelas'
+  '/freelas': 'Freelas',
+  '/configuracoes': 'Configurações',
 }
 
 const title = computed(() => {
@@ -121,6 +132,12 @@ function confirmLogout() {
   showSheet.value = false
   showConfirm.value = true
   hapticLight()
+}
+
+function goConfig() {
+  showSheet.value = false
+  hapticLight()
+  router.push('/configuracoes')
 }
 
 function doLogout() {

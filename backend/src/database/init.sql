@@ -10,6 +10,10 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(255) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   company_id INT,
+  phone VARCHAR(20),
+  avatar_url VARCHAR(1000),
+  notif_whatsapp TINYINT(1) DEFAULT 0,
+  reminder_hour INT DEFAULT 8,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -45,6 +49,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   status ENUM('todo', 'in_progress', 'done') DEFAULT 'todo',
   priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
   difficulty ENUM('easy', 'medium', 'hard') DEFAULT 'medium',
+  due_date DATE,
   user_id INT,
   project_id INT,
   dependency_id INT,
