@@ -12,19 +12,19 @@
     :class="[
       collapsed ? '-translate-x-full md:translate-x-0 md:w-14' : 'w-52',
       collapsed ? 'md:rounded-2xl' : 'md:rounded-2xl',
-      'h-screen md:h-[calc(100vh-1.5rem)]',
     ]"
     style="
       top: env(safe-area-inset-top, 0px);
+      height: 100dvh;
+      height: 100vh;
       padding-bottom: max(
         env(safe-area-inset-bottom, 0px),
         var(--safe-bottom, 0px),
-        1rem
+        0.5rem
       );
     "
-    @mouseenter="onHover(true)"
-    @mouseleave="onHover(false)"
   >
+    @mouseenter="onHover(true)" @mouseleave="onHover(false)" >
     <!-- Logo -->
     <div
       class="px-2.5 py-3 border-b border-gray-800 flex items-center gap-2 min-h-[56px]"
@@ -63,7 +63,10 @@
     </nav>
 
     <!-- Version tag -->
-    <div class="px-3 pb-2 border-t border-gray-800 pt-2" :class="sidebarCompact ? 'hidden' : ''">
+    <div
+      class="px-3 pb-2 border-t border-gray-800 pt-2"
+      :class="sidebarCompact ? 'hidden' : ''"
+    >
       <p class="text-[9px] text-gray-600 text-center">{{ versionText }}</p>
     </div>
 
@@ -177,7 +180,7 @@ onMounted(() => loadVersion());
 
 const versionText = computed(() => {
   if (!appVersion.value) return "";
-  const isNative = !!(window.Capacitor?.isNativePlatform?.());
+  const isNative = !!window.Capacitor?.isNativePlatform?.();
   return isNative ? `app ${appVersion.value}` : `web ${appVersion.value}`;
 });
 
