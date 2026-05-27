@@ -13,9 +13,19 @@ const apkDest = resolve(releasesDir, apkName)
 
 if (!existsSync(releasesDir)) mkdirSync(releasesDir, { recursive: true })
 
+// Preserve minVersion from existing file, only bump when version itself changes
+let minVersion = pkg.version
+if (existsSync(versionFile)) {
+  const prev = JSON.parse(readFileSync(versionFile, 'utf-8'))
+  if (prev.minVersion && prev.version !== pkg.version) {
+    // Keep minVersion stable unless explicitly bumped
+    minVersion = prev.minVersion
+  }
+}
+
 const version = {
   version: pkg.version,
-  minVersion: pkg.version,
+  minVersion,
   apkUrl: `https://mycompany.zlabs.com.br/releases/${apkName}`,
   releaseNotes: ''
 }
