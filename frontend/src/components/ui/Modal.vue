@@ -3,10 +3,10 @@
     <div v-if="show" class="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4">
       <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="$emit('close')"></div>
       <div
-        class="relative bg-gray-900 border border-gray-800 shadow-2xl w-full md:max-w-lg rounded-t-2xl md:rounded-xl overflow-y-auto max-h-[92dvh] md:max-h-[90vh]"
+        class="relative glass-strong gradient-border w-full md:max-w-lg rounded-t-2xl md:rounded-2xl overflow-y-auto max-h-[92dvh] md:max-h-[90vh] scrollbar-slim"
         style="padding-bottom: var(--safe-bottom)"
       >
-        <div class="flex items-center justify-between p-4 border-b border-gray-800 sticky top-0 bg-gray-900 z-10">
+        <div class="flex items-center justify-between p-4 border-b border-white/5 sticky top-0 bg-slate-900/70 backdrop-blur-xl z-10">
           <h3 class="text-base font-semibold text-white">{{ title }}</h3>
           <button @click="$emit('close')" class="text-gray-500 hover:text-white p-1 -m-1" aria-label="Fechar">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

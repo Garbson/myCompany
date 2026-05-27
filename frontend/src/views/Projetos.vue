@@ -8,14 +8,14 @@
     </div>
 
     <!-- Frase motivacional -->
-    <div v-if="isGarbson" class="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-4 text-center">
+    <div v-if="isGarbson" class="glass rounded-xl glow-hover rounded-xl p-4 mb-4 text-center">
       <p class="text-sm text-gray-300 italic">"{{ currentQuote.text }}"</p>
       <p class="text-xs text-gray-500 mt-1">— {{ currentQuote.author }}</p>
     </div>
 
     <div class="space-y-3">
-      <div v-for="project in projectTasks" :key="project.id" class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="p-4 cursor-pointer hover:bg-gray-800/50 transition-colors" @click="toggle(project.id)">
+      <div v-for="project in projectTasks" :key="project.id" class="glass rounded-xl glow-hover rounded-xl overflow-hidden">
+        <div class="p-4 cursor-pointer hover:bg-white/5/50 transition-colors" @click="toggle(project.id)">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span class="text-lg">{{ expanded === project.id ? '▼' : '▶' }}</span>
@@ -52,12 +52,12 @@
           </div>
         </div>
 
-        <div v-if="expanded === project.id" class="border-t border-gray-800 p-4 bg-gray-950">
+        <div v-if="expanded === project.id" class="border-t border-white/5 p-4 bg-slate-950/40">
           <div class="space-y-1">
             <div
               v-for="task in project.tasks"
               :key="task.id"
-              class="flex items-center gap-3 px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-700 transition-colors"
+              class="flex items-center gap-3 px-4 py-2 glass rounded-xl glow-hover rounded-lg hover:border-gray-700 transition-colors"
             >
               <button
                 class="w-5 h-5 rounded-full border-2 shrink-0"
@@ -94,15 +94,15 @@
       <form @submit.prevent="saveProject" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Nome *</label>
-          <input v-model="projectForm.name" type="text" required class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-indigo-500" />
+          <input v-model="projectForm.name" type="text" required class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-indigo-500" />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
-          <textarea v-model="projectForm.description" rows="2" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-indigo-500"></textarea>
+          <textarea v-model="projectForm.description" rows="2" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-indigo-500"></textarea>
         </div>
         <div class="flex gap-3 pt-2">
           <div class="flex-1"></div>
-          <button type="button" @click="closeProjectModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-gray-800 rounded-lg">Cancelar</button>
+          <button type="button" @click="closeProjectModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg">Cancelar</button>
           <button type="submit" class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">{{ editingProject ? 'Salvar' : 'Criar' }}</button>
         </div>
       </form>

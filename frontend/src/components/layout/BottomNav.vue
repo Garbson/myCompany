@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-xl border-t border-gray-800"
+    class="md:hidden fixed bottom-0 left-0 right-0 z-40 glass-strong border-t border-white/10"
     style="padding-bottom: var(--safe-bottom); padding-left: var(--safe-left); padding-right: var(--safe-right)"
   >
     <div class="flex items-stretch justify-around px-1 pt-1">
@@ -10,6 +10,7 @@
         :to="item.path"
         class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 px-1 min-w-0 transition-colors"
         :class="isActive(item.path) ? 'text-blue-400' : 'text-gray-500 hover:text-gray-300'"
+        @click="hapticSelection()"
       >
         <div
           class="flex items-center justify-center w-10 h-7 rounded-full transition-colors"
@@ -29,6 +30,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
+import { hapticSelection } from '../../services/haptics'
 
 const route = useRoute()
 const auth = useAuthStore()

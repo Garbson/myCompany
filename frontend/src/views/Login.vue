@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-900">
-    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md">
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="glass-strong gradient-border p-8 rounded-2xl w-full max-w-md">
       <div class="text-center mb-8">
         <h1 class="text-2xl font-bold text-white">myCompany</h1>
         <p class="text-gray-400 mt-2">Entre para gerenciar seu negócio</p>
@@ -13,7 +13,7 @@
             v-model="form.email"
             type="email"
             required
-            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            class="w-full px-4 py-3 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             placeholder="seu@email.com"
           />
         </div>
@@ -23,7 +23,7 @@
             v-model="form.password"
             type="password"
             required
-            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            class="w-full px-4 py-3 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             placeholder="Sua senha"
           />
         </div>
@@ -44,21 +44,21 @@
             v-model="reg.name"
             type="text"
             required
-            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            class="w-full px-4 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             placeholder="Nome"
           />
           <input
             v-model="reg.email"
             type="email"
             required
-            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            class="w-full px-4 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             placeholder="Email"
           />
           <input
             v-model="reg.password"
             type="password"
             required
-            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            class="w-full px-4 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             placeholder="Senha"
           />
           <p v-if="regError" class="text-red-400 text-sm">{{ regError }}</p>

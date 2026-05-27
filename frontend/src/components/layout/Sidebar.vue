@@ -1,6 +1,6 @@
 <template>
   <aside
-    class="hidden md:flex sticky inset-y-0 left-0 z-50 m-3 w-56 bg-gray-900 border border-gray-800/80 flex-col overflow-hidden shadow-xl shadow-black/30 rounded-2xl"
+    class="hidden md:flex sticky inset-y-0 left-0 z-50 m-3 w-56 glass-strong gradient-border flex-col overflow-hidden rounded-2xl"
     style="
       top: var(--safe-top);
       height: 100dvh;
@@ -8,7 +8,7 @@
     "
   >
     <!-- Logo -->
-    <div class="px-4 py-4 flex items-center gap-2.5 border-b border-gray-800/60">
+    <div class="px-4 py-4 flex items-center gap-2.5 border-b border-white/5">
       <img src="/logo.svg" alt="myCompany" class="w-8 h-8 shrink-0" />
       <h1 class="text-base font-bold text-white tracking-tight">myCompany</h1>
     </div>
@@ -19,7 +19,7 @@
         v-for="item in menu"
         :key="item.path"
         :to="item.path"
-        class="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800/70 hover:text-white transition-colors whitespace-nowrap"
+        class="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors whitespace-nowrap"
         :class="{
           'bg-blue-500/10 text-blue-400 hover:bg-blue-500/15 hover:text-blue-300':
             isActive(item.path),
@@ -44,10 +44,10 @@
     </nav>
 
     <!-- User -->
-    <div class="p-3 border-t border-gray-800/60 relative">
+    <div class="p-3 border-t border-white/5 relative">
       <button
         @click="showMenu = !showMenu"
-        class="w-full flex items-center gap-2.5 p-2 rounded-lg hover:bg-gray-800/60 transition-colors"
+        class="w-full flex items-center gap-2.5 p-2 rounded-lg hover:bg-white/5 transition-colors"
       >
         <div
           class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0"
@@ -81,7 +81,7 @@
       >
         <div
           v-if="showMenu"
-          class="absolute bottom-full left-3 right-3 mb-2 bg-gray-800 border border-gray-700/80 rounded-xl shadow-2xl shadow-black/40 overflow-hidden"
+          class="absolute bottom-full left-3 right-3 mb-2 glass-strong rounded-xl overflow-hidden"
         >
           <button
             @click="confirmLogout"
@@ -126,6 +126,7 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import ConfirmDialog from "../ui/ConfirmDialog.vue";
+import { hapticLight } from "../../services/haptics";
 
 const appVersion = ref("");
 const showMenu = ref(false);
@@ -197,6 +198,7 @@ const userInitial = computed(
 function confirmLogout() {
   showMenu.value = false;
   showConfirm.value = true;
+  hapticLight();
 }
 
 function doLogout() {

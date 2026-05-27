@@ -1,6 +1,6 @@
 <template>
   <header
-    class="md:hidden sticky top-0 z-30 bg-gray-950/85 backdrop-blur-xl border-b border-gray-800/60"
+    class="md:hidden sticky top-0 z-30 glass border-b border-white/5"
     style="padding-top: var(--safe-top); padding-left: var(--safe-left); padding-right: var(--safe-right)"
   >
     <div class="flex items-center justify-between px-4 h-12">
@@ -11,7 +11,7 @@
       <button
         v-if="user"
         @click="showSheet = true"
-        class="shrink-0 flex items-center gap-2 px-1 py-1 rounded-full hover:bg-gray-800/60 transition"
+        class="shrink-0 flex items-center gap-2 px-1 py-1 rounded-full hover:bg-white/5 transition"
         aria-label="Abrir menu da conta"
       >
         <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-semibold text-white">
@@ -43,7 +43,7 @@
         >
           <div
             v-if="showSheet"
-            class="absolute bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 rounded-t-2xl shadow-2xl"
+            class="absolute bottom-0 left-0 right-0 glass-strong border-t border-white/10 rounded-t-2xl"
             style="padding-bottom: calc(var(--safe-bottom) + 0.5rem)"
           >
             <div class="flex justify-center pt-2 pb-1">
@@ -91,6 +91,7 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import ConfirmDialog from '../ui/ConfirmDialog.vue'
+import { hapticLight } from '../../services/haptics'
 
 const route = useRoute()
 const router = useRouter()
@@ -119,6 +120,7 @@ const title = computed(() => {
 function confirmLogout() {
   showSheet.value = false
   showConfirm.value = true
+  hapticLight()
 }
 
 function doLogout() {

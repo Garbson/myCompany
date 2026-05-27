@@ -8,8 +8,8 @@
     </div>
 
     <div class="space-y-3">
-      <div v-for="project in freelasProjects" :key="project.id" class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <div class="p-4 cursor-pointer hover:bg-gray-800/50 transition-colors" @click="toggleProject(project)">
+      <div v-for="project in freelasProjects" :key="project.id" class="glass rounded-xl glow-hover rounded-xl overflow-hidden">
+        <div class="p-4 cursor-pointer hover:bg-white/5/50 transition-colors" @click="toggleProject(project)">
           <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0 flex-1">
               <span class="text-lg shrink-0">{{ project.status === 'ativo' ? '📋' : project.status === 'concluido' ? '✅' : '❌' }}</span>
@@ -52,7 +52,7 @@
           </div>
         </div>
 
-        <div v-if="expanded === project.id" class="border-t border-gray-800 p-4 bg-gray-950">
+        <div v-if="expanded === project.id" class="border-t border-white/5 p-4 bg-slate-950/40">
           <div class="flex items-center justify-between mb-3">
             <h4 class="text-xs font-semibold text-gray-400">{{ isMonthlyProject(project) ? 'Mensalidades' : 'Parcelas' }}</h4>
             <button @click="openAddPayment(project)" class="text-xs px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
@@ -90,7 +90,7 @@
           </div>
 
           <div class="md:hidden space-y-2">
-            <div v-for="p in payments[project.id]" :key="p.id" class="bg-gray-900 border border-gray-800 rounded-lg p-3 flex items-center justify-between" :class="{ 'opacity-50': p.status === 'pago' }">
+            <div v-for="p in payments[project.id]" :key="p.id" class="glass rounded-xl glow-hover rounded-lg p-3 flex items-center justify-between" :class="{ 'opacity-50': p.status === 'pago' }">
               <div>
                 <p class="text-sm text-gray-200">#{{ p.installment_number }} — {{ formatCurrency(p.amount) }}</p>
                 <p class="text-xs text-gray-500">Venc: {{ formatDate(p.due_date) }}</p>
@@ -117,15 +117,15 @@
       <form @submit.prevent="saveProject" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Nome *</label>
-          <input v-model="projectForm.name" type="text" required class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          <input v-model="projectForm.name" type="text" required class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
-          <textarea v-model="projectForm.description" rows="2" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"></textarea>
+          <textarea v-model="projectForm.description" rows="2" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"></textarea>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Tipo de pagamento</label>
-          <select v-model="projectForm.payment_type" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+          <select v-model="projectForm.payment_type" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500">
             <option value="pagamento_unico">Pagamento único</option>
             <option value="parcelado">Parcelado</option>
             <option value="recorrente">Mensalidade (recorrente)</option>
@@ -134,24 +134,24 @@
         </div>
         <div v-if="hasSetup" class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-lg">
           <label class="block text-sm font-medium text-gray-300 mb-1">Valor do projeto</label>
-          <input v-model.number="projectForm.setup_value" type="number" step="0.01" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          <input v-model.number="projectForm.setup_value" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
         </div>
         <div v-if="hasInstallments" class="bg-orange-500/10 border border-orange-500/20 p-3 rounded-lg space-y-3">
           <div v-if="!hasSetup">
             <label class="block text-sm font-medium text-gray-300 mb-1">Valor total do projeto</label>
-            <input v-model.number="projectForm.total_value" type="number" step="0.01" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <input v-model.number="projectForm.total_value" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Entrada</label>
-            <input v-model.number="projectForm.entry_value" type="number" step="0.01" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <input v-model.number="projectForm.entry_value" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Data da entrada</label>
-            <input v-model="projectForm.entry_date" type="date" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <input v-model="projectForm.entry_date" type="date" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Parcelar o restante em</label>
-            <select v-model.number="projectForm.installments" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+            <select v-model.number="projectForm.installments" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500">
               <option :value="1">1x</option>
               <option :value="2">2x</option>
               <option :value="3">3x</option>
@@ -167,23 +167,23 @@
         </div>
         <div v-if="hasSingle" class="bg-green-500/10 border border-green-500/20 p-3 rounded-lg">
           <label class="block text-sm font-medium text-gray-300 mb-1">Valor total</label>
-          <input v-model.number="projectForm.total_value" type="number" step="0.01" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          <input v-model.number="projectForm.total_value" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
         </div>
         <div v-if="hasMonthly" class="bg-purple-500/10 border border-purple-500/20 p-3 rounded-lg space-y-3">
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Valor da mensalidade</label>
-            <input v-model.number="projectForm.monthly_fee" type="number" step="0.01" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <input v-model.number="projectForm.monthly_fee" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-400 mb-1">Ciclo</label>
-            <select v-model="projectForm.monthly_cycle" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+            <select v-model="projectForm.monthly_cycle" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500">
               <option value="mensal">Mensal (todo mês)</option>
               <option value="anual">Anual (1x por ano)</option>
             </select>
           </div>
           <div v-if="projectForm.monthly_cycle === 'anual'">
             <label class="block text-xs font-medium text-gray-400 mb-1">Parcelar anuidade em</label>
-            <select v-model.number="projectForm.annual_installments" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+            <select v-model.number="projectForm.annual_installments" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500">
               <option :value="1">1x (à vista)</option>
               <option :value="2">2x</option>
               <option :value="3">3x</option>
@@ -199,16 +199,16 @@
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Data início</label>
-            <input v-model="projectForm.start_date" type="date" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <input v-model="projectForm.start_date" type="date" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Prazo final</label>
-            <input v-model="projectForm.end_date" type="date" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <input v-model="projectForm.end_date" type="date" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
           </div>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
-          <select v-model="projectForm.status" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+          <select v-model="projectForm.status" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500">
             <option value="ativo">Ativo</option>
             <option value="concluido">Concluído</option>
             <option value="cancelado">Cancelado</option>
@@ -217,7 +217,7 @@
         <div class="flex gap-3 pt-2">
           <button v-if="editingProject" type="button" @click="deleteProject" class="px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg">Excluir</button>
           <div class="flex-1"></div>
-          <button type="button" @click="closeProjectModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-gray-800 rounded-lg">Cancelar</button>
+          <button type="button" @click="closeProjectModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg">Cancelar</button>
           <button type="submit" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Salvar</button>
         </div>
       </form>
@@ -228,24 +228,24 @@
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Valor *</label>
-            <input v-model="paymentForm.amount" type="number" step="0.01" required class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <input v-model="paymentForm.amount" type="number" step="0.01" required class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Nº {{ activeProjectMonthly ? 'mês' : 'parcela' }}</label>
-            <input v-model="paymentForm.installment_number" type="number" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <input v-model="paymentForm.installment_number" type="number" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
           </div>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Vencimento *</label>
-          <input v-model="paymentForm.due_date" type="date" required class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          <input v-model="paymentForm.due_date" type="date" required class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Notas</label>
-          <input v-model="paymentForm.notes" type="text" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500" placeholder="Ex: Pix, boleto..." />
+          <input v-model="paymentForm.notes" type="text" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" placeholder="Ex: Pix, boleto..." />
         </div>
         <div class="flex gap-3 pt-2">
           <div class="flex-1"></div>
-          <button type="button" @click="showPaymentModal = false" class="px-4 py-2 text-sm text-gray-400 hover:bg-gray-800 rounded-lg">Cancelar</button>
+          <button type="button" @click="showPaymentModal = false" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg">Cancelar</button>
           <button type="submit" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Adicionar</button>
         </div>
       </form>

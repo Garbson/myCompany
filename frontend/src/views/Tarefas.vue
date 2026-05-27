@@ -19,7 +19,7 @@
     <!-- FAB mobile -->
     <button
       @click="openCreate"
-      class="md:hidden fixed z-30 right-4 bg-blue-600 text-white rounded-full shadow-xl shadow-blue-600/30 hover:bg-blue-500 active:scale-95 transition-all flex items-center justify-center w-14 h-14"
+      class="md:hidden fixed z-30 right-4 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-xl shadow-blue-500/50 hover:shadow-blue-500/70 active:scale-95 transition-all flex items-center justify-center w-14 h-14 ring-1 ring-white/20"
       style="bottom: calc(var(--safe-bottom) + 5rem)"
       aria-label="Nova tarefa"
     >
@@ -29,7 +29,7 @@
     </button>
 
     <!-- Frase motivacional -->
-    <div v-if="isGarbson" class="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-4 text-center">
+    <div v-if="isGarbson" class="glass rounded-xl p-4 mb-4 text-center">
       <p class="text-sm text-gray-300 italic">"{{ currentQuote.text }}"</p>
       <p class="text-xs text-gray-500 mt-1">— {{ currentQuote.author }}</p>
     </div>
@@ -42,14 +42,14 @@
           :key="f.key"
           @click="activeFilter = f.key"
           class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap"
-          :class="activeFilter === f.key ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'"
+          :class="activeFilter === f.key ? 'bg-blue-500/90 text-white shadow-lg shadow-blue-500/30' : 'glass-light text-gray-400 hover:text-white'"
         >
           {{ f.label }}
           <span class="ml-1 opacity-60">({{ f.count }})</span>
         </button>
         <select
           v-model="projectFilter"
-          class="hidden md:block md:ml-auto px-3 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500"
+          class="hidden md:block md:ml-auto px-3 py-1.5 text-xs bg-slate-900/60 border border-white/10 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500"
           @change="applyProjectFilter"
         >
           <option value="">Todos os projetos</option>
@@ -58,7 +58,7 @@
       </div>
       <select
         v-model="projectFilter"
-        class="md:hidden w-full px-3 py-2 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500"
+        class="md:hidden w-full px-3 py-2 text-xs bg-slate-900/60 border border-white/10 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500"
         @change="applyProjectFilter"
       >
         <option value="">Todos os projetos</option>
@@ -71,7 +71,7 @@
       <div
         v-for="task in filteredTasks"
         :key="task.id"
-        class="flex items-center gap-3 px-4 py-3 md:px-5 md:py-3.5 bg-gray-900 border border-gray-800/70 rounded-xl hover:border-gray-700 hover:bg-gray-900/80 active:bg-gray-800/60 cursor-pointer transition-all group"
+        class="flex items-center gap-3 px-4 py-3 md:px-5 md:py-3.5 glass rounded-xl glow-hover active:bg-white/5 cursor-pointer group"
         @click="editTask(task)"
       >
         <!-- Status checkbox -->
@@ -158,7 +158,7 @@
             v-model="form.title"
             type="text"
             required
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
           />
         </div>
         <div>
@@ -166,14 +166,14 @@
           <textarea
             v-model="form.description"
             rows="3"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
           ></textarea>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Projeto</label>
           <select
             v-model="form.project_id"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
           >
             <option :value="null">Nenhum</option>
             <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
@@ -183,7 +183,7 @@
           <label class="block text-sm font-medium text-gray-300 mb-1">Responsável</label>
           <select
             v-model="form.user_id"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
           >
             <option :value="null">Não atribuído</option>
             <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
@@ -193,7 +193,7 @@
           <label class="block text-sm font-medium text-gray-300 mb-1">Depende de</label>
           <select
             v-model="form.dependency_id"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
           >
             <option :value="null">Nenhuma</option>
             <option v-for="t in availableDeps" :key="t.id" :value="t.id">{{ t.title }}</option>
@@ -204,7 +204,7 @@
             <label class="block text-sm font-medium text-gray-300 mb-1">Dificuldade</label>
             <select
               v-model="form.difficulty"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
             >
               <option value="easy">Fácil</option>
               <option value="medium">Média</option>
@@ -215,7 +215,7 @@
             <label class="block text-sm font-medium text-gray-300 mb-1">Prioridade</label>
             <select
               v-model="form.priority"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
             >
               <option value="low">Baixa</option>
               <option value="medium">Média</option>
@@ -226,7 +226,7 @@
             <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
             <select
               v-model="form.status"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
             >
               <option value="todo">A fazer</option>
               <option value="in_progress">Em andamento</option>
@@ -240,7 +240,7 @@
             Excluir
           </button>
           <div class="flex-1"></div>
-          <button type="button" @click="closeModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-gray-800 rounded-lg">Cancelar</button>
+          <button type="button" @click="closeModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg transition-colors">Cancelar</button>
           <button type="submit" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Salvar</button>
         </div>
       </form>
@@ -266,6 +266,10 @@ import api from '../api'
 import Modal from '../components/ui/Modal.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import { quotes, getQuote } from '../quotes'
+import { useToast } from '../composables/useToast'
+import { hapticLight, hapticMedium, hapticSuccess } from '../services/haptics'
+
+const toast = useToast()
 
 const taskStore = useTaskStore()
 const auth = useAuthStore()
@@ -358,9 +362,19 @@ function closeModal() { showModal.value = false; editing.value = null }
 
 async function save() {
   const payload = { ...form, project_id: form.project_id || null, dependency_id: form.dependency_id || null }
-  if (editing.value) await taskStore.update(editing.value.id, payload)
-  else await taskStore.create(payload)
-  closeModal()
+  try {
+    if (editing.value) {
+      await taskStore.update(editing.value.id, payload)
+      toast.success('Tarefa atualizada')
+    } else {
+      await taskStore.create(payload)
+      toast.success('Tarefa criada')
+    }
+    hapticMedium()
+    closeModal()
+  } catch (e) {
+    toast.error('Não foi possível salvar')
+  }
 }
 
 function deleteTask() {
@@ -375,25 +389,38 @@ async function doDelete() {
   if (!taskToDelete.value) return
   const id = taskToDelete.value.id
   taskToDelete.value = null
-  await taskStore.remove(id)
+  try {
+    await taskStore.remove(id)
+    hapticMedium()
+    toast.success('Tarefa excluída')
+  } catch {
+    toast.error('Não foi possível excluir')
+  }
   if (editing.value?.id === id) closeModal()
 }
 
 async function toggleStatus(task) {
   if (task.status !== 'done' && task.dependency_id && task.dependency_status !== 'done') {
-    alert(`Conclua primeiro a tarefa "${task.dependency_title}"`)
+    toast.warning(`Conclua primeiro: "${task.dependency_title}"`)
     return
   }
   const next = task.status === 'done' ? 'todo' : 'done'
   await taskStore.update(task.id, { status: next })
+  if (next === 'done') {
+    hapticSuccess()
+    toast.success('Concluído! 🎉')
+  } else {
+    hapticLight()
+  }
 }
 
 async function moveTask(task, status) {
   if (status === 'done' && task.dependency_id && task.dependency_status !== 'done') {
-    alert(`Conclua primeiro a tarefa "${task.dependency_title}"`)
+    toast.warning(`Conclua primeiro: "${task.dependency_title}"`)
     return
   }
   await taskStore.update(task.id, { status })
+  hapticLight()
 }
 
 function applyProjectFilter() {
