@@ -42,24 +42,27 @@
 
     <!-- User -->
     <div class="p-3 border-t border-gray-800">
-      <div class="flex items-center gap-2 overflow-hidden whitespace-nowrap" :class="sidebarCompact ? 'justify-center' : 'px-1'">
-        <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-xs font-medium text-white shrink-0">
-          {{ userInitial }}
+      <div class="overflow-hidden whitespace-nowrap" :class="sidebarCompact ? 'flex justify-center' : 'px-1'">
+        <div class="flex items-center gap-2" :class="sidebarCompact ? '' : 'mb-2'">
+          <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-xs font-medium text-white shrink-0">
+            {{ userInitial }}
+          </div>
+          <div class="flex-1 min-w-0 transition-all duration-300 ease-in-out overflow-hidden" :class="sidebarCompact ? 'w-0 opacity-0' : 'w-auto opacity-100'">
+            <p class="text-xs font-medium text-gray-300 truncate">{{ user?.name }}</p>
+          </div>
         </div>
-        <div class="flex-1 min-w-0 transition-all duration-300 ease-in-out overflow-hidden" :class="sidebarCompact ? 'w-0 opacity-0' : 'w-auto opacity-100'">
-          <p class="text-xs font-medium text-gray-300 truncate">{{ user?.name }}</p>
-          <p class="text-[10px] text-gray-500 truncate">{{ user?.email }}</p>
+        <div class="flex items-center gap-2 transition-all duration-300 ease-in-out overflow-hidden" :class="sidebarCompact ? 'w-0 opacity-0 h-0' : 'w-auto opacity-100'">
+          <p class="text-[10px] text-gray-500 truncate flex-1 min-w-0">{{ user?.email }}</p>
+          <button
+            @click="logout"
+            class="text-gray-500 hover:text-red-400 shrink-0 transition-colors duration-200"
+            title="Sair"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
         </div>
-        <button
-          v-if="!sidebarCompact"
-          @click="logout"
-          class="text-gray-500 hover:text-white shrink-0 transition-colors duration-200"
-          title="Sair"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-        </button>
       </div>
     </div>
   </aside>
