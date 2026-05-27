@@ -49,6 +49,15 @@ const showBlock = computed(() => updateMandatory.value)
 
 function download() {
   const url = updateInfo.value?.apkUrl || 'https://mycompany.zlabs.com.br/myCompany.apk'
-  window.location.href = url
+  // Tenta abrir no navegador do sistema (Capacitor)
+  const w = window.open(url, '_system')
+  // Fallback: se bloqueado, cria link e clica
+  if (!w || w.closed) {
+    const a = document.createElement('a')
+    a.href = url
+    a.target = '_blank'
+    a.rel = 'noopener'
+    a.click()
+  }
 }
 </script>
