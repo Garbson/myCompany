@@ -62,6 +62,11 @@
       </router-link>
     </nav>
 
+    <!-- Version tag -->
+    <div class="px-3 pb-2 border-t border-gray-800 pt-2" :class="sidebarCompact ? 'hidden' : ''">
+      <p class="text-[9px] text-gray-600 text-center">{{ versionText }}</p>
+    </div>
+
     <!-- User -->
     <div class="p-3 border-t border-gray-800">
       <div
@@ -146,9 +151,35 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
+
+const appVersion = ref("...");
+
+async function loadVersion() {
+  try {
+    const { App } = await import("@capacitor/app");
+    const info = await App.getInfo();
+    appVersion.value = `v${info.version}`;
+  } catch {
+    try {
+      const r = await fetch("/version.json", { cache: "no-cache" });
+      const d = await r.json();
+      appVersion.value = `v${d.version}`;
+    } catch {
+      appVersion.value = "";
+    }
+  }
+}
+
+onMounted(() => loadVersion());
+
+const versionText = computed(() => {
+  if (!appVersion.value) return "";
+  const isNative = !!(window.Capacitor?.isNativePlatform?.());
+  return isNative ? `app ${appVersion.value}` : `web ${appVersion.value}`;
+});
 
 const props = defineProps({ collapsed: Boolean });
 const emit = defineEmits(["toggle"]);

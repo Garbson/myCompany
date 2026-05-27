@@ -105,6 +105,20 @@
       </div>
     </div>
 
+    <!-- Spotify -->
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 mt-4">
+      <h3 class="text-sm font-semibold text-white mb-3">🎵 Foco</h3>
+      <iframe
+        style="border-radius:12px"
+        src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS?utm_source=generator"
+        width="100%"
+        height="152"
+        allowfullscreen=""
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"
+      ></iframe>
+    </div>
+
     <!-- Modal editar tarefa -->
     <Modal :show="showTaskModal" title="Editar tarefa" @close="closeTaskModal">
       <form @submit.prevent="saveTask" class="space-y-4">
