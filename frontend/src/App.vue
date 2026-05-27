@@ -5,10 +5,7 @@
       :collapsed="sidebarCollapsed"
       @toggle="sidebarCollapsed = !sidebarCollapsed"
     />
-    <main
-      class="flex-1 min-w-0 p-4 md:pt-3 md:p-6 overflow-auto"
-      style="padding-top: calc(env(safe-area-inset-top, 0px) + 3rem)"
-    >
+    <main class="flex-1 min-w-0 p-4 md:p-3 overflow-auto safe-pt-mobile">
       <router-view />
     </main>
   </div>
