@@ -4,6 +4,7 @@ dist/
 
 # APK files (generated, large binaries)
 *.apk
+releases/
 
 # Apple double files
 ._*
