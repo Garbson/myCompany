@@ -1,124 +1,135 @@
 <template>
-  <!-- Sidebar (somente desktop) -->
   <aside
-    class="hidden md:flex sticky inset-y-0 left-0 z-50 md:m-3 bg-gray-900 border border-gray-800 flex-col transition-all duration-300 ease-in-out overflow-hidden shadow-lg shadow-black/20 md:rounded-2xl"
-    :class="collapsed ? 'md:w-14' : 'w-52'"
+    class="hidden md:flex sticky inset-y-0 left-0 z-50 m-3 w-56 bg-gray-900 border border-gray-800/80 flex-col overflow-hidden shadow-xl shadow-black/30 rounded-2xl"
     style="
       top: var(--safe-top);
       height: 100dvh;
       padding-bottom: max(var(--safe-bottom), 0.5rem);
     "
-    @mouseenter="onHover(true)"
-    @mouseleave="onHover(false)"
   >
     <!-- Logo -->
-    <div
-      class="px-2.5 py-3 border-b border-gray-800 flex items-center gap-2 min-h-[56px]"
-    >
+    <div class="px-4 py-4 flex items-center gap-2.5 border-b border-gray-800/60">
       <img src="/logo.svg" alt="myCompany" class="w-8 h-8 shrink-0" />
-      <div
-        class="overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out"
-        :class="sidebarCompact ? 'w-0 opacity-0' : 'w-auto opacity-100'"
-      >
-        <h1 class="text-base font-bold text-white">myCompany</h1>
-      </div>
+      <h1 class="text-base font-bold text-white tracking-tight">myCompany</h1>
     </div>
 
     <!-- Menu -->
-    <nav class="flex-1 p-2 space-y-0.5 overflow-y-auto overflow-x-hidden">
+    <nav class="flex-1 p-2.5 space-y-1 overflow-y-auto overflow-x-hidden">
       <router-link
         v-for="item in menu"
         :key="item.path"
         :to="item.path"
-        class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all duration-200 whitespace-nowrap overflow-hidden"
-        :class="{ 'bg-gray-800 text-white': isActive(item.path) }"
+        class="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800/70 hover:text-white transition-colors whitespace-nowrap"
+        :class="{
+          'bg-blue-500/10 text-blue-400 hover:bg-blue-500/15 hover:text-blue-300':
+            isActive(item.path),
+        }"
       >
-        <span class="text-base shrink-0 flex items-center justify-center w-4">{{
-          item.icon
-        }}</span>
         <span
-          class="text-[13px] transition-all duration-300 ease-in-out"
+          class="shrink-0 flex items-center justify-center w-5 h-5"
           :class="
-            sidebarCompact
-              ? 'opacity-0 -translate-x-2'
-              : 'opacity-100 translate-x-0'
+            isActive(item.path) ? 'text-blue-400' : 'text-gray-500 group-hover:text-gray-300'
           "
-          >{{ item.label }}</span
         >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
+          </svg>
+        </span>
+        <span class="font-medium">{{ item.label }}</span>
+        <span
+          v-if="isActive(item.path)"
+          class="ml-auto w-1.5 h-1.5 rounded-full bg-blue-400"
+        ></span>
       </router-link>
     </nav>
 
-    <!-- Version tag -->
-    <div
-      class="px-3 pb-2 border-t border-gray-800 pt-2"
-      :class="sidebarCompact ? 'hidden' : ''"
-    >
-      <p class="text-[9px] text-gray-600 text-center">{{ versionText }}</p>
-    </div>
-
     <!-- User -->
-    <div class="p-3 border-t border-gray-800">
-      <div
-        class="overflow-hidden whitespace-nowrap"
-        :class="sidebarCompact ? 'flex justify-center' : 'px-1'"
+    <div class="p-3 border-t border-gray-800/60 relative">
+      <button
+        @click="showMenu = !showMenu"
+        class="w-full flex items-center gap-2.5 p-2 rounded-lg hover:bg-gray-800/60 transition-colors"
       >
         <div
-          class="flex items-center gap-2"
-          :class="sidebarCompact ? '' : 'mb-2'"
+          class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0"
         >
-          <div
-            class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-xs font-medium text-white shrink-0"
-          >
-            {{ userInitial }}
-          </div>
-          <div
-            class="flex-1 min-w-0 transition-all duration-300 ease-in-out overflow-hidden"
-            :class="sidebarCompact ? 'w-0 opacity-0' : 'w-auto opacity-100'"
-          >
-            <p class="text-xs font-medium text-gray-300 truncate">
-              {{ user?.name }}
-            </p>
-          </div>
+          {{ userInitial }}
         </div>
-        <div
-          class="flex items-center gap-2 transition-all duration-300 ease-in-out overflow-hidden"
-          :class="sidebarCompact ? 'w-0 opacity-0 h-0' : 'w-auto opacity-100'"
+        <div class="flex-1 min-w-0 text-left">
+          <p class="text-xs font-medium text-gray-200 truncate">{{ user?.name }}</p>
+          <p class="text-[10px] text-gray-500 truncate">{{ user?.email }}</p>
+        </div>
+        <svg
+          class="w-4 h-4 text-gray-500 shrink-0 transition-transform"
+          :class="{ 'rotate-180': showMenu }"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
         >
-          <p class="text-[10px] text-gray-500 truncate flex-1 min-w-0">
-            {{ user?.email }}
-          </p>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <!-- Popover menu -->
+      <Transition
+        enter-active-class="transition duration-150 ease-out"
+        enter-from-class="opacity-0 translate-y-1"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-100 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="showMenu"
+          class="absolute bottom-full left-3 right-3 mb-2 bg-gray-800 border border-gray-700/80 rounded-xl shadow-2xl shadow-black/40 overflow-hidden"
+        >
           <button
-            @click="logout"
-            class="text-gray-500 hover:text-red-400 shrink-0 transition-colors duration-200"
-            title="Sair"
+            @click="confirmLogout"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
           >
-            <svg
-              class="w-3.5 h-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               />
             </svg>
+            Sair da conta
           </button>
         </div>
-      </div>
+      </Transition>
+
+      <p class="text-[9px] text-gray-600 text-center mt-2">{{ versionText }}</p>
     </div>
+
+    <!-- Click outside catcher -->
+    <div
+      v-if="showMenu"
+      class="fixed inset-0 z-[-1]"
+      @click="showMenu = false"
+    ></div>
   </aside>
 
+  <ConfirmDialog
+    :show="showConfirm"
+    title="Sair da conta?"
+    message="Você precisará fazer login novamente."
+    confirm-label="Sair"
+    danger
+    @confirm="doLogout"
+    @cancel="showConfirm = false"
+  />
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
+import ConfirmDialog from "../ui/ConfirmDialog.vue";
 
 const appVersion = ref("");
+const showMenu = ref(false);
+const showConfirm = ref(false);
 
 onMounted(async () => {
   try {
@@ -127,33 +138,45 @@ onMounted(async () => {
     const isNative = !!window.Capacitor?.isNativePlatform?.();
     appVersion.value = isNative ? `app v${d.version}` : `web v${d.version}`;
   } catch {
-    appVersion.value = "v1.0.3";
+    appVersion.value = "";
   }
 });
 
 const versionText = computed(() => appVersion.value);
-
-const props = defineProps({ collapsed: Boolean });
-const emit = defineEmits(["toggle"]);
 
 const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 const user = computed(() => auth.user);
 
-const hovered = ref(false);
-const sidebarCompact = computed(() => props.collapsed && !hovered.value);
-
-const isGarbson = computed(
-  () => user.value?.email === "garbsonsouza@gmail.com",
-);
+const isGarbson = computed(() => user.value?.email === "garbsonsouza@gmail.com");
 
 const allMenu = [
-  { path: "/", label: "Dashboard", icon: "📊" },
-  { path: "/tarefas", label: "Tarefas", icon: "✅" },
-  { path: "/projetos", label: "Projetos", icon: "📋" },
-  { path: "/leads", label: "Leads", icon: "👥" },
-  { path: "/freelas", label: "Freelas", icon: "💰" },
+  {
+    path: "/",
+    label: "Dashboard",
+    icon: "M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3v-6h6v6h3a1 1 0 001-1V10",
+  },
+  {
+    path: "/tarefas",
+    label: "Tarefas",
+    icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4",
+  },
+  {
+    path: "/projetos",
+    label: "Projetos",
+    icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+  },
+  {
+    path: "/leads",
+    label: "Leads",
+    icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
+  },
+  {
+    path: "/freelas",
+    label: "Freelas",
+    icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+  },
 ];
 
 const menu = computed(() => {
@@ -167,15 +190,17 @@ function isActive(path) {
   return route.path.startsWith(path);
 }
 
-function onHover(state) {
-  if (props.collapsed) hovered.value = state;
-}
-
 const userInitial = computed(
   () => user.value?.name?.charAt(0)?.toUpperCase() || "?",
 );
 
-function logout() {
+function confirmLogout() {
+  showMenu.value = false;
+  showConfirm.value = true;
+}
+
+function doLogout() {
+  showConfirm.value = false;
   auth.logout();
   router.push("/login");
 }

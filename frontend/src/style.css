@@ -38,3 +38,12 @@ html, body {
   .safe-pt-mobile { padding-top: var(--safe-top); }
   .safe-pb-mobile { padding-bottom: var(--safe-bottom); }
 }
+
+/* Hide scrollbar (still scrollable) */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

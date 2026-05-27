@@ -1,12 +1,18 @@
 <template>
   <div>
-    <div class="flex items-center justify-between mb-4 md:mb-6">
-      <h1 class="hidden md:block text-xl font-bold text-white">Tarefas</h1>
+    <div class="hidden md:flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Tarefas</h1>
+        <p class="text-xs text-gray-500 mt-0.5">{{ filteredTasks.length }} {{ filteredTasks.length === 1 ? 'tarefa' : 'tarefas' }}</p>
+      </div>
       <button
         @click="openCreate"
-        class="hidden md:inline-flex px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors ml-auto"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20"
       >
-        + Nova tarefa
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Nova tarefa
       </button>
     </div>
 
@@ -29,20 +35,30 @@
     </div>
 
     <!-- Filtros -->
-    <div class="flex gap-2 mb-4 flex-wrap items-center">
-      <button
-        v-for="f in filters"
-        :key="f.key"
-        @click="activeFilter = f.key"
-        class="px-3 py-1.5 text-xs rounded-lg transition-colors"
-        :class="activeFilter === f.key ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'"
-      >
-        {{ f.label }}
-        <span class="ml-1 opacity-60">({{ f.count }})</span>
-      </button>
+    <div class="space-y-2 mb-4">
+      <div class="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:pb-0 md:flex-wrap md:items-center scrollbar-none">
+        <button
+          v-for="f in filters"
+          :key="f.key"
+          @click="activeFilter = f.key"
+          class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap"
+          :class="activeFilter === f.key ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'"
+        >
+          {{ f.label }}
+          <span class="ml-1 opacity-60">({{ f.count }})</span>
+        </button>
+        <select
+          v-model="projectFilter"
+          class="hidden md:block md:ml-auto px-3 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500"
+          @change="applyProjectFilter"
+        >
+          <option value="">Todos os projetos</option>
+          <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
+        </select>
+      </div>
       <select
         v-model="projectFilter"
-        class="ml-auto px-3 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-400 focus:outline-none focus:border-blue-500"
+        class="md:hidden w-full px-3 py-2 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500"
         @change="applyProjectFilter"
       >
         <option value="">Todos os projetos</option>
@@ -55,7 +71,7 @@
       <div
         v-for="task in filteredTasks"
         :key="task.id"
-        class="flex items-center gap-3 px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-700 active:bg-gray-800/60 cursor-pointer transition-colors group"
+        class="flex items-center gap-3 px-4 py-3 md:px-5 md:py-3.5 bg-gray-900 border border-gray-800/70 rounded-xl hover:border-gray-700 hover:bg-gray-900/80 active:bg-gray-800/60 cursor-pointer transition-all group"
         @click="editTask(task)"
       >
         <!-- Status checkbox -->
@@ -71,27 +87,29 @@
         </button>
 
         <div class="flex-1 min-w-0">
-          <div class="flex items-start md:items-center gap-2 flex-wrap">
-            <p class="text-sm text-gray-200 break-words" :class="{ 'line-through opacity-50': task.status === 'done' }">
+          <div class="flex items-center gap-2 min-w-0">
+            <p class="flex-1 min-w-0 text-sm text-gray-200 break-words" :class="{ 'line-through opacity-50': task.status === 'done' }">
               {{ task.title }}
             </p>
-            <span v-if="task.dependency_id && task.dependency_status !== 'done'" class="text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 shrink-0" :title="'Depende de: ' + task.dependency_title">
-              🔗 {{ task.dependency_title }}
-            </span>
+            <span
+              v-if="task.dependency_id && task.dependency_status !== 'done'"
+              class="text-[10px] shrink-0"
+              :title="'Depende de: ' + task.dependency_title"
+            >🔗</span>
           </div>
-          <div class="flex items-center gap-2 mt-1 flex-wrap">
+          <p v-if="task.description" class="hidden md:block text-xs text-gray-500 truncate max-w-md mt-0.5">
+            {{ task.description }}
+          </p>
+          <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
             <span class="text-[10px] px-2 py-0.5 rounded-full font-medium" :class="difficultyBadge(task.difficulty)">
               {{ difficultyLabel(task.difficulty) }}
             </span>
             <span class="text-[10px] px-2 py-0.5 rounded-full font-medium" :class="statusBadge(task.status)">
               {{ statusLabel(task.status) }}
             </span>
-            <span v-if="task.project_name" class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400">
+            <span v-if="task.project_name" class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 truncate max-w-[50%]">
               {{ task.project_name }}
             </span>
-            <p v-if="task.description" class="hidden md:block text-xs text-gray-500 truncate max-w-md">
-              {{ task.description }}
-            </p>
           </div>
         </div>
 
@@ -102,24 +120,27 @@
         </div>
 
         <!-- Quick actions (somente desktop) -->
-        <div class="hidden md:group-hover:flex items-center gap-1 shrink-0">
-          <button
-            v-if="task.status !== 'todo'"
-            @click.stop="moveTask(task, 'todo')"
-            class="text-[10px] px-1.5 py-0.5 text-gray-500 hover:text-gray-300 rounded"
-            title="Mover para A fazer"
-          >◀◀</button>
+        <div class="hidden md:opacity-0 md:group-hover:opacity-100 md:flex items-center gap-0.5 shrink-0 transition-opacity">
           <button
             v-if="task.status !== 'done'"
             @click.stop="moveTask(task, task.status === 'todo' ? 'in_progress' : 'done')"
-            class="text-[10px] px-1.5 py-0.5 text-gray-500 hover:text-green-400 rounded"
+            class="p-1.5 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-md transition-colors"
             :title="task.status === 'todo' ? 'Iniciar' : 'Concluir'"
-          >{{ task.status === 'todo' ? '▶' : '✓' }}</button>
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path v-if="task.status === 'todo'" stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path v-else stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
           <button
-            @click.stop="deleteTaskFromList(task.id)"
-            class="text-[10px] px-1.5 py-0.5 text-gray-600 hover:text-red-400 rounded"
+            @click.stop="confirmDelete(task)"
+            class="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
             title="Excluir tarefa"
-          >🗑</button>
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -224,6 +245,16 @@
         </div>
       </form>
     </Modal>
+
+    <ConfirmDialog
+      :show="!!taskToDelete"
+      title="Excluir tarefa?"
+      :message="taskToDelete ? `“${taskToDelete.title}” será removida permanentemente.` : ''"
+      confirm-label="Excluir"
+      danger
+      @confirm="doDelete"
+      @cancel="taskToDelete = null"
+    />
   </div>
 </template>
 
@@ -233,12 +264,14 @@ import { useTaskStore } from '../stores/tasks'
 import { useAuthStore } from '../stores/auth'
 import api from '../api'
 import Modal from '../components/ui/Modal.vue'
+import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import { quotes, getQuote } from '../quotes'
 
 const taskStore = useTaskStore()
 const auth = useAuthStore()
 const showModal = ref(false)
 const editing = ref(null)
+const taskToDelete = ref(null)
 const users = ref([])
 const projects = ref([])
 const activeFilter = ref('all')
@@ -330,12 +363,20 @@ async function save() {
   closeModal()
 }
 
-async function deleteTask() {
-  if (confirm('Excluir esta tarefa?')) { await taskStore.remove(editing.value.id); closeModal() }
+function deleteTask() {
+  taskToDelete.value = editing.value
 }
 
-async function deleteTaskFromList(id) {
-  if (confirm('Excluir esta tarefa?')) { await taskStore.remove(id) }
+function confirmDelete(task) {
+  taskToDelete.value = task
+}
+
+async function doDelete() {
+  if (!taskToDelete.value) return
+  const id = taskToDelete.value.id
+  taskToDelete.value = null
+  await taskStore.remove(id)
+  if (editing.value?.id === id) closeModal()
 }
 
 async function toggleStatus(task) {

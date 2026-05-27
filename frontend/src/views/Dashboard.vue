@@ -1,33 +1,41 @@
 <template>
   <div v-if="isGarbson">
+    <!-- Hello header (desktop) -->
+    <div class="hidden md:flex items-end justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">{{ greeting }}, {{ firstName }}</h1>
+        <p class="text-sm text-gray-500 mt-0.5">{{ todayLabel }}</p>
+      </div>
+    </div>
+
     <!-- Dashboard pessoal - frase + relógio -->
     <div class="flex flex-col-reverse md:flex-row md:items-stretch gap-3 mb-4 md:mb-6">
-      <div class="flex-1 bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col justify-center">
-        <p class="text-sm text-gray-300 italic">"{{ currentQuote.text }}"</p>
-        <p class="text-xs text-gray-500 mt-1">— {{ currentQuote.author }}</p>
+      <div class="flex-1 bg-gray-900 border border-gray-800/70 rounded-xl p-4 md:p-5 flex flex-col justify-center">
+        <p class="text-sm text-gray-300 italic leading-relaxed">"{{ currentQuote.text }}"</p>
+        <p class="text-xs text-gray-500 mt-1.5">— {{ currentQuote.author }}</p>
       </div>
-      <div class="bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 font-mono text-xl md:text-2xl font-bold text-white tabular-nums tracking-[0.2em] flex items-center justify-center shrink-0">
+      <div class="bg-gradient-to-br from-gray-900 to-gray-900/50 border border-gray-800/70 rounded-xl px-5 py-3 font-mono text-xl md:text-3xl font-bold text-white tabular-nums tracking-[0.18em] flex items-center justify-center shrink-0 md:min-w-[200px]">
         {{ clock.now }}
       </div>
     </div>
 
     <!-- Cards de tarefas -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-        <p class="text-xs text-gray-500">Total de tarefas</p>
-        <p class="text-2xl font-bold text-white mt-1">{{ taskStore.tasks.length }}</p>
+      <div class="bg-gray-900 border border-gray-800/70 rounded-xl p-4 hover:border-gray-700 transition-colors">
+        <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total</p>
+        <p class="text-2xl font-bold text-white mt-1.5">{{ taskStore.tasks.length }}</p>
       </div>
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-        <p class="text-xs text-gray-500">A fazer</p>
-        <p class="text-2xl font-bold text-yellow-400 mt-1">{{ tasksByStatus.todo }}</p>
+      <div class="bg-gray-900 border border-gray-800/70 rounded-xl p-4 hover:border-yellow-500/30 transition-colors">
+        <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">A fazer</p>
+        <p class="text-2xl font-bold text-yellow-400 mt-1.5">{{ tasksByStatus.todo }}</p>
       </div>
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-        <p class="text-xs text-gray-500">Em andamento</p>
-        <p class="text-2xl font-bold text-blue-400 mt-1">{{ tasksByStatus.in_progress }}</p>
+      <div class="bg-gray-900 border border-gray-800/70 rounded-xl p-4 hover:border-blue-500/30 transition-colors">
+        <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Em andamento</p>
+        <p class="text-2xl font-bold text-blue-400 mt-1.5">{{ tasksByStatus.in_progress }}</p>
       </div>
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-        <p class="text-xs text-gray-500">Concluídas</p>
-        <p class="text-2xl font-bold text-green-400 mt-1">{{ tasksByStatus.done }}</p>
+      <div class="bg-gray-900 border border-gray-800/70 rounded-xl p-4 hover:border-green-500/30 transition-colors">
+        <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Concluídas</p>
+        <p class="text-2xl font-bold text-green-400 mt-1.5">{{ tasksByStatus.done }}</p>
       </div>
     </div>
 
@@ -267,6 +275,18 @@ let projInstance = null
 let revInstance = null
 
 const currentQuote = ref(getQuote('quote-dash'))
+
+const firstName = computed(() => auth.user?.name?.split(' ')[0] || '')
+const greeting = computed(() => {
+  const h = new Date().getHours()
+  if (h < 5) return 'Boa madrugada'
+  if (h < 12) return 'Bom dia'
+  if (h < 18) return 'Boa tarde'
+  return 'Boa noite'
+})
+const todayLabel = computed(() =>
+  new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+)
 
 // Relógio digital
 const clock = reactive({ now: '' })
