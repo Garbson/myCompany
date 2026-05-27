@@ -242,8 +242,11 @@ const form = reactive({
 })
 
 const availableDeps = computed(() => {
+  const projectId = form.project_id || (editing.value?.project_id)
   return taskStore.tasks.filter(t => {
     if (editing.value && t.id === editing.value.id) return false
+    if (!projectId) return false
+    if (t.project_id !== Number(projectId)) return false
     return t.status !== 'done'
   })
 })

@@ -8,7 +8,7 @@
     </div>
 
     <div class="space-y-3">
-      <div v-for="project in projectStore.projects" :key="project.id" class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+      <div v-for="project in freelasProjects" :key="project.id" class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         <div class="p-4 cursor-pointer hover:bg-gray-800/50 transition-colors" @click="toggleProject(project)">
           <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0 flex-1">
@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <p v-if="projectStore.projects.length === 0 && !projectStore.loading" class="text-center text-gray-600 py-12 text-sm">Nenhum projeto cadastrado</p>
+      <p v-if="freelasProjects.length === 0 && !projectStore.loading" class="text-center text-gray-600 py-12 text-sm">Nenhum freela cadastrado</p>
     </div>
 
     <Modal :show="showProjectModal" :title="editingProject ? 'Editar projeto' : 'Novo projeto'" @close="closeProjectModal">
@@ -271,6 +271,7 @@ const activeProjectId = ref(null)
 const activeProjectMonthly = ref(false)
 const paymentForm = reactive({ amount: 0, due_date: '', installment_number: 1, notes: '' })
 
+const freelasProjects = computed(() => projectStore.projects.filter(p => p.is_freela))
 const hasSetup = computed(() => projectForm.payment_type === 'implantacao_recorrente')
 const hasInstallments = computed(() => ['parcelado', 'implantacao_recorrente'].includes(projectForm.payment_type))
 const hasSingle = computed(() => projectForm.payment_type === 'pagamento_unico')
@@ -312,6 +313,7 @@ async function saveProject() {
   if (!hasInstallments.value) { d.entry_value = 0; d.entry_date = null; d.installments = 1 }
   if (!hasMonthly.value) { d.monthly_fee = 0; d.monthly_cycle = 'mensal'; d.annual_installments = 1 }
   if (d.monthly_cycle === 'mensal') d.annual_installments = 1
+  d.is_freela = true
   if (editingProject.value) await projectStore.update(editingProject.value.id, d)
   else await projectStore.create(d)
   closeProjectModal()

@@ -155,7 +155,7 @@ async function saveProject() {
   if (editingProject.value) {
     await api.put(`/projects/${editingProject.value.id}`, { ...projectForm })
   } else {
-    await api.post('/projects', { ...projectForm, payment_type: 'pagamento_unico', status: 'ativo' })
+    await api.post('/projects', { ...projectForm, payment_type: 'pagamento_unico', status: 'ativo', is_freela: false })
   }
   closeProjectModal()
   await loadProjects()
@@ -163,6 +163,7 @@ async function saveProject() {
 
 const projectTasks = computed(() => {
   return projects.value
+    .filter(p => !p.is_freela)
     .map(p => ({
       ...p,
       tasks: taskStore.tasks.filter(t => t.project_id === p.id),

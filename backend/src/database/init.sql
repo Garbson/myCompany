@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS projects (
   start_date DATE,
   end_date DATE,
   status ENUM('ativo', 'concluido', 'cancelado') DEFAULT 'ativo',
+  is_freela TINYINT(1) DEFAULT 0,
   company_id INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
