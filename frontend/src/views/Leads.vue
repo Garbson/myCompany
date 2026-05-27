@@ -9,7 +9,7 @@
 
     <!-- Pipeline - scroll horizontal no mobile -->
     <div class="flex gap-3 overflow-x-auto pb-4 -mx-1 px-1">
-      <div v-for="col in pipeline" :key="col.key" class="glass rounded-xl glow-hover rounded-xl p-3 min-w-[200px] flex-shrink-0 flex-1">
+      <div v-for="col in pipeline" :key="col.key" class="glass rounded-xl glow-hover p-3 min-w-[200px] flex-shrink-0 flex-1">
         <div class="flex items-center justify-between mb-3 px-1">
           <h3 class="text-xs font-semibold" :class="col.color">{{ col.label }}</h3>
           <span class="text-[10px] glass-light px-1.5 py-0.5 rounded-full text-gray-400">{{ leadStore.byStatus(col.key).length }}</span>

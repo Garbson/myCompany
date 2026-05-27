@@ -8,14 +8,14 @@
     </div>
 
     <!-- Frase motivacional -->
-    <div v-if="isGarbson" class="glass rounded-xl glow-hover rounded-xl p-4 mb-4 text-center">
+    <div v-if="isGarbson" class="glass rounded-xl glow-hover p-4 mb-4 text-center">
       <p class="text-sm text-gray-300 italic">"{{ currentQuote.text }}"</p>
       <p class="text-xs text-gray-500 mt-1">— {{ currentQuote.author }}</p>
     </div>
 
     <div class="space-y-3">
-      <div v-for="project in projectTasks" :key="project.id" class="glass rounded-xl glow-hover rounded-xl overflow-hidden">
-        <div class="p-4 cursor-pointer hover:bg-white/5/50 transition-colors" @click="toggle(project.id)">
+      <div v-for="project in projectTasks" :key="project.id" class="glass rounded-xl glow-hover overflow-hidden">
+        <div class="p-4 cursor-pointer hover:bg-white/5 transition-colors" @click="toggle(project.id)">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span class="text-lg">{{ expanded === project.id ? '▼' : '▶' }}</span>
@@ -28,6 +28,15 @@
             </div>
             <div class="flex items-center gap-1">
               <button
+                @click.stop="openFlow(project)"
+                class="text-gray-600 hover:text-indigo-400 transition-colors p-1"
+                title="Fluxograma do projeto"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h6v6H4zM14 6h6v4h-6zM14 14h6v4h-6zM10 9h4M14 16H7a1 1 0 01-1-1v-3" />
+                </svg>
+              </button>
+              <button
                 @click.stop="openEditProject(project)"
                 class="text-gray-600 hover:text-blue-400 transition-colors p-1"
                 title="Editar projeto"
@@ -37,7 +46,7 @@
                 </svg>
               </button>
               <button
-                @click.stop="deleteProject(project.id)"
+                @click.stop="askDeleteProject(project)"
                 class="text-gray-600 hover:text-red-400 transition-colors p-1"
                 title="Excluir projeto"
               >
@@ -57,7 +66,7 @@
             <div
               v-for="task in project.tasks"
               :key="task.id"
-              class="flex items-center gap-3 px-4 py-2 glass rounded-xl glow-hover rounded-lg hover:border-gray-700 transition-colors"
+              class="flex items-center gap-3 px-4 py-2 glass-light rounded-lg glow-hover hover:border-gray-700 transition-colors"
             >
               <button
                 class="w-5 h-5 rounded-full border-2 shrink-0"
@@ -100,13 +109,35 @@
           <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
           <textarea v-model="projectForm.description" rows="2" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-indigo-500"></textarea>
         </div>
+
+        <div v-if="editingProject" class="pt-3 border-t border-white/5">
+          <AttachmentList entity-type="project" :entity-id="editingProject.id" />
+        </div>
+
         <div class="flex gap-3 pt-2">
           <div class="flex-1"></div>
-          <button type="button" @click="closeProjectModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">{{ editingProject ? 'Salvar' : 'Criar' }}</button>
+          <button type="button" @click="closeProjectModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg transition-colors">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-sm bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-lg shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all font-medium">{{ editingProject ? 'Salvar' : 'Criar' }}</button>
         </div>
       </form>
     </Modal>
+
+    <!-- Modal fluxograma -->
+    <ProjectFlowModal
+      :show="!!flowProject"
+      :project="flowProject"
+      @close="flowProject = null"
+    />
+
+    <ConfirmDialog
+      :show="!!projectToDelete"
+      title="Excluir projeto?"
+      :message="projectToDelete ? `“${projectToDelete.name}” e todas as tarefas vinculadas serão removidas.` : ''"
+      confirm-label="Excluir"
+      danger
+      @confirm="doDeleteProject"
+      @cancel="projectToDelete = null"
+    />
   </div>
 </template>
 
@@ -117,11 +148,19 @@ import { useAuthStore } from '../stores/auth'
 import api from '../api'
 import { quotes, getQuote } from '../quotes'
 import Modal from '../components/ui/Modal.vue'
+import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
+import AttachmentList from '../components/tasks/AttachmentList.vue'
+import ProjectFlowModal from '../components/projects/ProjectFlowModal.vue'
+import { useToast } from '../composables/useToast'
+import { hapticLight } from '../services/haptics'
 
 const taskStore = useTaskStore()
 const auth = useAuthStore()
+const toast = useToast()
 const expanded = ref(null)
 const projects = ref([])
+const flowProject = ref(null)
+const projectToDelete = ref(null)
 
 const isGarbson = computed(() => auth.user?.email === 'garbsonsouza@gmail.com')
 
@@ -189,10 +228,27 @@ function statusLabel(s) {
   return { todo: 'A fazer', in_progress: 'Em andamento', done: 'Concluído', ativo: 'Ativo', concluido: 'Concluído', cancelado: 'Cancelado' }[s] || s
 }
 
-async function deleteProject(id) {
-  if (!confirm('Excluir este projeto e todas as tarefas vinculadas?')) return
-  await api.delete(`/projects/${id}`)
-  await loadProjects()
+function askDeleteProject(project) {
+  projectToDelete.value = project
+}
+
+async function doDeleteProject() {
+  if (!projectToDelete.value) return
+  const id = projectToDelete.value.id
+  projectToDelete.value = null
+  try {
+    await api.delete(`/projects/${id}`)
+    hapticLight()
+    toast.success('Projeto excluído')
+    await loadProjects()
+  } catch {
+    toast.error('Falha ao excluir')
+  }
+}
+
+function openFlow(project) {
+  flowProject.value = project
+  hapticLight()
 }
 
 async function loadProjects() {

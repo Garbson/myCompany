@@ -9,6 +9,7 @@ import dashboardRoutes from './routes/dashboard.js'
 import subtaskRoutes from './routes/subtasks.js'
 import commentRoutes from './routes/comments.js'
 import attachmentRoutes from './routes/attachments.js'
+import projectFlowRoutes from './routes/projectFlows.js'
 
 dotenv.config()
 
@@ -24,6 +25,7 @@ app.use('/api/dashboard', dashboardRoutes)
 app.use('/api', subtaskRoutes)
 app.use('/api', commentRoutes)
 app.use('/api', attachmentRoutes)
+app.use('/api', projectFlowRoutes)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {

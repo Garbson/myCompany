@@ -8,8 +8,8 @@
     </div>
 
     <div class="space-y-3">
-      <div v-for="project in freelasProjects" :key="project.id" class="glass rounded-xl glow-hover rounded-xl overflow-hidden">
-        <div class="p-4 cursor-pointer hover:bg-white/5/50 transition-colors" @click="toggleProject(project)">
+      <div v-for="project in freelasProjects" :key="project.id" class="glass rounded-xl glow-hover overflow-hidden">
+        <div class="p-4 cursor-pointer hover:bg-white/5 transition-colors" @click="toggleProject(project)">
           <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0 flex-1">
               <span class="text-lg shrink-0">{{ project.status === 'ativo' ? '📋' : project.status === 'concluido' ? '✅' : '❌' }}</span>
@@ -90,7 +90,7 @@
           </div>
 
           <div class="md:hidden space-y-2">
-            <div v-for="p in payments[project.id]" :key="p.id" class="glass rounded-xl glow-hover rounded-lg p-3 flex items-center justify-between" :class="{ 'opacity-50': p.status === 'pago' }">
+            <div v-for="p in payments[project.id]" :key="p.id" class="glass-light rounded-lg glow-hover p-3 flex items-center justify-between" :class="{ 'opacity-50': p.status === 'pago' }">
               <div>
                 <p class="text-sm text-gray-200">#{{ p.installment_number }} — {{ formatCurrency(p.amount) }}</p>
                 <p class="text-xs text-gray-500">Venc: {{ formatDate(p.due_date) }}</p>
