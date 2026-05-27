@@ -235,13 +235,20 @@
           </div>
         </div>
 
+        <!-- Subtarefas, comentários e anexos (só ao editar) -->
+        <div v-if="editing" class="space-y-5 pt-4 border-t border-white/5">
+          <SubtaskList :task-id="editing.id" />
+          <AttachmentList entity-type="task" :entity-id="editing.id" />
+          <CommentList :task-id="editing.id" />
+        </div>
+
         <div class="flex gap-3 pt-2">
-          <button v-if="editing" type="button" @click="deleteTask" class="px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg">
+          <button v-if="editing" type="button" @click="deleteTask" class="px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
             Excluir
           </button>
           <div class="flex-1"></div>
           <button type="button" @click="closeModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg transition-colors">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Salvar</button>
+          <button type="submit" class="px-4 py-2 text-sm bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-lg shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all font-medium">Salvar</button>
         </div>
       </form>
     </Modal>
@@ -265,6 +272,9 @@ import { useAuthStore } from '../stores/auth'
 import api from '../api'
 import Modal from '../components/ui/Modal.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
+import SubtaskList from '../components/tasks/SubtaskList.vue'
+import CommentList from '../components/tasks/CommentList.vue'
+import AttachmentList from '../components/tasks/AttachmentList.vue'
 import { quotes, getQuote } from '../quotes'
 import { useToast } from '../composables/useToast'
 import { hapticLight, hapticMedium, hapticSuccess } from '../services/haptics'

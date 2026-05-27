@@ -73,6 +73,45 @@ CREATE TABLE IF NOT EXISTS leads (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS subtasks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  task_id INT NOT NULL,
+  title VARCHAR(500) NOT NULL,
+  is_done TINYINT(1) DEFAULT 0,
+  position INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+  INDEX idx_subtasks_task (task_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS task_comments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  task_id INT NOT NULL,
+  user_id INT,
+  body TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_task_comments_task (task_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS attachments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  entity_type ENUM('task', 'project') NOT NULL,
+  entity_id INT NOT NULL,
+  filename VARCHAR(500) NOT NULL,
+  mime_type VARCHAR(100),
+  size_bytes BIGINT,
+  storage_key VARCHAR(500) NOT NULL,
+  url VARCHAR(1000) NOT NULL,
+  user_id INT,
+  company_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_attachments_entity (entity_type, entity_id),
+  INDEX idx_attachments_company (company_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS payments (
   id INT AUTO_INCREMENT PRIMARY KEY,
   project_id INT NOT NULL,
