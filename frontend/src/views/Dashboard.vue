@@ -110,9 +110,9 @@
       <h3 class="text-sm font-semibold text-white mb-3">🎵 Foco</h3>
       <iframe
         style="border-radius:12px"
-        src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS?utm_source=generator"
+        src="https://open.spotify.com/embed/playlist/45pNIxE5hc1AGo5aIoII56?utm_source=generator"
         width="100%"
-        height="152"
+        height="352"
         allowfullscreen=""
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
         loading="lazy"
