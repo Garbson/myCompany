@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Safe area for mobile system bars */
+/* iOS uses env(safe-area-inset-*), Android uses --safe-bottom from JS */
+html, body {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-bottom, 0px));
+}
+
+.safe-top  { padding-top: env(safe-area-inset-top, 0px); }
+.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-bottom, 0px)); }
+.safe-left  { padding-left: env(safe-area-inset-left, 0px); }
+.safe-right { padding-right: env(safe-area-inset-right, 0px); }

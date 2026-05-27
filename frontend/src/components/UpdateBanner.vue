@@ -1,0 +1,56 @@
+<template>
+  <Teleport to="body">
+    <!-- Atualização opcional: banner no topo -->
+    <div
+      v-if="showBanner"
+      class="fixed top-0 left-0 right-0 z-[100] bg-blue-600 text-white px-4 py-2.5 flex items-center justify-between gap-3 shadow-lg"
+    >
+      <p class="text-sm">Nova versão {{ updateInfo?.version }} disponível</p>
+      <button
+        @click="download"
+        class="shrink-0 bg-white text-blue-600 text-xs font-semibold px-3 py-1 rounded-lg hover:bg-blue-50 transition"
+      >
+        Atualizar
+      </button>
+    </div>
+
+    <!-- Atualização obrigatória: tela cheia bloqueante -->
+    <div
+      v-if="showBlock"
+      class="fixed inset-0 z-[200] bg-gray-950 flex items-center justify-center p-6"
+    >
+      <div class="text-center max-w-sm">
+        <img src="/logo.png" alt="myCompany" class="w-16 h-auto mx-auto mb-6 rounded-lg" />
+        <h2 class="text-white text-xl font-bold mb-2">Atualização necessária</h2>
+        <p class="text-gray-400 text-sm mb-6">
+          A versão {{ updateInfo?.minVersion }} é obrigatória. Você está na {{ appVersion }}.
+          Atualize para continuar usando o app.
+        </p>
+        <button
+          @click="download"
+          class="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-blue-500 transition"
+        >
+          Baixar atualização
+        </button>
+      </div>
+    </div>
+  </Teleport>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { useVersionCheck } from '../services/versionCheck'
+
+const APP_VERSION = '1.0.1'
+
+const { updateAvailable, updateMandatory, updateInfo } = useVersionCheck()
+
+const appVersion = APP_VERSION
+const showBanner = computed(() => updateAvailable.value && !updateMandatory.value)
+const showBlock = computed(() => updateMandatory.value)
+
+function download() {
+  const url = updateInfo.value?.apkUrl || 'https://mycompany.zlabs.com.br/myCompany.apk'
+  window.open(url, '_blank')
+}
+</script>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">myCompany</string>
+    <string name="title_activity_main">myCompany</string>
+    <string name="package_name">com.zlabs.mycompany</string>
+    <string name="custom_url_scheme">com.zlabs.mycompany</string>
+</resources>

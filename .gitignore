@@ -1,0 +1,70 @@
+node_modules/
+dist/
+.env
+
+# APK files (generated, large binaries)
+*.apk
+
+# Apple double files
+._*
+.DS_Store
+**/.DS_Store
+
+# Capacitor native build artifacts
+android/app/build/
+android/.gradle/
+android/build/
+android/captures/
+ios/App/Pods/
+ios/App/DerivedData/
+ios/App/build/
+*.xcworkspace
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+
+# Generated Capacitor assets
+frontend/android/app/src/main/res/drawable*/
+frontend/android/app/src/main/res/mipmap-hdpi/
+frontend/android/app/src/main/res/mipmap-mdpi/
+frontend/android/app/src/main/res/mipmap-xhdpi/
+frontend/android/app/src/main/res/mipmap-xxhdpi/
+frontend/android/app/src/main/res/mipmap-xxxhdpi/
+frontend/android/app/src/main/res/mipmap-ldpi/
+frontend/ios/App/App/Assets.xcassets/
+
+# Generated PWA icons
+frontend/icons/
+
+# Generated public favicons (keep SVG logo, sw.js, version.json)
+frontend/public/favicon*.png
+frontend/public/icon-*.png
+frontend/public/apple-touch-icon.png
+frontend/public/logo.png
+frontend/public/manifest.webmanifest
+frontend/resources/splash.png
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

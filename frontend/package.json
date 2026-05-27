@@ -1,0 +1,38 @@
+{
+  "name": "mycompany-frontend",
+  "private": true,
+  "version": "1.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "version-sync": "node scripts/prebuild.mjs",
+    "build": "npm run version-sync && vite build",
+    "preview": "vite preview",
+    "cap:sync": "npm run build && npx cap sync",
+    "cap:sync:android": "npm run build && npx cap sync android",
+    "cap:sync:ios": "npm run build && npx cap sync ios",
+    "cap:open:android": "npx cap open android",
+    "cap:open:ios": "npx cap open ios",
+    "cap:assets": "npx capacitor-assets generate --iconBackgroundColor '#030712' --splashBackgroundColor '#030712' --logoSplashTargetWidth 512"
+  },
+  "dependencies": {
+    "@capacitor/status-bar": "^8.0.2",
+    "axios": "^1.7.2",
+    "chart.js": "^4.5.1",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.27",
+    "vue-router": "^4.3.2"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.3.4",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.3.4",
+    "@capacitor/core": "^8.3.4",
+    "@capacitor/ios": "^8.3.4",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "vite": "^5.2.12"
+  }
+}
