@@ -17,7 +17,12 @@ function compareVersions(a, b) {
   return 0
 }
 
+function isNative() {
+  return !!(window.Capacitor?.isNativePlatform?.())
+}
+
 async function getAppVersion() {
+  if (!isNative()) return null
   try {
     const { App } = await import('@capacitor/app')
     const info = await App.getInfo()
@@ -29,6 +34,7 @@ async function getAppVersion() {
 
 async function check() {
   if (checking.value) return
+  if (!isNative()) return  // Only check updates on native mobile app
   checking.value = true
   try {
     const [info, appVersion] = await Promise.all([
@@ -36,8 +42,10 @@ async function check() {
       getAppVersion()
     ])
     updateInfo.value = info
-    updateMandatory.value = compareVersions(info.minVersion, appVersion) > 0
-    updateAvailable.value = compareVersions(info.version, appVersion) > 0
+    if (appVersion) {
+      updateMandatory.value = compareVersions(info.minVersion, appVersion) > 0
+      updateAvailable.value = compareVersions(info.version, appVersion) > 0
+    }
   } catch {
     // offline or server error — silently ignore
   } finally {
