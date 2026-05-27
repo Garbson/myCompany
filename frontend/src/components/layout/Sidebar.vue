@@ -129,10 +129,10 @@
   <!-- Mobile toggle -->
   <button
     @click="$emit('toggle')"
-    class="fixed z-30 md:hidden bg-gray-900 border border-gray-700 text-gray-400 p-1.5 rounded-lg hover:text-white transition-colors"
+    class="fixed z-30 md:hidden bg-gray-950/70 backdrop-blur-sm border border-gray-700/50 text-gray-400 p-1.5 rounded-full hover:text-white hover:border-gray-500 transition-all shadow-lg"
     style="
-      top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
-      left: calc(env(safe-area-inset-left, 0px) + 0.75rem);
+      top: calc(env(safe-area-inset-top, 0px) + 0.5rem);
+      left: calc(env(safe-area-inset-left, 0px) + 0.5rem);
     "
   >
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
