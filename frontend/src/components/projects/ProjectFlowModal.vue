@@ -21,7 +21,7 @@
               </svg>
             </button>
             <div class="min-w-0">
-              <p class="text-xs text-gray-500 leading-none">Fluxograma</p>
+              <p class="text-xs text-gray-500 leading-none">Fluxograma BPMN</p>
               <h2 class="text-sm md:text-base font-semibold text-white truncate">{{ project?.name }}</h2>
             </div>
           </div>
@@ -51,12 +51,13 @@
         <!-- Toolbar -->
         <div class="shrink-0 glass-light border-b border-white/5 px-3 md:px-6 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
           <button
-            v-for="t in nodeTypes"
-            :key="t.type"
-            @click="addNode(t.type)"
+            v-for="t in nodeKinds"
+            :key="t.kind"
+            @click="addNode(t.kind)"
             class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium glass-light rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+            :title="t.hint"
           >
-            <span class="w-2 h-2 rounded-full" :style="{ background: t.color }"></span>
+            <span v-html="t.icon" class="text-[14px]"></span>
             {{ t.label }}
           </button>
           <div class="w-px h-5 bg-white/10 mx-1"></div>
@@ -64,19 +65,21 @@
             @click="clearAll"
             class="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
           >
-            Limpar tudo
+            Limpar
           </button>
-          <p class="hidden md:block ml-auto text-[10px] text-gray-500 shrink-0">
-            Arraste para mover · Conecte das bordas · Duplo-clique pra renomear
+          <p class="hidden lg:block ml-auto text-[10px] text-gray-500 shrink-0">
+            Duplo-clique no nó ou na linha pra editar texto
           </p>
         </div>
 
         <!-- Canvas -->
-        <div class="flex-1 relative min-h-0" @drop="onDrop" @dragover.prevent>
+        <div class="flex-1 relative min-h-0">
           <VueFlow
             v-if="show"
             v-model:nodes="nodes"
             v-model:edges="edges"
+            :node-types="nodeTypes"
+            :edge-types="edgeTypes"
             :default-edge-options="defaultEdgeOptions"
             :fit-view-on-init="true"
             :connect-on-click="false"
@@ -84,7 +87,6 @@
             @nodes-change="onChange"
             @edges-change="onChange"
             @connect="onConnect"
-            @node-double-click="renameNode"
           >
             <Background :gap="24" :size="1" pattern-color="rgba(255,255,255,0.05)" />
             <Controls position="bottom-right" />
@@ -97,7 +99,7 @@
           <div v-else-if="nodes.length === 0" class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="text-center max-w-xs">
               <p class="text-sm text-gray-400 mb-1">Sem nós ainda</p>
-              <p class="text-xs text-gray-600">Use a barra acima para adicionar etapas, decisões ou marcos.</p>
+              <p class="text-xs text-gray-600">Use a barra acima pra adicionar eventos, tarefas, gateways…</p>
             </div>
           </div>
         </div>
@@ -107,11 +109,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import { VueFlow, useVueFlow } from '@vue-flow/core'
+import { ref, watch, markRaw } from 'vue'
+import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
+import BpmnNode from './BpmnNode.vue'
+import BpmnEdge from './BpmnEdge.vue'
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
 import '@vue-flow/controls/dist/style.css'
@@ -120,10 +124,7 @@ import api from '../../api'
 import { useToast } from '../../composables/useToast'
 import { hapticLight, hapticSuccess } from '../../services/haptics'
 
-const props = defineProps({
-  show: Boolean,
-  project: Object,
-})
+const props = defineProps({ show: Boolean, project: Object })
 const emit = defineEmits(['close'])
 const toast = useToast()
 
@@ -136,43 +137,54 @@ const loadedOnce = ref(false)
 let suppressDirty = false
 let saveTimer = null
 
-const nodeTypes = [
-  { type: 'start', label: '+ Início', color: '#22c55e' },
-  { type: 'step', label: '+ Etapa', color: '#3b82f6' },
-  { type: 'decision', label: '+ Decisão', color: '#eab308' },
-  { type: 'end', label: '+ Fim', color: '#ef4444' },
+const nodeTypes = { bpmn: markRaw(BpmnNode) }
+const edgeTypes = { 'bpmn-edge': markRaw(BpmnEdge) }
+
+const nodeKinds = [
+  { kind: 'start', label: 'Início', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/></svg>', hint: 'Evento de início' },
+  { kind: 'task', label: 'Tarefa', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>', hint: 'Atividade / tarefa' },
+  { kind: 'decision', label: 'Gateway X', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 80 80" fill="none" stroke="#eab308" stroke-width="8"><polygon points="40,4 76,40 40,76 4,40"/></svg>', hint: 'Gateway exclusivo (XOR)' },
+  { kind: 'parallel', label: 'Gateway +', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 80 80" fill="none" stroke="#f97316" stroke-width="8"><polygon points="40,4 76,40 40,76 4,40"/></svg>', hint: 'Gateway paralelo (AND)' },
+  { kind: 'event', label: 'Evento', icon: '<span style="color:#a855f7;font-size:18px;line-height:1">◎</span>', hint: 'Evento intermediário' },
+  { kind: 'timer', label: 'Timer', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><circle cx="12" cy="13" r="9"/><polyline points="12,7 12,13 16,15"/></svg>', hint: 'Evento de timer' },
+  { kind: 'message', label: 'Mensagem', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', hint: 'Evento de mensagem' },
+  { kind: 'error', label: 'Erro', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', hint: 'Evento de erro' },
+  { kind: 'subprocess', label: 'Subproc.', icon: '<span style="color:#6366f1;font-size:15px;line-height:1">⊞</span>', hint: 'Subprocesso' },
+  { kind: 'document', label: 'Documento', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 60 80" fill="none" stroke="#f472b6" stroke-width="6"><path stroke-linejoin="round" d="M8,3 L48,3 L56,13 L56,77 L8,77 Z M48,3 L48,13 L56,13"/></svg>', hint: 'Documento / dado' },
+  { kind: 'datastore', label: 'Dados', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 80 80" fill="none" stroke="#14b8a6" stroke-width="5"><ellipse cx="40" cy="18" rx="34" ry="12"/><line x1="6" y1="18" x2="6" y2="62"/><line x1="74" y1="18" x2="74" y2="62"/><ellipse cx="40" cy="62" rx="34" ry="12"/></svg>', hint: 'Armazenamento de dados' },
+  { kind: 'end', label: 'Fim', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>', hint: 'Evento de fim' },
 ]
 
+const labelByKind = {
+  start: 'Início',
+  task: 'Nova tarefa',
+  decision: 'Decisão?',
+  parallel: 'Paralelo',
+  event: 'Evento',
+  timer: 'Timer',
+  message: 'Mensagem',
+  error: 'Erro',
+  subprocess: 'Subprocesso',
+  document: 'Documento',
+  datastore: 'Dados',
+  end: 'Fim',
+}
+function handleEdgeLabelChange() {
+  dirty.value = true
+  scheduleAutosave()
+}
+
+// Compat: mapeia kinds antigos (step -> task)
+const LEGACY_MAP = { step: 'task' }
+function normalizeKind(k) {
+  return LEGACY_MAP[k] || k || 'task'
+}
+
 const defaultEdgeOptions = {
+  type: 'bpmn-edge',
   animated: true,
-  style: { stroke: 'rgba(96, 165, 250, 0.6)', strokeWidth: 2 },
-  type: 'smoothstep',
-}
-
-const styleByType = {
-  start: { background: 'rgba(34, 197, 94, 0.18)', borderColor: '#22c55e' },
-  step: { background: 'rgba(59, 130, 246, 0.18)', borderColor: '#3b82f6' },
-  decision: { background: 'rgba(234, 179, 8, 0.18)', borderColor: '#eab308' },
-  end: { background: 'rgba(239, 68, 68, 0.18)', borderColor: '#ef4444' },
-}
-
-const labelByType = { start: 'Início', step: 'Etapa', decision: 'Decisão?', end: 'Fim' }
-
-function buildStyle(type) {
-  const s = styleByType[type] || styleByType.step
-  return {
-    background: s.background,
-    borderColor: s.borderColor,
-    color: '#ffffff',
-    border: `1.5px solid ${s.borderColor}`,
-    borderRadius: '12px',
-    padding: '10px 16px',
-    fontWeight: '500',
-    backdropFilter: 'blur(12px)',
-    boxShadow: `0 4px 20px ${s.borderColor}33`,
-    minWidth: '120px',
-    textAlign: 'center',
-  }
+  style: { stroke: 'rgba(96, 165, 250, 0.7)', strokeWidth: 2 },
+  markerEnd: { type: 'arrowclosed', color: 'rgba(96, 165, 250, 0.9)' },
 }
 
 let nextId = 0
@@ -181,26 +193,19 @@ function genId() {
   return `n${Date.now().toString(36)}-${nextId}`
 }
 
-function addNode(type) {
+function addNode(kind) {
   const id = genId()
-  const offsetX = 80 + (nodes.value.length % 4) * 30
-  const offsetY = 80 + (nodes.value.length % 3) * 30
+  const offsetX = 80 + (nodes.value.length % 4) * 40
+  const offsetY = 100 + (nodes.value.length % 3) * 40
   nodes.value.push({
     id,
-    type: 'default',
+    type: 'bpmn',
     position: { x: offsetX, y: offsetY },
-    data: { label: labelByType[type] || 'Nó', kind: type },
-    style: buildStyle(type),
+    data: { label: labelByKind[kind] || 'Nó', kind },
   })
   dirty.value = true
   hapticLight()
-}
-
-function renameNode({ node }) {
-  const next = window.prompt('Renomear', node.data?.label || '')
-  if (next === null) return
-  node.data = { ...node.data, label: next }
-  dirty.value = true
+  scheduleAutosave()
 }
 
 function onConnect(conn) {
@@ -210,10 +215,16 @@ function onConnect(conn) {
     target: conn.target,
     sourceHandle: conn.sourceHandle,
     targetHandle: conn.targetHandle,
-    ...defaultEdgeOptions,
+    label: '',
+    type: 'bpmn-edge',
+    data: { onDirty: handleEdgeLabelChange },
+    animated: true,
+    style: { stroke: 'rgba(96, 165, 250, 0.7)', strokeWidth: 2 },
+    markerEnd: { type: 'arrowclosed', color: 'rgba(96, 165, 250, 0.9)' },
   })
   dirty.value = true
   hapticLight()
+  scheduleAutosave()
 }
 
 function onChange() {
@@ -235,9 +246,16 @@ async function load(projectId) {
     const flow = data.data || { nodes: [], edges: [] }
     nodes.value = (flow.nodes || []).map((n) => ({
       ...n,
-      style: n.style || buildStyle(n.data?.kind),
+      type: 'bpmn',
+      data: { ...n.data, kind: normalizeKind(n.data?.kind) },
+      style: undefined, // limpa estilos legacy
     }))
-    edges.value = (flow.edges || []).map((e) => ({ ...defaultEdgeOptions, ...e }))
+    edges.value = (flow.edges || []).map((e) => ({
+      ...defaultEdgeOptions,
+      ...e,
+      type: 'bpmn-edge',
+      data: { onDirty: handleEdgeLabelChange, ...(e.data || {}) },
+    }))
     loadedOnce.value = true
     dirty.value = false
   } catch {
@@ -257,9 +275,9 @@ async function saveNow() {
   const payload = {
     nodes: nodes.value.map((n) => ({
       id: n.id,
+      type: 'bpmn',
       position: n.position,
-      data: n.data,
-      style: n.style,
+      data: { label: n.data?.label || '', kind: n.data?.kind || 'task' },
     })),
     edges: edges.value.map((e) => ({
       id: e.id,
@@ -267,6 +285,7 @@ async function saveNow() {
       target: e.target,
       sourceHandle: e.sourceHandle,
       targetHandle: e.targetHandle,
+      label: e.label || '',
     })),
   }
   try {
@@ -289,8 +308,6 @@ function clearAll() {
   scheduleAutosave()
 }
 
-function onDrop() {}
-
 watch(
   () => props.show,
   (v) => {
@@ -307,22 +324,23 @@ watch(
 </script>
 
 <style>
-/* Override do tema vue-flow para combinar com glass */
+/* Tema vue-flow combinando com glass */
 .flow-canvas {
   background: transparent;
 }
-.flow-canvas .vue-flow__handle {
-  background: rgba(96, 165, 250, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  width: 10px;
-  height: 10px;
-}
-.flow-canvas .vue-flow__handle:hover {
-  background: rgb(96, 165, 250);
-  box-shadow: 0 0 12px rgba(96, 165, 250, 0.7);
-}
 .flow-canvas .vue-flow__edge-path {
   filter: drop-shadow(0 0 4px rgba(96, 165, 250, 0.4));
+}
+.flow-canvas .vue-flow__edge-text {
+  fill: #fff;
+  font-size: 11px;
+  font-weight: 500;
+}
+.flow-canvas .vue-flow__edge-textbg {
+  fill: rgba(15, 23, 42, 0.85);
+}
+.flow-canvas .vue-flow__edge.selected .vue-flow__edge-path {
+  stroke: rgba(168, 85, 247, 0.95);
 }
 .flow-canvas .vue-flow__controls {
   background: rgba(15, 23, 42, 0.78);
@@ -349,5 +367,19 @@ watch(
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   overflow: hidden;
+}
+/* Garante que o custom node fica visivel/clicavel sem container do tema default */
+.flow-canvas .vue-flow__node-bpmn {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.flow-canvas .vue-flow__node-bpmn.selected .bpmn-shape,
+.flow-canvas .vue-flow__node-bpmn:focus .bpmn-shape {
+  outline: 2px solid rgba(168, 85, 247, 0.7);
+  outline-offset: 4px;
+  border-radius: inherit;
 }
 </style>
