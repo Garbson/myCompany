@@ -22,9 +22,9 @@ html, body {
   );
 }
 
-/* Mobile-only: extra top padding for the toggle button + status bar */
+/* Mobile-only: status bar safe area */
 @media (max-width: 767px) {
   .safe-pt-mobile {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 2.75rem);
+    padding-top: env(safe-area-inset-top, 0px);
   }
 }
