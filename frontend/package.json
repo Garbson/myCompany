@@ -1,7 +1,7 @@
 {
   "name": "mycompany-frontend",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,6 +16,7 @@
     "cap:assets": "npx capacitor-assets generate --iconBackgroundColor '#030712' --splashBackgroundColor '#030712' --logoSplashTargetWidth 512"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.0",
     "@capacitor/status-bar": "^8.0.2",
     "axios": "^1.7.2",
     "chart.js": "^4.5.1",

@@ -1,6 +1,5 @@
 import { ref } from 'vue'
 
-const APP_VERSION = '1.0.1'
 const CHECK_INTERVAL = 15 * 60 * 1000
 
 const updateAvailable = ref(false)
@@ -9,8 +8,8 @@ const updateInfo = ref(null)
 const checking = ref(false)
 
 function compareVersions(a, b) {
-  const pa = a.split('.').map(Number)
-  const pb = b.split('.').map(Number)
+  const pa = String(a).split('.').map(Number)
+  const pb = String(b).split('.').map(Number)
   for (let i = 0; i < 3; i++) {
     if ((pa[i] || 0) > (pb[i] || 0)) return 1
     if ((pa[i] || 0) < (pb[i] || 0)) return -1
@@ -18,15 +17,27 @@ function compareVersions(a, b) {
   return 0
 }
 
+async function getAppVersion() {
+  try {
+    const { App } = await import('@capacitor/app')
+    const info = await App.getInfo()
+    return info.version
+  } catch {
+    return '0.0.0'
+  }
+}
+
 async function check() {
   if (checking.value) return
   checking.value = true
   try {
-    const r = await fetch('/version.json', { cache: 'no-cache' })
-    const info = await r.json()
+    const [info, appVersion] = await Promise.all([
+      fetch('/version.json', { cache: 'no-cache' }).then(r => r.json()),
+      getAppVersion()
+    ])
     updateInfo.value = info
-    updateMandatory.value = compareVersions(info.minVersion, APP_VERSION) > 0
-    updateAvailable.value = compareVersions(info.version, APP_VERSION) > 0
+    updateMandatory.value = compareVersions(info.minVersion, appVersion) > 0
+    updateAvailable.value = compareVersions(info.version, appVersion) > 0
   } catch {
     // offline or server error — silently ignore
   } finally {
