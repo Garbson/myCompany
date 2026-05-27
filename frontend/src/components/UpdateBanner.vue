@@ -49,6 +49,6 @@ const showBlock = computed(() => updateMandatory.value)
 
 function download() {
   const url = updateInfo.value?.apkUrl || 'https://mycompany.zlabs.com.br/myCompany.apk'
-  window.open(url, '_blank')
+  window.location.href = url
 }
 </script>

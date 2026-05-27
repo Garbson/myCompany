@@ -5,7 +5,9 @@
       :collapsed="sidebarCollapsed"
       @toggle="sidebarCollapsed = !sidebarCollapsed"
     />
-    <main class="flex-1 min-w-0 p-4 md:p-3 overflow-auto safe-pt-mobile">
+    <main
+      class="flex-1 min-w-0 p-4 md:p-3 overflow-auto safe-pt-mobile h-screen md:h-[calc(100vh-1.5rem)]"
+    >
       <router-view />
     </main>
   </div>
