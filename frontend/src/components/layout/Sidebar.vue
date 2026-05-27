@@ -1,11 +1,6 @@
 <template>
   <aside
-    class="hidden md:flex sticky inset-y-0 left-0 z-50 m-3 w-56 glass-strong gradient-border flex-col overflow-hidden rounded-2xl"
-    style="
-      top: var(--safe-top);
-      height: 100dvh;
-      padding-bottom: max(var(--safe-bottom), 0.5rem);
-    "
+    class="hidden md:flex sticky top-3 left-0 z-50 m-3 w-56 h-[calc(100vh-1.5rem)] glass-strong gradient-border flex-col overflow-hidden rounded-2xl"
   >
     <!-- Logo -->
     <div class="px-4 py-4 flex items-center gap-2.5 border-b border-white/5">
