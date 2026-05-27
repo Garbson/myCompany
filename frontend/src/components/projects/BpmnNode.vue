@@ -1,7 +1,6 @@
 <template>
   <div
     class="bpmn-node group"
-    :class="`bpmn-${kind}`"
     :style="containerStyle"
   >
     <!-- Handles -->

@@ -109,7 +109,7 @@
 </template>
 
 <script setup>
-import { ref, watch, markRaw } from 'vue'
+import { ref, watch, markRaw, provide } from 'vue'
 import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
@@ -173,6 +173,7 @@ function handleEdgeLabelChange() {
   dirty.value = true
   scheduleAutosave()
 }
+provide('onFlowDirty', handleEdgeLabelChange)
 
 // Compat: mapeia kinds antigos (step -> task)
 const LEGACY_MAP = { step: 'task' }
@@ -217,7 +218,6 @@ function onConnect(conn) {
     targetHandle: conn.targetHandle,
     label: '',
     type: 'bpmn-edge',
-    data: { onDirty: handleEdgeLabelChange },
     animated: true,
     style: { stroke: 'rgba(96, 165, 250, 0.7)', strokeWidth: 2 },
     markerEnd: { type: 'arrowclosed', color: 'rgba(96, 165, 250, 0.9)' },
@@ -254,7 +254,6 @@ async function load(projectId) {
       ...defaultEdgeOptions,
       ...e,
       type: 'bpmn-edge',
-      data: { onDirty: handleEdgeLabelChange, ...(e.data || {}) },
     }))
     loadedOnce.value = true
     dirty.value = false

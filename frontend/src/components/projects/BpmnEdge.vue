@@ -37,8 +37,8 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick } from 'vue'
-import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, useVueFlow } from '@vue-flow/core'
+import { computed, ref, nextTick, inject } from 'vue'
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, useVueFlow } from '@vue-flow/core'
 
 const props = defineProps({
   id: String,
@@ -59,16 +59,17 @@ const props = defineProps({
 })
 
 const { updateEdge } = useVueFlow()
+const onDirty = inject('onFlowDirty', null)
 
 const edgePath = computed(() =>
-  getSmoothStepPath({
+  getBezierPath({
     sourceX: props.sourceX,
     sourceY: props.sourceY,
     sourcePosition: props.sourcePosition,
     targetX: props.targetX,
     targetY: props.targetY,
     targetPosition: props.targetPosition,
-    borderRadius: 8,
+    curvature: 0.25,
   })
 )
 
@@ -99,7 +100,7 @@ function commit() {
   const newLabel = draft.value.trim()
   updateEdge(props.id, { label: newLabel })
   editing.value = false
-  props.data?.onDirty?.()
+  onDirty?.()
 }
 
 function cancel() {
