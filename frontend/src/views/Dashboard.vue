@@ -1,35 +1,13 @@
 <template>
   <div v-if="isGarbson">
-    <!-- Dashboard pessoal - cabeçalho lado a lado -->
+    <!-- Dashboard pessoal - frase + relógio -->
     <div class="flex items-stretch gap-3 mb-6">
-      <!-- Coluna esquerda: frase + spotify -->
-      <div class="flex-1 flex flex-col gap-3 min-w-0">
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-          <p class="text-sm text-gray-300 italic">"{{ currentQuote.text }}"</p>
-          <p class="text-xs text-gray-500 mt-1">— {{ currentQuote.author }}</p>
-        </div>
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-3">
-          <iframe
-            style="border-radius:8px"
-            src="https://open.spotify.com/embed/playlist/45pNIxE5hc1AGo5aIoII56?utm_source=generator"
-            width="100%"
-            height="152"
-            allowfullscreen=""
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy"
-          ></iframe>
-        </div>
+      <div class="flex-1 bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col justify-center">
+        <p class="text-sm text-gray-300 italic">"{{ currentQuote.text }}"</p>
+        <p class="text-xs text-gray-500 mt-1">— {{ currentQuote.author }}</p>
       </div>
-      <!-- Coluna direita: relógio + calendário -->
-      <div class="flex flex-col gap-3 shrink-0 w-48">
-        <div class="bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 font-mono text-xl font-bold text-white tabular-nums tracking-[0.15em] text-center">
-          {{ clock.now }}
-        </div>
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center flex-1 flex flex-col justify-center">
-          <p class="text-xs text-gray-500">{{ today.dayName }}</p>
-          <p class="text-3xl font-bold text-white mt-1">{{ today.day }}</p>
-          <p class="text-sm text-gray-400">{{ today.monthName }}</p>
-        </div>
+      <div class="bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 font-mono text-2xl font-bold text-white tabular-nums tracking-[0.2em] flex items-center shrink-0">
+        {{ clock.now }}
       </div>
     </div>
 
@@ -290,20 +268,13 @@ let revInstance = null
 
 const currentQuote = ref(getQuote('quote-dash'))
 
-// Relógio digital + calendário
-const today = reactive({ day: '', dayName: '', monthName: '' })
+// Relógio digital
 const clock = reactive({ now: '' })
 let clockTimer = null
-
-const DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
-const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 
 function updateClock() {
   const d = new Date()
   clock.now = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-  today.day = d.getDate()
-  today.dayName = DAYS[d.getDay()]
-  today.monthName = MONTHS[d.getMonth()]
 }
 
 // Garbson dashboard
