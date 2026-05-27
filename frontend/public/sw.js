@@ -1,4 +1,4 @@
-const CACHE = 'mycompany-v1'
+const CACHE = 'mycompany-v2'
 
 const PRECACHE = ['/', '/index.html', '/logo.png', '/favicon.png']
 
