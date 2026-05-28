@@ -35,12 +35,10 @@ const show = computed(() => isWeb() && !!current.value?.src)
   height: 100%;
   object-fit: cover;
 }
+/* Overlay bem sutil — só pra dar leitura ao conteúdo sem escurecer o vídeo */
 .video-bg-overlay {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59, 130, 246, 0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 60% at 85% 100%, rgba(99, 102, 241, 0.18) 0%, transparent 55%),
-    linear-gradient(180deg, rgba(5, 7, 20, 0.55), rgba(5, 7, 20, 0.7));
+  background: linear-gradient(180deg, rgba(5, 7, 20, 0.18), rgba(5, 7, 20, 0.28));
 }
 </style>

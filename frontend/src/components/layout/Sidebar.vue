@@ -10,52 +10,50 @@
 
     <!-- Menu -->
     <nav class="flex-1 p-2.5 space-y-1 overflow-y-auto overflow-x-hidden">
-      <router-link
-        v-for="item in menu"
-        :key="item.path"
-        :to="item.path"
-        class="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors whitespace-nowrap"
-        :class="{
-          'bg-blue-500/10 text-blue-400 hover:bg-blue-500/15 hover:text-blue-300':
-            isActive(item.path),
-        }"
-      >
-        <span
-          class="shrink-0 flex items-center justify-center w-5 h-5"
-          :class="
-            isActive(item.path) ? 'text-blue-400' : 'text-gray-500 group-hover:text-gray-300'
-          "
+      <template v-for="item in menu" :key="item.path || item.action">
+        <!-- Item de ação (ex: Fundo) -->
+        <button
+          v-if="item.action"
+          @click="handleAction(item.action)"
+          class="group w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors whitespace-nowrap"
         >
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
-          </svg>
-        </span>
-        <span class="font-medium">{{ item.label }}</span>
-        <span
-          v-if="isActive(item.path)"
-          class="ml-auto w-1.5 h-1.5 rounded-full bg-blue-400"
-        ></span>
-      </router-link>
+          <span class="shrink-0 flex items-center justify-center w-5 h-5 text-gray-500 group-hover:text-gray-300">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
+            </svg>
+          </span>
+          <span class="font-medium">{{ item.label }}</span>
+          <span v-if="item.action === 'bg' && currentBgId !== 'none'" class="ml-auto text-[10px] text-blue-400">●</span>
+        </button>
+        <!-- Item de rota -->
+        <router-link
+          v-else
+          :to="item.path"
+          class="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors whitespace-nowrap"
+          :class="{
+            'bg-blue-500/10 text-blue-400 hover:bg-blue-500/15 hover:text-blue-300':
+              isActive(item.path),
+          }"
+        >
+          <span
+            class="shrink-0 flex items-center justify-center w-5 h-5"
+            :class="isActive(item.path) ? 'text-blue-400' : 'text-gray-500 group-hover:text-gray-300'"
+          >
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
+            </svg>
+          </span>
+          <span class="font-medium">{{ item.label }}</span>
+          <span
+            v-if="isActive(item.path)"
+            class="ml-auto w-1.5 h-1.5 rounded-full bg-blue-400"
+          ></span>
+        </router-link>
+      </template>
     </nav>
 
     <!-- User -->
     <div class="p-3 border-t border-white/5 relative">
-      <button
-        v-if="isWebPlatform"
-        @click="showBgPicker = true"
-        class="w-full mb-2 flex items-center gap-2.5 px-2 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-        title="Fundo do site"
-      >
-        <span class="shrink-0 flex items-center justify-center w-5 h-5">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <rect x="3" y="5" width="18" height="14" rx="2" stroke-linejoin="round"/>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l5-5 4 4 3-3 6 6"/>
-            <circle cx="9" cy="10" r="1.5"/>
-          </svg>
-        </span>
-        <span class="text-sm font-medium">Fundo</span>
-        <span v-if="currentBgId !== 'none'" class="ml-auto text-[10px] text-blue-400">●</span>
-      </button>
       <button
         @click="showMenu = !showMenu"
         class="w-full flex items-center gap-2.5 p-2 rounded-lg hover:bg-white/5 transition-colors"
@@ -205,15 +203,32 @@ const allMenu = [
   },
 ];
 
+const bgMenuItem = {
+  action: "bg",
+  label: "Fundo",
+  icon: "M3 5h18a0 0 0 010 0v14a0 0 0 010 0H3a0 0 0 010 0V5a0 0 0 010 0zM3 17l5-5 4 4 3-3 6 6M9 11.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z",
+};
+
 const menu = computed(() => {
-  if (isGarbson.value)
-    return allMenu.filter((m) => !["/leads", "/freelas"].includes(m.path));
-  return allMenu;
+  let items = isGarbson.value
+    ? allMenu.filter((m) => !["/leads", "/freelas"].includes(m.path))
+    : allMenu.slice();
+  // Insere "Fundo" antes de Configurações — só na web
+  if (isWebPlatform.value) {
+    const idx = items.findIndex((m) => m.path === "/configuracoes");
+    if (idx >= 0) items.splice(idx, 0, bgMenuItem);
+    else items.push(bgMenuItem);
+  }
+  return items;
 });
 
 function isActive(path) {
   if (path === "/") return route.path === "/";
   return route.path.startsWith(path);
+}
+
+function handleAction(action) {
+  if (action === "bg") showBgPicker.value = true;
 }
 
 const userInitial = computed(

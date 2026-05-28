@@ -1,9 +1,9 @@
 <template>
   <VideoBackground />
-  <div v-if="auth.isLoggedIn" class="flex min-h-screen bg-transparent">
+  <div v-if="auth.isLoggedIn" class="flex h-screen overflow-hidden bg-transparent">
     <UpdateBanner />
     <Sidebar />
-    <div class="flex-1 min-w-0 flex flex-col h-[100dvh] md:h-[calc(100vh-1.5rem)]">
+    <div class="flex-1 min-w-0 flex flex-col h-[100dvh] md:my-3 md:mr-3 md:h-[calc(100vh-1.5rem)]">
       <MobileHeader />
       <main
         class="flex-1 min-w-0 overflow-auto px-4 pt-3 md:px-6 md:pt-5 pb-[calc(var(--safe-bottom)+4.75rem)] md:pb-6"
