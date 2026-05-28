@@ -116,7 +116,6 @@ html.has-video-bg body {
     top: 0;
     z-index: 20;
     margin-bottom: 1rem;
-    padding-top: 1rem;
     padding-bottom: 1rem;
     background: transparent;
     backdrop-filter: blur(12px);
