@@ -106,8 +106,8 @@ html.has-video-bg body {
 }
 
 /* Título de página fixo no topo (desktop)
- * Fica inline com os cards abaixo (mesmo padding horizontal do <main>)
- * e alinhado verticalmente com o header da sidebar (mesmo py-4 = 1rem).
+ * Padding-top de 1rem casa com o py-4 do header da sidebar — o texto do
+ * título fica exatamente na mesma linha horizontal que o logo "myCompany".
  * Sem background sólido — só um blur sutil para preservar a leitura
  * quando o conteúdo rola por trás. */
 @media (min-width: 768px) {
@@ -115,7 +115,6 @@ html.has-video-bg body {
     position: sticky;
     top: 0;
     z-index: 20;
-    margin-top: -1.25rem;
     margin-bottom: 1rem;
     padding-top: 1rem;
     padding-bottom: 1rem;

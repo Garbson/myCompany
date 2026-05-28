@@ -62,23 +62,39 @@
         </div>
 
         <div v-if="expanded === project.id" class="border-t border-white/5 p-4 bg-slate-950/40">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-xs font-medium text-gray-400">Tarefas do projeto</p>
+            <button
+              @click.stop="openCreateTask(project)"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors shadow-md shadow-blue-600/20"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              Nova tarefa
+            </button>
+          </div>
           <div class="space-y-1">
             <div
               v-for="task in project.tasks"
               :key="task.id"
-              class="flex items-center gap-3 px-4 py-2 glass-light rounded-lg glow-hover hover:border-gray-700 transition-colors"
+              class="flex items-center gap-3 px-4 py-2 glass-light rounded-lg glow-hover hover:border-gray-700 cursor-pointer transition-colors"
+              @click.stop="openEditTask(task)"
             >
               <button
-                class="w-5 h-5 rounded-full border-2 shrink-0"
-                :class="task.status === 'done' ? 'bg-green-500 border-green-500' : 'border-gray-600'"
+                @click.stop="toggleTaskStatus(task)"
+                class="w-5 h-5 rounded-full border-2 shrink-0 transition-colors flex items-center justify-center"
+                :class="task.status === 'done' ? 'bg-green-500 border-green-500' : 'border-gray-600 hover:border-blue-500'"
+                :aria-label="task.status === 'done' ? 'Marcar como pendente' : 'Concluir'"
               >
-                <svg v-if="task.status === 'done'" class="w-3 h-3 mx-auto text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-if="task.status === 'done'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                 </svg>
               </button>
               <div class="flex-1 min-w-0">
-                <p class="text-sm text-gray-200" :class="{ 'line-through opacity-50': task.status === 'done' }">{{ task.title }}</p>
+                <p class="text-sm text-gray-200 truncate" :class="{ 'line-through opacity-50': task.status === 'done' }">{{ task.title }}</p>
               </div>
+              <span v-if="task.is_recurring" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 shrink-0" title="Tarefa recorrente">↻</span>
               <span class="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0" :class="difficultyBadge(task.difficulty)">
                 {{ difficultyLabel(task.difficulty) }}
               </span>
@@ -87,7 +103,7 @@
               </span>
             </div>
             <p v-if="project.tasks.length === 0" class="text-center text-gray-600 py-6 text-sm">
-              Nenhuma tarefa vinculada
+              Nenhuma tarefa vinculada — clique em <span class="text-blue-400">Nova tarefa</span> pra começar
             </p>
           </div>
         </div>
@@ -129,6 +145,29 @@
       @close="flowProject = null"
     />
 
+    <!-- Modal de tarefa (criar/editar dentro do projeto) -->
+    <TaskFormModal
+      :show="showTaskModal"
+      :editing="editingTask"
+      :users="users"
+      :projects="projects"
+      :fixed-project-id="taskProjectId"
+      :default-user-id="defaultUserId"
+      @close="closeTaskModal"
+      @save="saveTask"
+      @delete="(t) => (taskToDelete = t)"
+    />
+
+    <ConfirmDialog
+      :show="!!taskToDelete"
+      title="Excluir tarefa?"
+      :message="taskToDelete ? `“${taskToDelete.title}” será removida permanentemente.` : ''"
+      confirm-label="Excluir"
+      danger
+      @confirm="doDeleteTask"
+      @cancel="taskToDelete = null"
+    />
+
     <ConfirmDialog
       :show="!!projectToDelete"
       title="Excluir projeto?"
@@ -151,6 +190,7 @@ import Modal from '../components/ui/Modal.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import AttachmentList from '../components/tasks/AttachmentList.vue'
 import ProjectFlowModal from '../components/projects/ProjectFlowModal.vue'
+import TaskFormModal from '../components/tasks/TaskFormModal.vue'
 import { useToast } from '../composables/useToast'
 import { hapticLight } from '../services/haptics'
 
@@ -159,10 +199,18 @@ const auth = useAuthStore()
 const toast = useToast()
 const expanded = ref(null)
 const projects = ref([])
+const users = ref([])
 const flowProject = ref(null)
 const projectToDelete = ref(null)
 
+// Tarefa dentro do projeto
+const showTaskModal = ref(false)
+const editingTask = ref(null)
+const taskProjectId = ref(null)
+const taskToDelete = ref(null)
+
 const isGarbson = computed(() => auth.user?.email === 'garbsonsouza@gmail.com')
+const defaultUserId = computed(() => auth.user?.id || null)
 
 const currentQuote = ref(getQuote('quote-proj'))
 
@@ -253,8 +301,70 @@ function openFlow(project) {
 
 async function loadProjects() {
   await taskStore.fetch()
-  const { data } = await api.get('/projects')
-  projects.value = data
+  const [projRes, usersRes] = await Promise.all([
+    api.get('/projects'),
+    api.get('/auth/users'),
+  ])
+  projects.value = projRes.data
+  users.value = usersRes.data
+}
+
+// === Tarefas dentro do projeto ===
+function openCreateTask(project) {
+  editingTask.value = null
+  taskProjectId.value = project.id
+  showTaskModal.value = true
+}
+
+function openEditTask(task) {
+  editingTask.value = task
+  taskProjectId.value = task.project_id
+  showTaskModal.value = true
+}
+
+function closeTaskModal() {
+  showTaskModal.value = false
+  editingTask.value = null
+  taskProjectId.value = null
+}
+
+async function saveTask(payload) {
+  try {
+    if (editingTask.value) {
+      await taskStore.update(editingTask.value.id, payload)
+      toast.success('Tarefa atualizada')
+    } else {
+      await taskStore.create(payload)
+      toast.success('Tarefa criada')
+    }
+    hapticLight()
+    closeTaskModal()
+  } catch {
+    toast.error('Não foi possível salvar')
+  }
+}
+
+async function doDeleteTask() {
+  if (!taskToDelete.value) return
+  const id = taskToDelete.value.id
+  taskToDelete.value = null
+  try {
+    await taskStore.remove(id)
+    toast.success('Tarefa excluída')
+    if (editingTask.value?.id === id) closeTaskModal()
+  } catch {
+    toast.error('Não foi possível excluir')
+  }
+}
+
+async function toggleTaskStatus(task) {
+  if (task.status !== 'done' && task.dependency_id && task.dependency_status !== 'done') {
+    toast.warning(`Conclua primeiro: "${task.dependency_title}"`)
+    return
+  }
+  const next = task.status === 'done' ? 'todo' : 'done'
+  await taskStore.update(task.id, { status: next })
+  hapticLight()
 }
 
 onMounted(() => loadProjects())

@@ -159,122 +159,17 @@
       </p>
     </div>
 
-    <!-- Modal -->
-    <Modal :show="showModal" :title="editing ? 'Editar tarefa' : 'Nova tarefa'" @close="closeModal">
-      <form @submit.prevent="save" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Título *</label>
-          <input
-            v-model="form.title"
-            type="text"
-            required
-            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-          />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
-          <textarea
-            v-model="form.description"
-            rows="3"
-            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-          ></textarea>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Projeto</label>
-          <select
-            v-model="form.project_id"
-            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
-          >
-            <option :value="null">Nenhum</option>
-            <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Responsável</label>
-          <select
-            v-model="form.user_id"
-            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
-          >
-            <option :value="null">Não atribuído</option>
-            <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Depende de</label>
-          <select
-            v-model="form.dependency_id"
-            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
-          >
-            <option :value="null">Nenhuma</option>
-            <option v-for="t in availableDeps" :key="t.id" :value="t.id">{{ t.title }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Data de entrega</label>
-          <input
-            v-model="form.due_date"
-            type="date"
-            class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
-          />
-          <p v-if="form.due_date" class="text-[10px] text-gray-500 mt-1">
-            Você recebe lembrete no WhatsApp no dia da entrega (configure em
-            <router-link to="/configuracoes" class="text-blue-400 hover:underline">Configurações</router-link>)
-          </p>
-        </div>
-
-        <div class="grid grid-cols-3 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Dificuldade</label>
-            <select
-              v-model="form.difficulty"
-              class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
-            >
-              <option value="easy">Fácil</option>
-              <option value="medium">Média</option>
-              <option value="hard">Difícil</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Prioridade</label>
-            <select
-              v-model="form.priority"
-              class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
-            >
-              <option value="low">Baixa</option>
-              <option value="medium">Média</option>
-              <option value="high">Alta</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
-            <select
-              v-model="form.status"
-              class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
-            >
-              <option value="todo">A fazer</option>
-              <option value="in_progress">Em andamento</option>
-              <option value="done">Concluído</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Subtarefas, comentários e anexos (só ao editar) -->
-        <div v-if="editing" class="space-y-5 pt-4 border-t border-white/5">
-          <SubtaskList :task-id="editing.id" />
-          <AttachmentList entity-type="task" :entity-id="editing.id" />
-          <CommentList :task-id="editing.id" />
-        </div>
-
-        <div class="flex gap-3 pt-2">
-          <button v-if="editing" type="button" @click="deleteTask" class="px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-            Excluir
-          </button>
-          <div class="flex-1"></div>
-          <button type="button" @click="closeModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg transition-colors">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-lg shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all font-medium">Salvar</button>
-        </div>
-      </form>
-    </Modal>
+    <!-- Modal de criar/editar tarefa -->
+    <TaskFormModal
+      :show="showModal"
+      :editing="editing"
+      :users="users"
+      :projects="projects"
+      :default-user-id="defaultUserId"
+      @close="closeModal"
+      @save="save"
+      @delete="(task) => (taskToDelete = task)"
+    />
 
     <ConfirmDialog
       :show="!!taskToDelete"
@@ -289,15 +184,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useTaskStore } from '../stores/tasks'
 import { useAuthStore } from '../stores/auth'
 import api from '../api'
-import Modal from '../components/ui/Modal.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
-import SubtaskList from '../components/tasks/SubtaskList.vue'
-import CommentList from '../components/tasks/CommentList.vue'
-import AttachmentList from '../components/tasks/AttachmentList.vue'
+import TaskFormModal from '../components/tasks/TaskFormModal.vue'
 import { quotes, getQuote } from '../quotes'
 import { useToast } from '../composables/useToast'
 import { hapticLight, hapticMedium, hapticSuccess } from '../services/haptics'
@@ -315,22 +207,9 @@ const activeFilter = ref('all')
 const projectFilter = ref('')
 
 const isGarbson = computed(() => auth.user?.email === 'garbsonsouza@gmail.com')
+const defaultUserId = computed(() => auth.user?.id || null)
 
 const currentQuote = ref(getQuote('quote-tasks'))
-
-const form = reactive({
-  title: '', description: '', priority: 'medium', difficulty: 'medium', due_date: '', status: 'todo', user_id: null, project_id: null, dependency_id: null
-})
-
-const availableDeps = computed(() => {
-  const projectId = form.project_id || (editing.value?.project_id)
-  return taskStore.tasks.filter(t => {
-    if (editing.value && t.id === editing.value.id) return false
-    if (!projectId) return false
-    if (t.project_id !== Number(projectId)) return false
-    return t.status !== 'done'
-  })
-})
 
 const filters = computed(() => {
   let tasks = taskStore.tasks
@@ -400,30 +279,17 @@ function statusLabel(s) {
 
 function openCreate() {
   editing.value = null
-  Object.assign(form, { title: '', description: '', priority: 'medium', difficulty: 'medium', due_date: '', status: 'todo', user_id: null, project_id: null, dependency_id: null })
   showModal.value = true
 }
 
 function editTask(task) {
   editing.value = task
-  Object.assign(form, {
-    title: task.title,
-    description: task.description || '',
-    priority: task.priority,
-    difficulty: task.difficulty || 'medium',
-    due_date: task.due_date || '',
-    status: task.status,
-    user_id: task.user_id,
-    project_id: task.project_id,
-    dependency_id: task.dependency_id
-  })
   showModal.value = true
 }
 
 function closeModal() { showModal.value = false; editing.value = null }
 
-async function save() {
-  const payload = { ...form, project_id: form.project_id || null, dependency_id: form.dependency_id || null, due_date: form.due_date || null }
+async function save(payload) {
   try {
     if (editing.value) {
       await taskStore.update(editing.value.id, payload)
@@ -437,10 +303,6 @@ async function save() {
   } catch (e) {
     toast.error('Não foi possível salvar')
   }
-}
-
-function deleteTask() {
-  taskToDelete.value = editing.value
 }
 
 function confirmDelete(task) {
