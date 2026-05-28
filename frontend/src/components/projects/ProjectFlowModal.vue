@@ -67,9 +67,6 @@
           >
             Limpar
           </button>
-          <p class="hidden lg:block ml-auto text-[10px] text-gray-500 shrink-0">
-            Duplo-clique no nó ou na linha pra editar texto
-          </p>
         </div>
 
         <!-- Canvas -->
@@ -153,6 +150,7 @@ const nodeKinds = [
   { kind: 'document', label: 'Documento', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 60 80" fill="none" stroke="#f472b6" stroke-width="6"><path stroke-linejoin="round" d="M8,3 L48,3 L56,13 L56,77 L8,77 Z M48,3 L48,13 L56,13"/></svg>', hint: 'Documento / dado' },
   { kind: 'datastore', label: 'Dados', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 80 80" fill="none" stroke="#14b8a6" stroke-width="5"><ellipse cx="40" cy="18" rx="34" ry="12"/><line x1="6" y1="18" x2="6" y2="62"/><line x1="74" y1="18" x2="74" y2="62"/><ellipse cx="40" cy="62" rx="34" ry="12"/></svg>', hint: 'Armazenamento de dados' },
   { kind: 'end', label: 'Fim', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>', hint: 'Evento de fim' },
+  { kind: 'text', label: 'Texto', icon: '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h16"/></svg>', hint: 'Texto livre (redimensionável)' },
 ]
 
 const labelByKind = {
@@ -168,6 +166,7 @@ const labelByKind = {
   document: 'Documento',
   datastore: 'Dados',
   end: 'Fim',
+  text: '',
 }
 function handleEdgeLabelChange() {
   dirty.value = true
@@ -198,11 +197,18 @@ function addNode(kind) {
   const id = genId()
   const offsetX = 80 + (nodes.value.length % 4) * 40
   const offsetY = 100 + (nodes.value.length % 3) * 40
+  const defaultLabel = labelByKind[kind] ?? 'Nó'
+  const data = { label: defaultLabel, kind }
+  if (kind === 'text') {
+    data.width = 240
+    data.height = 80
+    data.fontSize = 16
+  }
   nodes.value.push({
     id,
     type: 'bpmn',
     position: { x: offsetX, y: offsetY },
-    data: { label: labelByKind[kind] || 'Nó', kind },
+    data,
   })
   dirty.value = true
   hapticLight()
@@ -272,12 +278,16 @@ async function saveNow() {
   if (saveTimer) clearTimeout(saveTimer)
   saving.value = true
   const payload = {
-    nodes: nodes.value.map((n) => ({
-      id: n.id,
-      type: 'bpmn',
-      position: n.position,
-      data: { label: n.data?.label || '', kind: n.data?.kind || 'task' },
-    })),
+    nodes: nodes.value.map((n) => {
+      const d = n.data || {}
+      const data = { label: d.label || '', kind: d.kind || 'task' }
+      if (data.kind === 'text') {
+        data.width = d.width || 220
+        data.height = d.height || 80
+        data.fontSize = d.fontSize || 16
+      }
+      return { id: n.id, type: 'bpmn', position: n.position, data }
+    }),
     edges: edges.value.map((e) => ({
       id: e.id,
       source: e.source,
@@ -309,10 +319,20 @@ function clearAll() {
 
 watch(
   () => props.show,
-  (v) => {
-    if (v && props.project) load(props.project.id)
-    else {
-      if (saveTimer) clearTimeout(saveTimer)
+  async (v) => {
+    if (v && props.project) {
+      load(props.project.id)
+    } else {
+      // Se estava com mudanças pendentes (ex: legenda da edge), salva antes de limpar
+      if (saveTimer) {
+        clearTimeout(saveTimer)
+        saveTimer = null
+      }
+      if (dirty.value && props.project) {
+        try {
+          await saveNow()
+        } catch {}
+      }
       nodes.value = []
       edges.value = []
       dirty.value = false

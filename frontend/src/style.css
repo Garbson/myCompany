@@ -29,6 +29,13 @@ body {
   min-height: 100vh;
 }
 
+/* Com video background ativo, deixamos html/body transparentes pro vídeo aparecer */
+html.has-video-bg,
+html.has-video-bg body {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
 /* Glass utilities */
 .glass {
   background-color: rgba(15, 23, 42, 0.55);

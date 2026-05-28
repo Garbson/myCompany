@@ -1,10 +1,10 @@
 <template>
-  <BaseEdge :id="id" :path="edgePath" :style="mergedStyle" :marker-end="markerEnd" />
+  <BaseEdge :id="id" :path="edgePath[0]" :style="mergedStyle" :marker-end="markerEnd" />
   <EdgeLabelRenderer>
     <div
       :style="{
         position: 'absolute',
-        transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+        transform: `translate(-50%, -50%) translate(${labelPos.x}px, ${labelPos.y}px)`,
         pointerEvents: 'all',
       }"
       class="bpmn-edge-label nodrag nopan"
@@ -15,6 +15,7 @@
         ref="inputRef"
         v-model="draft"
         type="text"
+        placeholder="legenda"
         class="bpmn-edge-label-input"
         @blur="commit"
         @keydown.enter.prevent="commit"
@@ -29,16 +30,17 @@
       >{{ label }}</span>
       <span
         v-else
-        class="bpmn-edge-label-placeholder"
+        class="bpmn-edge-label-empty"
         @mousedown.stop
-      >Duplo clique</span>
+        aria-hidden="true"
+      ></span>
     </div>
   </EdgeLabelRenderer>
 </template>
 
 <script setup>
 import { computed, ref, nextTick, inject } from 'vue'
-import { BaseEdge, EdgeLabelRenderer, getBezierPath, useVueFlow } from '@vue-flow/core'
+import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, useVueFlow } from '@vue-flow/core'
 
 const props = defineProps({
   id: String,
@@ -62,22 +64,30 @@ const { updateEdge } = useVueFlow()
 const onDirty = inject('onFlowDirty', null)
 
 const edgePath = computed(() =>
-  getBezierPath({
+  getSmoothStepPath({
     sourceX: props.sourceX,
     sourceY: props.sourceY,
     sourcePosition: props.sourcePosition,
     targetX: props.targetX,
     targetY: props.targetY,
     targetPosition: props.targetPosition,
-    curvature: 0.25,
+    borderRadius: 14,
+    offset: 24,
   })
 )
 
-const labelX = computed(() => (props.sourceX + props.targetX) / 2)
-const labelY = computed(() => (props.sourceY + props.targetY) / 2)
+const labelPos = computed(() => ({
+  x: edgePath.value[1] ?? (props.sourceX + props.targetX) / 2,
+  y: edgePath.value[2] ?? (props.sourceY + props.targetY) / 2,
+}))
 
 const mergedStyle = computed(() => {
-  const base = { stroke: 'rgba(96, 165, 250, 0.7)', strokeWidth: 2 }
+  const base = {
+    stroke: 'rgba(96, 165, 250, 0.75)',
+    strokeWidth: 2.2,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+  }
   if (props.selected) base.stroke = 'rgba(168, 85, 247, 0.95)'
   if (typeof props.style === 'object') return { ...base, ...props.style }
   return base
@@ -98,9 +108,11 @@ async function startEdit() {
 function commit() {
   if (!editing.value) return
   const newLabel = draft.value.trim()
-  updateEdge(props.id, { label: newLabel })
+  if (newLabel !== (props.label || '')) {
+    updateEdge(props.id, { label: newLabel })
+    onDirty?.()
+  }
   editing.value = false
-  onDirty?.()
 }
 
 function cancel() {
@@ -118,39 +130,39 @@ function cancel() {
 }
 .bpmn-edge-label-text {
   display: inline-block;
-  padding: 3px 8px;
-  background: rgba(15, 23, 42, 0.88);
+  padding: 3px 9px;
+  background: rgba(15, 23, 42, 0.9);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(96, 165, 250, 0.3);
+  border: 1px solid rgba(96, 165, 250, 0.35);
   border-radius: 8px;
   color: #e2e8f0;
   white-space: nowrap;
-  max-width: 180px;
+  max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: text;
 }
 .bpmn-edge-label-text:hover {
-  border-color: rgba(96, 165, 250, 0.7);
+  border-color: rgba(96, 165, 250, 0.8);
+  background: rgba(15, 23, 42, 0.95);
 }
-.bpmn-edge-label-placeholder {
+/* área clicável discreta quando não há texto */
+.bpmn-edge-label-empty {
   display: inline-block;
-  padding: 2px 6px;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
-  color: rgba(255, 255, 255, 0.2);
-  font-size: 10px;
-  white-space: nowrap;
-  transition: color 0.2s, border-color 0.2s;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
 }
-.bpmn-edge-label-placeholder:hover {
-  color: rgba(255, 255, 255, 0.5);
-  border-color: rgba(255, 255, 255, 0.3);
+.bpmn-edge-label:hover .bpmn-edge-label-empty {
+  background: rgba(96, 165, 250, 0.45);
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.6);
 }
 .bpmn-edge-label-input {
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(96, 165, 250, 0.7);
   border-radius: 6px;
   padding: 3px 8px;
@@ -158,9 +170,12 @@ function cancel() {
   font-size: 11px;
   font-weight: 500;
   text-align: center;
-  min-width: 80px;
-  max-width: 200px;
+  min-width: 100px;
+  max-width: 220px;
   outline: none;
   box-shadow: 0 0 12px rgba(96, 165, 250, 0.3);
+}
+.bpmn-edge-label-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
 }
 </style>

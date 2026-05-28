@@ -41,6 +41,22 @@
     <!-- User -->
     <div class="p-3 border-t border-white/5 relative">
       <button
+        v-if="isWebPlatform"
+        @click="showBgPicker = true"
+        class="w-full mb-2 flex items-center gap-2.5 px-2 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+        title="Fundo do site"
+      >
+        <span class="shrink-0 flex items-center justify-center w-5 h-5">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <rect x="3" y="5" width="18" height="14" rx="2" stroke-linejoin="round"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l5-5 4 4 3-3 6 6"/>
+            <circle cx="9" cy="10" r="1.5"/>
+          </svg>
+        </span>
+        <span class="text-sm font-medium">Fundo</span>
+        <span v-if="currentBgId !== 'none'" class="ml-auto text-[10px] text-blue-400">●</span>
+      </button>
+      <button
         @click="showMenu = !showMenu"
         class="w-full flex items-center gap-2.5 p-2 rounded-lg hover:bg-white/5 transition-colors"
       >
@@ -115,6 +131,8 @@
     @confirm="doLogout"
     @cancel="showConfirm = false"
   />
+
+  <BackgroundPicker :show="showBgPicker" @close="showBgPicker = false" />
 </template>
 
 <script setup>
@@ -122,11 +140,17 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import ConfirmDialog from "../ui/ConfirmDialog.vue";
+import BackgroundPicker from "../BackgroundPicker.vue";
 import { hapticLight } from "../../services/haptics";
+import { useBackground } from "../../composables/useBackground";
 
 const appVersion = ref("");
 const showMenu = ref(false);
 const showConfirm = ref(false);
+const showBgPicker = ref(false);
+
+const { currentId: currentBgId, isWeb } = useBackground();
+const isWebPlatform = computed(() => isWeb());
 
 onMounted(async () => {
   try {

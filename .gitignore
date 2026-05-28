@@ -6,6 +6,9 @@ dist/
 *.apk
 releases/
 
+# Video backgrounds (hospedados no Cloudflare R2)
+frontend/public/backgrounds/
+
 # Apple double files
 ._*
 .DS_Store
