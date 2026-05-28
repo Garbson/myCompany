@@ -105,6 +105,30 @@ html.has-video-bg body {
   .safe-pb-mobile { padding-bottom: var(--safe-bottom); }
 }
 
+/* Título de página fixo no topo (desktop)
+ * Estende de borda a borda do <main> e aplica glass blur para cobrir o
+ * conteúdo que rola por baixo. Cancela o pt-5 do <main> e substitui o mb-6. */
+@media (min-width: 768px) {
+  .md-sticky-title {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    margin-top: -1.25rem;
+    margin-bottom: 1.25rem;
+    padding: 0.875rem 1.5rem;
+    background: rgba(5, 7, 20, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  /* Quando há vídeo de fundo, o título usa overlay próprio mais translúcido */
+  html.has-video-bg .md-sticky-title {
+    background: rgba(5, 7, 20, 0.55);
+  }
+}
+
 /* Hide scrollbar (still scrollable) */
 .scrollbar-none {
   scrollbar-width: none;

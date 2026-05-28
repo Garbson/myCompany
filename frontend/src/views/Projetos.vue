@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center justify-between mb-6 md-sticky-title">
       <h1 class="text-xl font-bold text-white">Projetos</h1>
       <button @click="openCreateProject" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700">
         + Projeto

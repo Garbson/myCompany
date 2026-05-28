@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="hidden md:flex items-center justify-between mb-6">
+    <div class="hidden md:flex items-center justify-between mb-6 md-sticky-title">
       <div>
         <h1 class="text-2xl font-bold text-white tracking-tight">Tarefas</h1>
         <p class="text-xs text-gray-500 mt-0.5">{{ filteredTasks.length }} {{ filteredTasks.length === 1 ? 'tarefa' : 'tarefas' }}</p>

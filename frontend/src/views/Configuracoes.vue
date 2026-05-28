@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-2xl mx-auto">
-    <div class="hidden md:block mb-6">
+    <div class="hidden md:block mb-6 md-sticky-title">
       <h1 class="text-2xl font-bold text-white tracking-tight">Configurações</h1>
       <p class="text-sm text-gray-500 mt-0.5">Perfil, notificações e segurança</p>
     </div>
