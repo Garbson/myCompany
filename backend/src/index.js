@@ -11,6 +11,7 @@ import commentRoutes from './routes/comments.js'
 import attachmentRoutes from './routes/attachments.js'
 import projectFlowRoutes from './routes/projectFlows.js'
 import { startReminderLoop } from './services/reminders.js'
+import { startRecurrenceLoop } from './services/recurrence.js'
 import { runMigrations } from './database/migrations.js'
 
 dotenv.config()
@@ -34,4 +35,5 @@ app.listen(PORT, async () => {
   console.log(`API rodando na porta ${PORT}`)
   await runMigrations()
   startReminderLoop()
+  startRecurrenceLoop()
 })

@@ -22,7 +22,8 @@
               <div>
                 <p class="text-sm font-medium text-gray-200">{{ project.name }}</p>
                 <p class="text-xs text-gray-500">
-                  {{ project.taskCount }} tarefa{{ project.taskCount !== 1 ? 's' : '' }}
+                  {{ project.openCount }} pendente{{ project.openCount !== 1 ? 's' : '' }}
+                  <span v-if="project.doneCount" class="text-gray-600">· {{ project.doneCount }} concluída{{ project.doneCount !== 1 ? 's' : '' }}</span>
                 </p>
               </div>
             </div>
@@ -62,21 +63,35 @@
         </div>
 
         <div v-if="expanded === project.id" class="border-t border-white/5 p-4 bg-slate-950/40">
-          <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center justify-between mb-3 gap-2 flex-wrap">
             <p class="text-xs font-medium text-gray-400">Tarefas do projeto</p>
-            <button
-              @click.stop="openCreateTask(project)"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors shadow-md shadow-blue-600/20"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-              Nova tarefa
-            </button>
+            <div class="flex items-center gap-2">
+              <button
+                @click.stop="showCompleted = !showCompleted"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                :class="showCompleted ? 'bg-green-500/90 text-white shadow-md shadow-green-500/20' : 'glass-light text-gray-400 hover:text-white'"
+                :title="showCompleted ? 'Ocultar concluídas' : 'Mostrar concluídas'"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                  <path v-if="showCompleted" stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  <path v-else stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+                </svg>
+                {{ showCompleted ? 'Ocultar concluídas' : 'Mostrar concluídas' }}
+              </button>
+              <button
+                @click.stop="openCreateTask(project)"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors shadow-md shadow-blue-600/20"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Nova tarefa
+              </button>
+            </div>
           </div>
           <div class="space-y-1">
             <div
-              v-for="task in project.tasks"
+              v-for="task in visibleTasksFor(project)"
               :key="task.id"
               class="flex items-center gap-3 px-4 py-2 glass-light rounded-lg glow-hover hover:border-gray-700 cursor-pointer transition-colors"
               @click.stop="openEditTask(task)"
@@ -208,6 +223,7 @@ const showTaskModal = ref(false)
 const editingTask = ref(null)
 const taskProjectId = ref(null)
 const taskToDelete = ref(null)
+const showCompleted = ref(false)
 
 const isGarbson = computed(() => auth.user?.email === 'garbsonsouza@gmail.com')
 const defaultUserId = computed(() => auth.user?.id || null)
@@ -251,13 +267,25 @@ async function saveProject() {
 const projectTasks = computed(() => {
   return projects.value
     .filter(p => !p.is_freela)
-    .map(p => ({
-      ...p,
-      tasks: taskStore.tasks.filter(t => t.project_id === p.id),
-      taskCount: taskStore.tasks.filter(t => t.project_id === p.id).length
-    }))
-    .sort((a, b) => b.taskCount - a.taskCount)
+    .map(p => {
+      const all = taskStore.tasks.filter(t => t.project_id === p.id)
+      const open = all.filter(t => t.status !== 'done')
+      const done = all.filter(t => t.status === 'done')
+      return {
+        ...p,
+        tasks: all,
+        openCount: open.length,
+        doneCount: done.length,
+      }
+    })
+    .sort((a, b) => b.openCount - a.openCount)
 })
+
+function visibleTasksFor(project) {
+  return showCompleted.value
+    ? project.tasks
+    : project.tasks.filter((t) => t.status !== 'done')
+}
 
 function toggle(id) {
   expanded.value = expanded.value === id ? null : id

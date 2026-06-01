@@ -47,6 +47,18 @@
           {{ f.label }}
           <span class="ml-1 opacity-60">({{ f.count }})</span>
         </button>
+        <button
+          @click="showCompleted = !showCompleted"
+          class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap"
+          :class="showCompleted ? 'bg-green-500/90 text-white shadow-lg shadow-green-500/30' : 'glass-light text-gray-400 hover:text-white'"
+          :title="showCompleted ? 'Ocultar concluídas' : 'Mostrar concluídas'"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path v-if="showCompleted" stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            <path v-else stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+          </svg>
+          {{ showCompleted ? 'Ocultar concluídas' : 'Mostrar concluídas' }}
+        </button>
         <select
           v-model="projectFilter"
           class="hidden md:block md:ml-auto px-3 py-1.5 text-xs bg-slate-900/60 border border-white/10 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500"
@@ -210,6 +222,7 @@ const users = ref([])
 const projects = ref([])
 const activeFilter = ref('all')
 const projectFilter = ref('')
+const showCompleted = ref(false)
 
 const isGarbson = computed(() => auth.user?.email === 'garbsonsouza@gmail.com')
 const defaultUserId = computed(() => auth.user?.id || null)
@@ -219,11 +232,12 @@ const currentQuote = ref(getQuote('quote-tasks'))
 const filters = computed(() => {
   let tasks = taskStore.tasks
   if (projectFilter.value) tasks = tasks.filter(t => t.project_id === Number(projectFilter.value))
+  // Contagem ignora concluídas (a menos que o toggle esteja ativo)
+  const visible = showCompleted.value ? tasks : tasks.filter(t => t.status !== 'done')
   return [
-    { key: 'all', label: 'Todas', count: tasks.length },
+    { key: 'all', label: 'Todas', count: visible.length },
     { key: 'todo', label: 'A fazer', count: tasks.filter(t => t.status === 'todo').length },
     { key: 'in_progress', label: 'Em andamento', count: tasks.filter(t => t.status === 'in_progress').length },
-    { key: 'done', label: 'Concluídas', count: tasks.filter(t => t.status === 'done').length }
   ]
 })
 
@@ -231,6 +245,8 @@ const filteredTasks = computed(() => {
   let tasks = [...taskStore.tasks]
   if (projectFilter.value) tasks = tasks.filter(t => t.project_id === Number(projectFilter.value))
   if (activeFilter.value !== 'all') tasks = tasks.filter(t => t.status === activeFilter.value)
+  // Por padrão oculta concluídas; toggle "Concluídas" libera
+  if (!showCompleted.value) tasks = tasks.filter(t => t.status !== 'done')
   // Sort: done at bottom, then by difficulty (easy first), blocked tasks stay visible
   tasks.sort((a, b) => {
     if (a.status === 'done' && b.status !== 'done') return 1
