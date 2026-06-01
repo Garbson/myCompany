@@ -29,14 +29,16 @@
             />
           </div>
 
-          <!-- Descrição -->
+          <!-- Descrição (auto-expansível) -->
           <div>
             <p class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1.5">Descrição</p>
             <textarea
               v-model="form.description"
-              rows="4"
+              ref="descRef"
+              rows="3"
               placeholder="Adicione contexto, links, decisões…"
-              class="w-full px-3 py-2 bg-slate-900/40 border border-white/5 rounded-lg text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:bg-slate-900/60 transition-colors resize-y"
+              class="w-full px-3 py-2 bg-slate-900/40 border border-white/5 rounded-lg text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:bg-slate-900/60 transition-colors resize-none overflow-hidden leading-relaxed"
+              @input="autoResize"
             ></textarea>
           </div>
 
@@ -210,7 +212,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, watch } from 'vue'
+import { reactive, computed, watch, ref, nextTick } from 'vue'
 import Modal from '../ui/Modal.vue'
 import SubtaskList from './SubtaskList.vue'
 import CommentList from './CommentList.vue'
@@ -229,6 +231,14 @@ const props = defineProps({
 const emit = defineEmits(['close', 'save', 'delete'])
 
 const taskStore = useTaskStore()
+const descRef = ref(null)
+
+function autoResize() {
+  const ta = descRef.value
+  if (!ta) return
+  ta.style.height = 'auto'
+  ta.style.height = ta.scrollHeight + 'px'
+}
 
 const weekDays = [
   { idx: 0, label: 'D' },
@@ -298,7 +308,7 @@ const availableDeps = computed(() => {
 
 watch(
   () => props.show,
-  (v) => {
+  async (v) => {
     if (!v) return
     if (props.editing) {
       Object.assign(form, {
@@ -329,6 +339,9 @@ watch(
         recurrence_days: [],
       })
     }
+    // ajusta altura do textarea pro conteúdo carregado
+    await nextTick()
+    autoResize()
   },
   { immediate: true }
 )
