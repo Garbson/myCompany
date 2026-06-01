@@ -52,7 +52,10 @@ function maybePrefetch() {
 
 onMounted(() => {
   start();
-  if (auth.isLoggedIn) maybePrefetch();
+  if (auth.isLoggedIn) {
+    auth.refreshMe();
+    maybePrefetch();
+  }
 });
 watch(
   () => auth.isLoggedIn,

@@ -168,7 +168,7 @@ const router = useRouter();
 const auth = useAuthStore();
 const user = computed(() => auth.user);
 
-const isGarbson = computed(() => user.value?.email === "garbsonsouza@gmail.com");
+const workMode = computed(() => !!auth.workMode);
 
 const allMenu = [
   {
@@ -210,7 +210,7 @@ const bgMenuItem = {
 };
 
 const menu = computed(() => {
-  let items = isGarbson.value
+  let items = workMode.value
     ? allMenu.filter((m) => !["/leads", "/freelas"].includes(m.path))
     : allMenu.slice();
   // Insere "Fundo" antes de Configurações — só na web

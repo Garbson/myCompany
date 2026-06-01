@@ -2,6 +2,12 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import pool from '../database.js'
 
+async function getCompanyWorkMode(companyId) {
+  if (!companyId) return 0
+  const [rows] = await pool.query('SELECT work_mode FROM companies WHERE id = ?', [companyId])
+  return rows[0]?.work_mode ? 1 : 0
+}
+
 export async function login(req, res) {
   const { email, password } = req.body
   if (!email || !password) {
@@ -19,8 +25,9 @@ export async function login(req, res) {
     return res.status(401).json({ error: 'Email ou senha inválidos' })
   }
 
+  const work_mode = await getCompanyWorkMode(user.company_id)
   const token = jwt.sign({ id: user.id, company_id: user.company_id }, process.env.JWT_SECRET, { expiresIn: '7d' })
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email, company_id: user.company_id, avatar_url: user.avatar_url } })
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email, company_id: user.company_id, avatar_url: user.avatar_url, work_mode } })
 }
 
 export async function register(req, res) {
@@ -45,7 +52,14 @@ export async function register(req, res) {
 }
 
 export async function me(req, res) {
-  const [rows] = await pool.query('SELECT id, name, email, created_at FROM users WHERE id = ?', [req.userId])
+  const [rows] = await pool.query(
+    `SELECT u.id, u.name, u.email, u.company_id, u.avatar_url, u.created_at,
+            COALESCE(c.work_mode, 0) AS work_mode
+     FROM users u
+     LEFT JOIN companies c ON c.id = u.company_id
+     WHERE u.id = ?`,
+    [req.userId]
+  )
   if (rows.length === 0) {
     return res.status(404).json({ error: 'Usuário não encontrado' })
   }

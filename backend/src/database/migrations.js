@@ -1,4 +1,5 @@
 import pool from '../database.js'
+import bcrypt from 'bcryptjs'
 
 // Migrações idempotentes — cada ALTER tenta executar e ignora se já existe.
 // Ordem importa: rode na inicialização do servidor.
@@ -6,6 +7,7 @@ const migrations = [
   `ALTER TABLE tasks ADD COLUMN is_recurring TINYINT(1) NOT NULL DEFAULT 0`,
   `ALTER TABLE tasks ADD COLUMN recurrence_days VARCHAR(20) DEFAULT NULL`,
   `ALTER TABLE projects ADD COLUMN priority ENUM('low','medium','high') NOT NULL DEFAULT 'medium'`,
+  `ALTER TABLE companies ADD COLUMN work_mode TINYINT(1) NOT NULL DEFAULT 0`,
   `CREATE TABLE IF NOT EXISTS project_flow_tabs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     project_id INT NOT NULL,
@@ -37,6 +39,35 @@ export async function runMigrations() {
       }
     }
   }
+  // Garante que a company do Garbson está em work_mode=1 (sem leads/freelas)
+  try {
+    await pool.query(
+      `UPDATE companies SET work_mode = 1
+       WHERE id IN (SELECT company_id FROM users WHERE email = 'garbsonsouza@gmail.com' AND company_id IS NOT NULL)`
+    )
+  } catch (e) {
+    console.warn('[migrations] falha ao atualizar work_mode do Garbson:', e.message)
+  }
+
+  // Seed do usuário Emanuel: cria company "Emanuel" (work_mode=1) + user emanuel@gmail.com
+  try {
+    const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', ['emanuel@gmail.com'])
+    if (existing.length === 0) {
+      const [comp] = await pool.query(
+        `INSERT INTO companies (name, work_mode) VALUES (?, 1)`,
+        ['Emanuel']
+      )
+      const hash = await bcrypt.hash('emanuel123', 10)
+      await pool.query(
+        `INSERT INTO users (name, email, password_hash, company_id) VALUES (?, ?, ?, ?)`,
+        ['Emanuel', 'emanuel@gmail.com', hash, comp.insertId]
+      )
+      console.log(`[migrations] usuário Emanuel criado (company id=${comp.insertId})`)
+    }
+  } catch (e) {
+    console.warn('[migrations] falha ao criar usuário Emanuel:', e.message)
+  }
+
   // Migração de dados: traz o flow antigo (project_flows) pra primeira aba "Principal"
   try {
     const [old] = await pool.query(

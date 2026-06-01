@@ -29,7 +29,7 @@
     </button>
 
     <!-- Frase motivacional -->
-    <div v-if="isGarbson" class="glass rounded-xl p-4 mb-4 text-center">
+    <div v-if="workMode" class="glass rounded-xl p-4 mb-4 text-center">
       <p class="text-sm text-gray-300 italic">"{{ currentQuote.text }}"</p>
       <p class="text-xs text-gray-500 mt-1">— {{ currentQuote.author }}</p>
     </div>
@@ -224,7 +224,7 @@ const activeFilter = ref('all')
 const projectFilter = ref('')
 const showCompleted = ref(false)
 
-const isGarbson = computed(() => auth.user?.email === 'garbsonsouza@gmail.com')
+const workMode = computed(() => !!auth.workMode)
 const defaultUserId = computed(() => auth.user?.id || null)
 
 const currentQuote = ref(getQuote('quote-tasks'))

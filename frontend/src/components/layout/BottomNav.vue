@@ -35,7 +35,7 @@ import { hapticSelection } from '../../services/haptics'
 const route = useRoute()
 const auth = useAuthStore()
 
-const isGarbson = computed(() => auth.user?.email === 'garbsonsouza@gmail.com')
+const workMode = computed(() => !!auth.workMode)
 
 const allMenu = [
   { path: '/', label: 'Início', icon: 'M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3v-6h6v6h3a1 1 0 001-1V10' },
@@ -46,7 +46,7 @@ const allMenu = [
 ]
 
 const menu = computed(() => {
-  if (isGarbson.value) return allMenu.filter(m => !['/leads', '/freelas'].includes(m.path))
+  if (workMode.value) return allMenu.filter(m => !['/leads', '/freelas'].includes(m.path))
   return allMenu
 })
 

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isGarbson">
+  <div v-if="workMode">
     <!-- Hello header (desktop) -->
     <div class="hidden md:flex items-end justify-between mb-6 md-sticky-title">
       <div>
@@ -248,7 +248,7 @@ const taskStore = useTaskStore()
 const auth = useAuthStore()
 const d = computed(() => dashboard.data || { tasks: {}, leads: {}, finance: {} })
 
-const isGarbson = computed(() => auth.user?.email === 'garbsonsouza@gmail.com')
+const workMode = computed(() => !!auth.workMode)
 
 // Task editing modal (shared with Tarefas behavior)
 const showTaskModal = ref(false)
@@ -434,7 +434,7 @@ function buildCharts() {
 onMounted(async () => {
   updateClock()
   clockTimer = setInterval(updateClock, 1000)
-  if (isGarbson.value) {
+  if (workMode.value) {
     await taskStore.fetch()
   } else {
     await dashboard.fetch()
@@ -443,6 +443,6 @@ onMounted(async () => {
 })
 
 watch(() => dashboard.data, () => {
-  if (!isGarbson.value) setTimeout(buildCharts, 100)
+  if (!workMode.value) setTimeout(buildCharts, 100)
 })
 </script>

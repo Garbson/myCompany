@@ -8,7 +8,10 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   getters: {
-    isLoggedIn: (state) => !!state.token
+    isLoggedIn: (state) => !!state.token,
+    // Modo trabalho: a company tem foco em tarefas/projetos internos, sem leads/freelas.
+    // Marca-se com work_mode=1 na tabela companies.
+    workMode: (state) => state.user?.work_mode === 1,
   },
 
   actions: {
@@ -35,6 +38,16 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
       localStorage.removeItem('token')
       localStorage.removeItem('user')
+    },
+
+    // Re-busca o usuário com campos atualizados (ex: work_mode da company)
+    async refreshMe() {
+      if (!this.token) return
+      try {
+        const { data } = await api.get('/auth/me')
+        this.user = { ...this.user, ...data }
+        localStorage.setItem('user', JSON.stringify(this.user))
+      } catch {}
     }
   }
 })
