@@ -25,7 +25,8 @@
           >
             <div
               v-if="show"
-              class="modal-sheet pointer-events-auto glass-strong gradient-border w-full md:max-w-lg rounded-2xl flex flex-col overflow-hidden"
+              class="modal-sheet pointer-events-auto glass-strong gradient-border w-full rounded-2xl flex flex-col overflow-hidden"
+              :class="sizeClass"
             >
               <!-- Header sticky -->
               <div class="flex items-center justify-between px-4 py-3 md:py-4 border-b border-white/5 shrink-0">
@@ -52,8 +53,18 @@
 <script setup>
 import { computed } from 'vue'
 
-defineProps({ show: Boolean, title: String })
+const props = defineProps({
+  show: Boolean,
+  title: String,
+  size: { type: String, default: 'md' }, // md | lg | xl
+})
 defineEmits(['close'])
+
+const sizeClass = computed(() => ({
+  md: 'md:max-w-lg',
+  lg: 'md:max-w-3xl',
+  xl: 'md:max-w-5xl',
+})[props.size] || 'md:max-w-lg')
 
 // Container ocupa o visualViewport — encolhe quando teclado abre, mantendo o modal centrado
 const containerStyle = computed(() => ({
