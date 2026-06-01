@@ -48,6 +48,53 @@
           </div>
         </header>
 
+        <!-- Abas -->
+        <div class="shrink-0 border-b border-white/5 bg-slate-950/60 px-3 md:px-6 flex items-stretch overflow-x-auto scrollbar-none">
+          <div
+            v-for="t in tabs"
+            :key="t.id"
+            class="group relative flex items-center gap-2 px-3 md:px-4 py-2 border-b-2 cursor-pointer whitespace-nowrap transition-colors"
+            :class="t.id === activeTabId
+              ? 'border-indigo-400 text-white bg-white/5'
+              : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-white/[0.03]'"
+            @click="switchTab(t.id)"
+            @dblclick.stop="startRenameTab(t)"
+          >
+            <input
+              v-if="renamingTabId === t.id"
+              ref="renameInputRef"
+              v-model="renameDraft"
+              type="text"
+              class="bg-slate-900/80 border border-indigo-400/60 rounded px-2 py-0.5 text-xs text-white outline-none w-32"
+              @blur="commitRename(t)"
+              @keydown.enter.prevent="commitRename(t)"
+              @keydown.esc.prevent="cancelRename"
+              @click.stop
+            />
+            <span v-else class="text-xs font-medium">{{ t.title }}</span>
+            <button
+              v-if="tabs.length > 1 && renamingTabId !== t.id"
+              @click.stop="askDeleteTab(t)"
+              class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-red-400 p-0.5 -mr-1"
+              :title="`Excluir aba “${t.title}”`"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <button
+            @click="addTab"
+            class="shrink-0 inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+            title="Nova aba"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Nova aba
+          </button>
+        </div>
+
         <!-- Toolbar -->
         <div class="shrink-0 glass-light border-b border-white/5 px-3 md:px-6 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
           <button
@@ -106,7 +153,7 @@
 </template>
 
 <script setup>
-import { ref, watch, markRaw, provide } from 'vue'
+import { ref, watch, markRaw, provide, nextTick } from 'vue'
 import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
@@ -133,6 +180,13 @@ const dirty = ref(false)
 const loadedOnce = ref(false)
 let suppressDirty = false
 let saveTimer = null
+
+// Abas
+const tabs = ref([])
+const activeTabId = ref(null)
+const renamingTabId = ref(null)
+const renameDraft = ref('')
+const renameInputRef = ref(null)
 
 const nodeTypes = { bpmn: markRaw(BpmnNode) }
 const edgeTypes = { 'bpmn-edge': markRaw(BpmnEdge) }
@@ -244,17 +298,34 @@ function scheduleAutosave() {
   saveTimer = setTimeout(() => saveNow(), 1500)
 }
 
-async function load(projectId) {
+// Carrega a lista de abas e ativa a primeira (ou a já ativa)
+async function loadTabs(projectId, keepActive = false) {
+  try {
+    const { data } = await api.get(`/projects/${projectId}/flow-tabs`)
+    tabs.value = data || []
+    if (!tabs.value.length) return
+    const nextActive = keepActive && tabs.value.find((t) => t.id === activeTabId.value)
+      ? activeTabId.value
+      : tabs.value[0].id
+    await loadTab(nextActive)
+  } catch {
+    toast.error('Falha ao carregar abas')
+  }
+}
+
+async function loadTab(tabId) {
+  if (!props.project || !tabId) return
   loading.value = true
   suppressDirty = true
+  activeTabId.value = tabId
   try {
-    const { data } = await api.get(`/projects/${projectId}/flow`)
+    const { data } = await api.get(`/projects/${props.project.id}/flow-tabs/${tabId}`)
     const flow = data.data || { nodes: [], edges: [] }
     nodes.value = (flow.nodes || []).map((n) => ({
       ...n,
       type: 'bpmn',
       data: { ...n.data, kind: normalizeKind(n.data?.kind) },
-      style: undefined, // limpa estilos legacy
+      style: undefined,
     }))
     edges.value = (flow.edges || []).map((e) => ({
       ...defaultEdgeOptions,
@@ -273,11 +344,8 @@ async function load(projectId) {
   }
 }
 
-async function saveNow() {
-  if (!props.project) return
-  if (saveTimer) clearTimeout(saveTimer)
-  saving.value = true
-  const payload = {
+function buildPayload() {
+  return {
     nodes: nodes.value.map((n) => {
       const d = n.data || {}
       const data = { label: d.label || '', kind: d.kind || 'task' }
@@ -297,14 +365,95 @@ async function saveNow() {
       label: e.label || '',
     })),
   }
+}
+
+async function saveNow() {
+  if (!props.project || !activeTabId.value) return
+  if (saveTimer) clearTimeout(saveTimer)
+  saving.value = true
   try {
-    await api.put(`/projects/${props.project.id}/flow`, { data: payload })
+    await api.put(`/projects/${props.project.id}/flow-tabs/${activeTabId.value}`, {
+      data: buildPayload(),
+    })
     dirty.value = false
     hapticSuccess()
   } catch {
     toast.error('Falha ao salvar')
   } finally {
     saving.value = false
+  }
+}
+
+async function switchTab(tabId) {
+  if (tabId === activeTabId.value) return
+  if (dirty.value) {
+    try { await saveNow() } catch {}
+  }
+  if (saveTimer) { clearTimeout(saveTimer); saveTimer = null }
+  await loadTab(tabId)
+}
+
+async function addTab() {
+  if (!props.project) return
+  // Salva a aba atual antes
+  if (dirty.value) {
+    try { await saveNow() } catch {}
+  }
+  try {
+    const { data } = await api.post(`/projects/${props.project.id}/flow-tabs`, { title: 'Nova aba' })
+    await loadTabs(props.project.id)
+    // Ativa a nova aba e abre o renomear
+    activeTabId.value = data.id
+    await loadTab(data.id)
+    startRenameTab(data)
+    hapticLight()
+  } catch {
+    toast.error('Falha ao criar aba')
+  }
+}
+
+async function startRenameTab(tab) {
+  renamingTabId.value = tab.id
+  renameDraft.value = tab.title
+  await nextTick()
+  const el = Array.isArray(renameInputRef.value) ? renameInputRef.value[0] : renameInputRef.value
+  el?.focus?.()
+  el?.select?.()
+}
+
+async function commitRename(tab) {
+  if (renamingTabId.value !== tab.id) return
+  const newTitle = renameDraft.value.trim() || tab.title
+  renamingTabId.value = null
+  if (newTitle === tab.title) return
+  try {
+    await api.put(`/projects/${props.project.id}/flow-tabs/${tab.id}`, { title: newTitle })
+    const t = tabs.value.find((x) => x.id === tab.id)
+    if (t) t.title = newTitle
+  } catch {
+    toast.error('Falha ao renomear')
+  }
+}
+
+function cancelRename() {
+  renamingTabId.value = null
+}
+
+async function askDeleteTab(tab) {
+  if (tabs.value.length <= 1) return
+  if (!window.confirm(`Excluir a aba “${tab.title}”? Todo o fluxograma dela será removido.`)) return
+  try {
+    await api.delete(`/projects/${props.project.id}/flow-tabs/${tab.id}`)
+    const wasActive = tab.id === activeTabId.value
+    if (wasActive) {
+      activeTabId.value = null
+      nodes.value = []
+      edges.value = []
+    }
+    await loadTabs(props.project.id, !wasActive)
+    hapticLight()
+  } catch {
+    toast.error('Falha ao excluir aba')
   }
 }
 
@@ -321,20 +470,22 @@ watch(
   () => props.show,
   async (v) => {
     if (v && props.project) {
-      load(props.project.id)
+      activeTabId.value = null
+      tabs.value = []
+      await loadTabs(props.project.id)
     } else {
-      // Se estava com mudanças pendentes (ex: legenda da edge), salva antes de limpar
       if (saveTimer) {
         clearTimeout(saveTimer)
         saveTimer = null
       }
-      if (dirty.value && props.project) {
-        try {
-          await saveNow()
-        } catch {}
+      if (dirty.value && props.project && activeTabId.value) {
+        try { await saveNow() } catch {}
       }
       nodes.value = []
       edges.value = []
+      tabs.value = []
+      activeTabId.value = null
+      renamingTabId.value = null
       dirty.value = false
       loadedOnce.value = false
     }
