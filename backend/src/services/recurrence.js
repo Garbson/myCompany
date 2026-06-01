@@ -1,12 +1,11 @@
 import pool from '../database.js'
 
-// Reseta tarefas recorrentes pra status='todo' no início de cada novo dia,
-// caso o dia da semana atual esteja em recurrence_days (ou se a tarefa
-// não tem dias específicos — aí é considerada diária).
+// Reseta tarefas recorrentes pra status='todo' nos dias em que devem aparecer.
+// Importante: SÓ reseta tarefas done cujo updated_at é ANTERIOR ao início
+// de hoje (local TZ). Assim, se o user acaba de marcar como done hoje,
+// o reset não desfaz isso — mesmo que o servidor reinicie (deploy, etc).
 
 const TZ_OFFSET_MINUTES = -180 // America/Sao_Paulo (UTC-3) — sem DST
-
-let lastRunDate = null
 
 function localDate() {
   const now = new Date()
@@ -20,6 +19,20 @@ function localDayOfWeek() {
   return local.getUTCDay() // 0=dom ... 6=sáb
 }
 
+// Retorna o instante UTC equivalente a 00:00 do dia local atual.
+// Ex: agora=2026-05-29 02:00 UTC (= 28/05 23:00 BRT) → retorna 28/05 03:00 UTC
+//                                                               (00:00 BRT do dia 28).
+function startOfTodayLocalAsUTC() {
+  const now = new Date()
+  const local = new Date(now.getTime() + TZ_OFFSET_MINUTES * 60 * 1000)
+  local.setUTCHours(0, 0, 0, 0)
+  return new Date(local.getTime() - TZ_OFFSET_MINUTES * 60 * 1000)
+}
+
+function toMysqlDateTime(d) {
+  return d.toISOString().slice(0, 19).replace('T', ' ')
+}
+
 function parseDays(str) {
   if (!str) return []
   return String(str)
@@ -28,23 +41,26 @@ function parseDays(str) {
     .filter((d) => Number.isInteger(d) && d >= 0 && d <= 6)
 }
 
-export async function runRecurrenceReset({ force = false } = {}) {
+export async function runRecurrenceReset() {
   const today = localDate()
-  if (!force && lastRunDate === today) {
-    return { skipped: true, reason: 'já rodou hoje' }
-  }
-  lastRunDate = today
-
   const dow = localDayOfWeek()
+  const cutoff = toMysqlDateTime(startOfTodayLocalAsUTC())
+
+  // Só pega tarefas recorrentes que estão done E que foram marcadas como
+  // done antes do início do dia local atual.
   const [tasks] = await pool.query(
-    `SELECT id, recurrence_days FROM tasks
-     WHERE is_recurring = 1 AND status = 'done'`
+    `SELECT id, recurrence_days
+     FROM tasks
+     WHERE is_recurring = 1
+       AND status = 'done'
+       AND updated_at < ?`,
+    [cutoff]
   )
 
   const idsToReset = []
   for (const t of tasks) {
     const days = parseDays(t.recurrence_days)
-    // Sem dias selecionados: considera diária; senão, só se hoje está na lista
+    // Sem dias selecionados → considera diária; senão, só se hoje está na lista
     if (days.length === 0 || days.includes(dow)) {
       idsToReset.push(t.id)
     }
@@ -58,12 +74,14 @@ export async function runRecurrenceReset({ force = false } = {}) {
     `UPDATE tasks SET status = 'todo' WHERE id IN (?)`,
     [idsToReset]
   )
-  console.log(`[recurrence] reset ${idsToReset.length} tarefa(s) para hoje (${today}, dow=${dow})`)
+  console.log(`[recurrence] reset ${idsToReset.length} tarefa(s) recorrente(s) (${today}, dow=${dow})`)
   return { reset: idsToReset.length }
 }
 
 export function startRecurrenceLoop() {
-  // Roda imediatamente e depois a cada hora — `lastRunDate` evita duplicação
+  // Roda uma vez no startup e depois a cada hora. A query agora é segura
+  // (filtra por updated_at < início do dia), então pode rodar várias vezes
+  // sem efeitos colaterais.
   runRecurrenceReset().catch((e) => console.error('recurrence error', e))
   setInterval(() => {
     runRecurrenceReset().catch((e) => console.error('recurrence error', e))
