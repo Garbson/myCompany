@@ -5,6 +5,7 @@ import pool from '../database.js'
 const migrations = [
   `ALTER TABLE tasks ADD COLUMN is_recurring TINYINT(1) NOT NULL DEFAULT 0`,
   `ALTER TABLE tasks ADD COLUMN recurrence_days VARCHAR(20) DEFAULT NULL`,
+  `ALTER TABLE projects ADD COLUMN priority ENUM('low','medium','high') NOT NULL DEFAULT 'medium'`,
   `CREATE TABLE IF NOT EXISTS project_flow_tabs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     project_id INT NOT NULL,

@@ -11,19 +11,19 @@ export async function list(req, res) {
     LEFT JOIN payments pay ON pay.project_id = p.id AND pay.status = 'pago'
     WHERE p.company_id = ?
     GROUP BY p.id
-    ORDER BY p.created_at DESC
+    ORDER BY FIELD(p.priority, 'high', 'medium', 'low'), p.created_at DESC
   `, [cid(req)])
   res.json(rows)
 }
 
 export async function create(req, res) {
-  const { name, description, lead_id, total_value, setup_value, entry_value, entry_date, installments, monthly_fee, monthly_cycle, annual_installments, payment_type, start_date, end_date, is_freela } = req.body
+  const { name, description, lead_id, total_value, setup_value, entry_value, entry_date, installments, monthly_fee, monthly_cycle, annual_installments, payment_type, start_date, end_date, is_freela, priority } = req.body
   if (!name) {
     return res.status(400).json({ error: 'Nome é obrigatório' })
   }
   const [result] = await pool.query(
-    'INSERT INTO projects (name, description, lead_id, total_value, setup_value, entry_value, entry_date, installments, monthly_fee, monthly_cycle, annual_installments, payment_type, start_date, end_date, is_freela, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [name, description || null, lead_id || null, total_value || 0, setup_value || 0, entry_value || 0, entry_date || null, installments || 1, monthly_fee || 0, monthly_cycle || 'mensal', annual_installments || 1, payment_type || 'pagamento_unico', start_date || null, end_date || null, is_freela ? 1 : 0, cid(req)]
+    'INSERT INTO projects (name, description, lead_id, total_value, setup_value, entry_value, entry_date, installments, monthly_fee, monthly_cycle, annual_installments, payment_type, start_date, end_date, is_freela, priority, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [name, description || null, lead_id || null, total_value || 0, setup_value || 0, entry_value || 0, entry_date || null, installments || 1, monthly_fee || 0, monthly_cycle || 'mensal', annual_installments || 1, payment_type || 'pagamento_unico', start_date || null, end_date || null, is_freela ? 1 : 0, priority || 'medium', cid(req)]
   )
   const [rows] = await pool.query('SELECT * FROM projects WHERE id = ?', [result.insertId])
   res.status(201).json(rows[0])
@@ -31,7 +31,7 @@ export async function create(req, res) {
 
 export async function update(req, res) {
   const { id } = req.params
-  const fields = ['name', 'description', 'lead_id', 'total_value', 'setup_value', 'entry_value', 'entry_date', 'installments', 'monthly_fee', 'monthly_cycle', 'annual_installments', 'payment_type', 'start_date', 'end_date', 'status', 'is_freela']
+  const fields = ['name', 'description', 'lead_id', 'total_value', 'setup_value', 'entry_value', 'entry_date', 'installments', 'monthly_fee', 'monthly_cycle', 'annual_installments', 'payment_type', 'start_date', 'end_date', 'status', 'is_freela', 'priority']
   const sets = []
   const values = []
 

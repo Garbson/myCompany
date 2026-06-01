@@ -17,10 +17,15 @@
       <div v-for="project in projectTasks" :key="project.id" class="glass rounded-xl glow-hover overflow-hidden">
         <div class="p-4 cursor-pointer hover:bg-white/5 transition-colors" @click="toggle(project.id)">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="text-lg">{{ expanded === project.id ? '▼' : '▶' }}</span>
-              <div>
-                <p class="text-sm font-medium text-gray-200">{{ project.name }}</p>
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="text-lg shrink-0">{{ expanded === project.id ? '▼' : '▶' }}</span>
+              <span
+                class="shrink-0 inline-flex items-center justify-center w-2 h-2 rounded-full"
+                :class="priorityDot(project.priority)"
+                :title="`Prioridade ${priorityLabel(project.priority)}`"
+              ></span>
+              <div class="min-w-0">
+                <p class="text-sm font-medium text-gray-200 truncate">{{ project.name }}</p>
                 <p class="text-xs text-gray-500">
                   {{ project.openCount }} pendente{{ project.openCount !== 1 ? 's' : '' }}
                   <span v-if="project.doneCount" class="text-gray-600">· {{ project.doneCount }} concluída{{ project.doneCount !== 1 ? 's' : '' }}</span>
@@ -55,6 +60,12 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </button>
+              <span
+                class="text-[10px] px-2 py-0.5 rounded-full font-medium hidden sm:inline-block"
+                :class="priorityBadge(project.priority)"
+              >
+                {{ priorityLabel(project.priority) }}
+              </span>
               <span class="text-[10px] px-2 py-0.5 rounded-full font-medium" :class="statusBadge(project.status)">
                 {{ statusLabel(project.status) }}
               </span>
@@ -139,6 +150,24 @@
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
           <textarea v-model="projectForm.description" rows="2" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1.5">Prioridade</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              v-for="p in priorityOptions"
+              :key="p.value"
+              type="button"
+              @click="projectForm.priority = p.value"
+              class="px-3 py-2 text-xs font-semibold rounded-lg transition-colors"
+              :class="projectForm.priority === p.value
+                ? p.activeClass
+                : 'glass-light text-gray-400 hover:text-white hover:bg-white/10'"
+            >
+              {{ p.label }}
+            </button>
+          </div>
         </div>
 
         <div v-if="editingProject" class="pt-3 border-t border-white/5">
@@ -233,12 +262,37 @@ const currentQuote = ref(getQuote('quote-proj'))
 // Criar/editar projeto
 const showProjectModal = ref(false)
 const editingProject = ref(null)
-const projectForm = reactive({ name: '', description: '' })
+const projectForm = reactive({ name: '', description: '', priority: 'medium' })
+
+const priorityOptions = [
+  { value: 'low',    label: 'Baixa', activeClass: 'bg-slate-500/30 text-slate-200 ring-1 ring-slate-400/40' },
+  { value: 'medium', label: 'Média', activeClass: 'bg-amber-500/30 text-amber-200 ring-1 ring-amber-400/40' },
+  { value: 'high',   label: 'Alta',  activeClass: 'bg-red-500/30 text-red-200 ring-1 ring-red-400/40' },
+]
+
+function priorityBadge(p) {
+  return {
+    low:    'bg-slate-500/20 text-slate-300',
+    medium: 'bg-amber-500/20 text-amber-300',
+    high:   'bg-red-500/20 text-red-300',
+  }[p] || 'bg-slate-500/20 text-slate-300'
+}
+function priorityDot(p) {
+  return {
+    low:    'bg-slate-400',
+    medium: 'bg-amber-400',
+    high:   'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.7)]',
+  }[p] || 'bg-slate-400'
+}
+function priorityLabel(p) {
+  return { low: 'Baixa', medium: 'Média', high: 'Alta' }[p] || 'Média'
+}
 
 function openCreateProject() {
   editingProject.value = null
   projectForm.name = ''
   projectForm.description = ''
+  projectForm.priority = 'medium'
   showProjectModal.value = true
 }
 
@@ -246,6 +300,7 @@ function openEditProject(project) {
   editingProject.value = project
   projectForm.name = project.name
   projectForm.description = project.description || ''
+  projectForm.priority = project.priority || 'medium'
   showProjectModal.value = true
 }
 
@@ -264,6 +319,8 @@ async function saveProject() {
   await loadProjects()
 }
 
+const PRIORITY_RANK = { high: 0, medium: 1, low: 2 }
+
 const projectTasks = computed(() => {
   return projects.value
     .filter(p => !p.is_freela)
@@ -278,7 +335,14 @@ const projectTasks = computed(() => {
         doneCount: done.length,
       }
     })
-    .sort((a, b) => b.openCount - a.openCount)
+    .sort((a, b) => {
+      // Primeiro por prioridade (high → low); empate, por pendentes; empate, por nome
+      const ra = PRIORITY_RANK[a.priority] ?? 1
+      const rb = PRIORITY_RANK[b.priority] ?? 1
+      if (ra !== rb) return ra - rb
+      if (a.openCount !== b.openCount) return b.openCount - a.openCount
+      return a.name.localeCompare(b.name)
+    })
 })
 
 function visibleTasksFor(project) {
