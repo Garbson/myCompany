@@ -8,6 +8,17 @@ const migrations = [
   `ALTER TABLE tasks ADD COLUMN recurrence_days VARCHAR(20) DEFAULT NULL`,
   `ALTER TABLE projects ADD COLUMN priority ENUM('low','medium','high') NOT NULL DEFAULT 'medium'`,
   `ALTER TABLE companies ADD COLUMN work_mode TINYINT(1) NOT NULL DEFAULT 0`,
+  `CREATE TABLE IF NOT EXISTS notes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    company_id INT,
+    title VARCHAR(255) NOT NULL DEFAULT '',
+    content MEDIUMTEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_notes_user (user_id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
   `CREATE TABLE IF NOT EXISTS project_flow_tabs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     project_id INT NOT NULL,

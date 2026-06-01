@@ -38,6 +38,12 @@ const routes = [
     meta: { auth: true }
   },
   {
+    path: '/anotacoes',
+    name: 'Anotações',
+    component: () => import('../views/Anotacoes.vue'),
+    meta: { auth: true }
+  },
+  {
     path: '/configuracoes',
     name: 'Configurações',
     component: () => import('../views/Configuracoes.vue'),

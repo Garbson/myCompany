@@ -7,6 +7,7 @@
           <!-- Status chip + Título grande -->
           <div class="space-y-2">
             <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mr-1">Status</span>
               <button
                 v-for="s in statusOptions"
                 :key="s.value"
