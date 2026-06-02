@@ -27,6 +27,7 @@ services:
       DB_NAME: ${DB_NAME:-mycompany}
       JWT_SECRET: ${JWT_SECRET}
       PORT: 3000
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
     networks:
       - default
       - mycompany-net

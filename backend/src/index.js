@@ -11,6 +11,7 @@ import commentRoutes from './routes/comments.js'
 import attachmentRoutes from './routes/attachments.js'
 import projectFlowRoutes from './routes/projectFlows.js'
 import noteRoutes from './routes/notes.js'
+import aiRoutes from './routes/ai.js'
 import { startReminderLoop } from './services/reminders.js'
 import { startRecurrenceLoop } from './services/recurrence.js'
 import { runMigrations } from './database/migrations.js'
@@ -31,6 +32,7 @@ app.use('/api', commentRoutes)
 app.use('/api', attachmentRoutes)
 app.use('/api', projectFlowRoutes)
 app.use('/api', noteRoutes)
+app.use('/api', aiRoutes)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, async () => {
