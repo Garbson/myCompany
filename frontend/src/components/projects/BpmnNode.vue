@@ -240,10 +240,10 @@ function cancel() {
   editing.value = false
 }
 
-// Atalhos no textarea do nó de texto livre:
+// Atalhos no textarea do nó de texto livre (convenção tipo Slack/Linear):
 // - Esc cancela
 // - Enter (sem modificador) commita
-// - Ctrl/Cmd + Enter quebra linha (deixa o comportamento padrão do textarea)
+// - Shift + Enter quebra linha (deixa o comportamento padrão do textarea)
 function onTextareaKey(e) {
   if (e.key === 'Escape') {
     e.preventDefault()
@@ -252,7 +252,7 @@ function onTextareaKey(e) {
     return
   }
   if (e.key === 'Enter') {
-    if (e.ctrlKey || e.metaKey) {
+    if (e.shiftKey) {
       // permite a quebra de linha; só impede o vue-flow de capturar
       e.stopPropagation()
       return
