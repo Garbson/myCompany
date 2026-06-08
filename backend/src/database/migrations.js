@@ -19,6 +19,37 @@ const migrations = [
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_notes_user (user_id)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  `CREATE TABLE IF NOT EXISTS habits (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    company_id INT,
+    name VARCHAR(255) NOT NULL,
+    identity VARCHAR(255),
+    frequency ENUM('daily','specific_days') NOT NULL DEFAULT 'daily',
+    recurrence_days VARCHAR(20),
+    cue_time TIME,
+    cue_location VARCHAR(255),
+    stack_after VARCHAR(255),
+    temptation_bundle TEXT,
+    two_minute_version VARCHAR(255),
+    reward TEXT,
+    archived TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_habits_user (user_id, archived)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  `CREATE TABLE IF NOT EXISTS habit_completions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    habit_id INT NOT NULL,
+    user_id INT NOT NULL,
+    completion_date DATE NOT NULL,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    note TEXT,
+    FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_habit_date (habit_id, completion_date),
+    INDEX idx_completions_user_date (user_id, completion_date)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
   `CREATE TABLE IF NOT EXISTS project_flow_tabs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     project_id INT NOT NULL,
