@@ -130,6 +130,28 @@
             <span class="text-sm text-gray-400 pr-3 shrink-0">eu vou…</span>
           </div>
           <p class="text-[10px] text-gray-500 mt-1">Pegue um hábito que você já faz no automático e empilhe o novo logo em seguida.</p>
+
+          <!-- Sugestões de hábitos âncora -->
+          <div class="mt-3 space-y-2.5">
+            <div v-for="group in anchorHabits" :key="group.label">
+              <p class="text-[10px] text-gray-600 mb-1 flex items-center gap-1">
+                <span>{{ group.icon }}</span>
+                <span class="uppercase tracking-wider font-semibold">{{ group.label }}</span>
+              </p>
+              <div class="flex flex-wrap gap-1.5">
+                <button
+                  v-for="opt in group.options"
+                  :key="opt"
+                  type="button"
+                  @click="form.stack_after = opt"
+                  class="px-2 py-1 text-[11px] rounded-md transition-colors"
+                  :class="form.stack_after === opt
+                    ? 'bg-blue-500/30 text-blue-200 ring-1 ring-blue-400/50'
+                    : 'glass-light text-gray-400 hover:text-white hover:bg-white/10'"
+                >{{ opt }}</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -247,6 +269,36 @@ const form = reactive({
 const weekDays = [
   { idx: 0, label: 'D' }, { idx: 1, label: 'S' }, { idx: 2, label: 'T' },
   { idx: 3, label: 'Q' }, { idx: 4, label: 'Q' }, { idx: 5, label: 'S' }, { idx: 6, label: 'S' },
+]
+
+// Hábitos âncora — coisas que quase todo mundo já faz no automático.
+// Servem de gatilho pra empilhar hábitos novos (Habit Stacking).
+const anchorHabits = [
+  {
+    icon: '☀️',
+    label: 'Manhã',
+    options: ['acordar', 'sair da cama', 'ir ao banheiro', 'escovar os dentes', 'lavar o rosto', 'tomar banho', 'tomar café da manhã', 'beber o primeiro copo de água'],
+  },
+  {
+    icon: '💻',
+    label: 'Início do trabalho',
+    options: ['ligar o computador', 'abrir o email', 'tomar o primeiro café', 'fazer o primeiro standup', 'sentar na mesa'],
+  },
+  {
+    icon: '🍴',
+    label: 'Almoço',
+    options: ['almoçar', 'voltar do almoço', 'fechar o notebook pro almoço'],
+  },
+  {
+    icon: '🏁',
+    label: 'Fim do trabalho',
+    options: ['fechar o notebook', 'sair do trabalho', 'chegar em casa'],
+  },
+  {
+    icon: '🌙',
+    label: 'Noite',
+    options: ['jantar', 'tomar banho à noite', 'escovar os dentes à noite', 'deitar na cama', 'tirar a roupa do trabalho'],
+  },
 ]
 
 const steps = [
