@@ -307,12 +307,9 @@ function startResize(e) {
 <style scoped>
 .bpmn-node {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: inline-block;          /* contorna apenas o shape — handles ficam no perímetro real */
   font-family: inherit;
   color: #fff;
-  min-width: 80px;
 }
 
 .bpmn-shape-wrap {
@@ -526,8 +523,15 @@ function startResize(e) {
   cursor: text;
 }
 
-/* === Label fora (eventos / gateways / etc.) === */
+/* === Label fora (eventos / gateways / etc.) ===
+ * position absolute: o label fica visualmente embaixo do shape mas NÃO conta
+ * pra altura do container — assim os handles do Vue Flow ficam no perímetro
+ * real do círculo / documento / datastore, e não esticados pra envolver o label. */
 .bpmn-label-outside {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
   margin-top: 8px;
   max-width: 180px;
   padding: 3px 10px;
@@ -543,6 +547,7 @@ function startResize(e) {
   white-space: pre-wrap;
   line-height: 1.3;
   cursor: text;
+  pointer-events: auto;
 }
 
 .bpmn-label-outside > span {
