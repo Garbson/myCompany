@@ -124,30 +124,28 @@
 
       <!-- Task / subprocess: label INSIDE; cresce com o texto -->
       <div v-else-if="kind === 'subprocess'" class="bpmn-shape bpmn-subprocess">
-        <input
+        <textarea
           v-if="editing"
           ref="inputRef"
           v-model="draft"
-          type="text"
+          rows="1"
           class="bpmn-label-input bpmn-label-input-inside"
           @blur="commit"
-          @keydown.enter.prevent="commit"
-          @keydown.esc.prevent="cancel"
+          @keydown="onLabelKey"
         />
         <span v-else class="bpmn-label-inside" @dblclick.stop="startEdit">{{ label }}</span>
         <span class="subprocess-plus">+</span>
       </div>
 
       <div v-else class="bpmn-shape bpmn-task">
-        <input
+        <textarea
           v-if="editing"
           ref="inputRef"
           v-model="draft"
-          type="text"
+          rows="1"
           class="bpmn-label-input bpmn-label-input-inside"
           @blur="commit"
-          @keydown.enter.prevent="commit"
-          @keydown.esc.prevent="cancel"
+          @keydown="onLabelKey"
         />
         <span v-else class="bpmn-label-inside" @dblclick.stop="startEdit">{{ label }}</span>
       </div>
@@ -159,15 +157,14 @@
       class="bpmn-label-outside"
       @dblclick.stop="startEdit"
     >
-      <input
+      <textarea
         v-if="editing"
         ref="inputRef"
         v-model="draft"
-        type="text"
+        rows="1"
         class="bpmn-label-input"
         @blur="commit"
-        @keydown.enter.prevent="commit"
-        @keydown.esc.prevent="cancel"
+        @keydown="onLabelKey"
       />
       <span v-else>{{ label }}</span>
     </div>
@@ -175,7 +172,7 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick, inject } from 'vue'
+import { computed, ref, nextTick, inject, watch } from 'vue'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
 
 const props = defineProps({
@@ -211,6 +208,13 @@ const handlePositions = [
   { id: 'left', pos: Position.Left, style: {} },
 ]
 
+function autoSizeLabel() {
+  const el = inputRef.value
+  if (!el || el.tagName?.toLowerCase() !== 'textarea') return
+  el.style.height = 'auto'
+  el.style.height = el.scrollHeight + 'px'
+}
+
 async function startEdit() {
   draft.value = label.value
   editing.value = true
@@ -219,9 +223,16 @@ async function startEdit() {
     textareaRef.value?.focus()
   } else {
     inputRef.value?.focus()
-    inputRef.value?.select()
+    inputRef.value?.select?.()
+    autoSizeLabel()
   }
 }
+
+// Re-mede sempre que o draft mudar (digitação, paste, undo, etc.)
+watch(draft, () => {
+  if (!editing.value) return
+  nextTick(autoSizeLabel)
+})
 
 function commit() {
   if (!editing.value) return
@@ -240,28 +251,28 @@ function cancel() {
   editing.value = false
 }
 
-// Atalhos no textarea do nó de texto livre (convenção tipo Slack/Linear):
+// Atalhos nos editores de label (textarea dos nós: tarefa, subprocesso,
+// eventos, gateways, document, datastore — e também o nó de texto livre).
+// Convenção tipo Slack/Linear:
 // - Esc cancela
 // - Enter (sem modificador) commita
-// - Shift + Enter quebra linha (deixa o comportamento padrão do textarea)
-function onTextareaKey(e) {
-  // Sempre interrompe a propagação pra que vue-flow e listeners globais
-  // (undo, delete-node, etc.) não interfiram enquanto edito o texto
+// - Shift + Enter quebra linha
+function onLabelKey(e) {
+  // Blinda contra Vue Flow + listeners globais (undo, delete-node, etc.)
   e.stopPropagation()
-
   if (e.key === 'Escape') {
     e.preventDefault()
     cancel()
     return
   }
   if (e.key === 'Enter') {
-    // Shift+Enter → quebra linha (default do textarea, deixa rolar)
-    if (e.shiftKey) return
-    // Enter sozinho → commita
+    if (e.shiftKey) return // permite quebra de linha
     e.preventDefault()
     commit()
   }
 }
+// Alias mantido pra retrocompat (textarea do nó "text" usa onTextareaKey)
+const onTextareaKey = onLabelKey
 
 function changeFont(delta) {
   const next = Math.max(10, Math.min(64, textFontSize.value + delta))
@@ -529,10 +540,18 @@ function startResize(e) {
   color: #e2e8f0;
   text-align: center;
   word-break: break-word;
+  white-space: pre-wrap;
   line-height: 1.3;
   cursor: text;
 }
 
+.bpmn-label-outside > span {
+  display: inline-block;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* === Editor de label (textarea — suporta Shift+Enter pra quebrar linha) === */
 .bpmn-label-input {
   background: rgba(0, 0, 0, 0.7);
   border: 1px solid rgba(96, 165, 250, 0.7);
@@ -541,10 +560,15 @@ function startResize(e) {
   color: #fff;
   font-size: 12px;
   font-weight: 500;
+  font-family: inherit;
   text-align: center;
   min-width: 120px;
   max-width: 220px;
   outline: none;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.3;
+  white-space: pre-wrap;
 }
 .bpmn-label-input-inside {
   background: rgba(0, 0, 0, 0.55);
