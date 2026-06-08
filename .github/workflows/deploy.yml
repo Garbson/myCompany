@@ -4,16 +4,41 @@ on:
   push:
     branches: [main]
 
+# Comentário: o erro "dial tcp ***:22: i/o timeout" do dia 08/06 às 23:18 foi
+# um glitch transitório de rede entre o GitHub Actions (Azure) e a VPS. Logs
+# de auth.log mostram dezenas de conexões SSH bem-sucedidas de IPs Azure
+# antes e depois do incidente. Pra absorver esse tipo de blip, o passo
+# principal tem retry e timeout estendido; ainda há um 2º attempt manual
+# como fallback antes de marcar o run como falho.
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy via SSH
+        id: deploy
+        uses: appleboy/ssh-action@v1
+        continue-on-error: true
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          timeout: 90s
+          command_timeout: 15m
+          script: |
+            cd /opt/mycompany
+            git pull origin main
+            docker compose -f docker-compose.prod.yml up -d --build frontend backend
+
+      - name: Retry on transient SSH failure
+        if: steps.deploy.outcome == 'failure'
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
+          timeout: 120s
+          command_timeout: 15m
           script: |
             cd /opt/mycompany
             git pull origin main
