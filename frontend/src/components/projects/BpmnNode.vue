@@ -31,8 +31,7 @@
         class="bpmn-text-input nodrag nopan"
         :style="{ fontSize: textFontSize + 'px' }"
         @blur="commit"
-        @keydown.esc.prevent="cancel"
-        @keydown.enter.exact.stop=""
+        @keydown="onTextareaKey"
         @pointerdown.stop
         @mousedown.stop
       />
@@ -239,6 +238,29 @@ function commit() {
 
 function cancel() {
   editing.value = false
+}
+
+// Atalhos no textarea do nó de texto livre:
+// - Esc cancela
+// - Enter (sem modificador) commita
+// - Ctrl/Cmd + Enter quebra linha (deixa o comportamento padrão do textarea)
+function onTextareaKey(e) {
+  if (e.key === 'Escape') {
+    e.preventDefault()
+    e.stopPropagation()
+    cancel()
+    return
+  }
+  if (e.key === 'Enter') {
+    if (e.ctrlKey || e.metaKey) {
+      // permite a quebra de linha; só impede o vue-flow de capturar
+      e.stopPropagation()
+      return
+    }
+    e.preventDefault()
+    e.stopPropagation()
+    commit()
+  }
 }
 
 function changeFont(delta) {

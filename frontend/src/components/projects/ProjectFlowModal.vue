@@ -131,11 +131,30 @@
             @nodes-change="onChange"
             @edges-change="onChange"
             @connect="onConnect"
+            @node-drag="onNodeDrag"
+            @node-drag-stop="onNodeDragStop"
+            @viewport-change="onViewportChange"
           >
             <Background :gap="24" :size="1" pattern-color="rgba(255,255,255,0.05)" />
             <Controls position="bottom-right" />
             <MiniMap pannable zoomable class="hidden md:block" />
           </VueFlow>
+          <!-- Linhas-guia ao arrastar (overlay; transform segue o viewport) -->
+          <div
+            v-if="show && (helperLineV || helperLineH)"
+            class="flow-helper-overlay"
+          >
+            <div
+              v-if="helperLineV"
+              class="helper-line-v"
+              :style="{ left: (helperLineV.x * viewport.zoom + viewport.x) + 'px' }"
+            ></div>
+            <div
+              v-if="helperLineH"
+              class="helper-line-h"
+              :style="{ top: (helperLineH.y * viewport.zoom + viewport.y) + 'px' }"
+            ></div>
+          </div>
 
           <div v-if="loading" class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="glass-strong rounded-xl px-4 py-3 text-sm text-gray-300">Carregando…</div>
@@ -200,6 +219,146 @@ const activeTabId = ref(null)
 const renamingTabId = ref(null)
 const renameDraft = ref('')
 const renameInputRef = ref(null)
+
+// === Snap guides (linhas de alinhamento ao arrastar) ===
+const helperLineV = ref(null) // { x }
+const helperLineH = ref(null) // { y }
+const viewport = ref({ x: 0, y: 0, zoom: 1 })
+function onViewportChange(v) {
+  viewport.value = { x: v.x, y: v.y, zoom: v.zoom }
+}
+const SNAP_THRESHOLD = 6 // pixels (em coordenadas do flow)
+
+function getNodeBounds(n) {
+  // Vue Flow expõe dimensions quando o node já foi medido
+  const w = n.dimensions?.width || (n.data?.kind === 'text' ? (n.data?.width || 220) : 140)
+  const h = n.dimensions?.height || (n.data?.kind === 'text' ? (n.data?.height || 80) : 60)
+  return {
+    left: n.position.x,
+    right: n.position.x + w,
+    top: n.position.y,
+    bottom: n.position.y + h,
+    cx: n.position.x + w / 2,
+    cy: n.position.y + h / 2,
+    w, h,
+  }
+}
+
+function onNodeDrag(event) {
+  const dragged = event.node
+  if (!dragged) return
+  const me = getNodeBounds(dragged)
+  let snapDx = null
+  let snapDy = null
+  let lineV = null
+  let lineH = null
+
+  for (const n of nodes.value) {
+    if (n.id === dragged.id) continue
+    const o = getNodeBounds(n)
+    // Vertical (mesmo X): center, left, right
+    for (const [ours, theirs] of [[me.cx, o.cx], [me.left, o.left], [me.right, o.right]]) {
+      const d = theirs - ours
+      if (Math.abs(d) < SNAP_THRESHOLD && (snapDx === null || Math.abs(d) < Math.abs(snapDx))) {
+        snapDx = d
+        lineV = theirs
+      }
+    }
+    // Horizontal (mesmo Y)
+    for (const [ours, theirs] of [[me.cy, o.cy], [me.top, o.top], [me.bottom, o.bottom]]) {
+      const d = theirs - ours
+      if (Math.abs(d) < SNAP_THRESHOLD && (snapDy === null || Math.abs(d) < Math.abs(snapDy))) {
+        snapDy = d
+        lineH = theirs
+      }
+    }
+  }
+
+  // Aplica snap mutando a posição reativa do nó
+  if (snapDx !== null) dragged.position.x += snapDx
+  if (snapDy !== null) dragged.position.y += snapDy
+
+  helperLineV.value = lineV !== null ? { x: lineV } : null
+  helperLineH.value = lineH !== null ? { y: lineH } : null
+}
+
+function onNodeDragStop() {
+  helperLineV.value = null
+  helperLineH.value = null
+}
+
+// === Histórico (undo / redo por aba) ===
+const history = ref([])
+const historyIndex = ref(-1)
+let historyTimer = null
+let suppressHistory = false
+
+function takeSnapshot() {
+  history.value = history.value.slice(0, historyIndex.value + 1)
+  history.value.push({
+    nodes: JSON.parse(JSON.stringify(nodes.value)),
+    edges: JSON.parse(JSON.stringify(edges.value)),
+  })
+  if (history.value.length > 80) history.value.shift()
+  historyIndex.value = history.value.length - 1
+}
+
+function scheduleSnapshot() {
+  if (suppressHistory) return
+  if (historyTimer) clearTimeout(historyTimer)
+  historyTimer = setTimeout(takeSnapshot, 350)
+}
+
+function resetHistory() {
+  if (historyTimer) { clearTimeout(historyTimer); historyTimer = null }
+  history.value = []
+  historyIndex.value = -1
+}
+
+function applyHistoryAt(idx) {
+  const state = history.value[idx]
+  if (!state) return
+  suppressDirty = true
+  suppressHistory = true
+  nodes.value = state.nodes.map((n) => ({ ...n, type: 'bpmn' }))
+  edges.value = state.edges.map((e) => ({ ...defaultEdgeOptions, ...e, type: 'bpmn-edge' }))
+  dirty.value = true
+  scheduleAutosave()
+  setTimeout(() => {
+    suppressDirty = false
+    suppressHistory = false
+  }, 80)
+}
+
+function undo() {
+  if (historyIndex.value <= 0) return
+  historyIndex.value -= 1
+  applyHistoryAt(historyIndex.value)
+}
+
+function redo() {
+  if (historyIndex.value >= history.value.length - 1) return
+  historyIndex.value += 1
+  applyHistoryAt(historyIndex.value)
+}
+
+function onGlobalKey(e) {
+  if (!props.show) return
+  const tag = (e.target?.tagName || '').toLowerCase()
+  // Ignora se foco em campo editável (renomear aba, label de nó, texto livre etc)
+  if (tag === 'input' || tag === 'textarea' || e.target?.isContentEditable) return
+  const mod = e.ctrlKey || e.metaKey
+  if (!mod) return
+  const k = e.key.toLowerCase()
+  if (k === 'z') {
+    e.preventDefault()
+    if (e.shiftKey) redo()
+    else undo()
+  } else if (k === 'y') {
+    e.preventDefault()
+    redo()
+  }
+}
 
 const nodeTypes = { bpmn: markRaw(BpmnNode) }
 const edgeTypes = { 'bpmn-edge': markRaw(BpmnEdge) }
@@ -298,12 +457,14 @@ function onConnect(conn) {
   dirty.value = true
   hapticLight()
   scheduleAutosave()
+  scheduleSnapshot()
 }
 
 function onChange() {
   if (suppressDirty) return
   dirty.value = true
   scheduleAutosave()
+  scheduleSnapshot()
 }
 
 function scheduleAutosave() {
@@ -348,6 +509,9 @@ async function loadTab(tabId) {
     }))
     loadedOnce.value = true
     dirty.value = false
+    // Reseta histórico e cria snapshot inicial dessa aba
+    resetHistory()
+    setTimeout(() => takeSnapshot(), 120)
   } catch {
     toast.error('Falha ao carregar fluxograma')
     nodes.value = []
@@ -486,8 +650,10 @@ watch(
     if (v && apiBaseUrl.value) {
       activeTabId.value = null
       tabs.value = []
+      window.addEventListener('keydown', onGlobalKey)
       await loadTabs()
     } else {
+      window.removeEventListener('keydown', onGlobalKey)
       if (saveTimer) {
         clearTimeout(saveTimer)
         saveTimer = null
@@ -502,6 +668,7 @@ watch(
       renamingTabId.value = null
       dirty.value = false
       loadedOnce.value = false
+      resetHistory()
     }
   }
 )
@@ -511,6 +678,31 @@ watch(
 /* Tema vue-flow combinando com glass */
 .flow-canvas {
   background: transparent;
+}
+
+/* Linhas-guia ao arrastar — desenhadas em screen coords sobre o canvas */
+.flow-helper-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  overflow: hidden;
+}
+.helper-line-v,
+.helper-line-h {
+  position: absolute;
+  background: rgba(244, 114, 182, 0.85); /* rosa, igual ao do Figma */
+  box-shadow: 0 0 6px rgba(244, 114, 182, 0.7);
+}
+.helper-line-v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.helper-line-h {
+  left: 0;
+  right: 0;
+  height: 1px;
 }
 .flow-canvas .vue-flow__edge-path {
   filter: drop-shadow(0 0 4px rgba(96, 165, 250, 0.4));
