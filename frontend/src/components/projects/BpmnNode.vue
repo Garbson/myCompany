@@ -526,14 +526,20 @@ function startResize(e) {
 /* === Label fora (eventos / gateways / etc.) ===
  * position absolute: o label fica visualmente embaixo do shape mas NÃO conta
  * pra altura do container — assim os handles do Vue Flow ficam no perímetro
- * real do círculo / documento / datastore, e não esticados pra envolver o label. */
+ * real do círculo / documento / datastore, e não esticados pra envolver o label.
+ *
+ * width: max-content é essencial: como o containing block (o nó do vue-flow)
+ * tem só o tamanho do shape, sem isso o navegador usa shrink-to-fit limitado
+ * a esse tamanho e o texto quebra caractere-por-caractere. Com max-content
+ * o label cresce até max-width naturalmente. */
 .bpmn-label-outside {
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
   margin-top: 8px;
-  max-width: 180px;
+  width: max-content;
+  max-width: 220px;
   padding: 3px 10px;
   background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(10px);
@@ -543,17 +549,11 @@ function startResize(e) {
   font-weight: 500;
   color: #e2e8f0;
   text-align: center;
-  word-break: break-word;
   white-space: pre-wrap;
+  overflow-wrap: break-word;
   line-height: 1.3;
   cursor: text;
   pointer-events: auto;
-}
-
-.bpmn-label-outside > span {
-  display: inline-block;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
 
 /* === Editor de label (textarea — suporta Shift+Enter pra quebrar linha) === */
