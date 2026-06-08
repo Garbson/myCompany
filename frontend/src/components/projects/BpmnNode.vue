@@ -245,20 +245,20 @@ function cancel() {
 // - Enter (sem modificador) commita
 // - Shift + Enter quebra linha (deixa o comportamento padrão do textarea)
 function onTextareaKey(e) {
+  // Sempre interrompe a propagação pra que vue-flow e listeners globais
+  // (undo, delete-node, etc.) não interfiram enquanto edito o texto
+  e.stopPropagation()
+
   if (e.key === 'Escape') {
     e.preventDefault()
-    e.stopPropagation()
     cancel()
     return
   }
   if (e.key === 'Enter') {
-    if (e.shiftKey) {
-      // permite a quebra de linha; só impede o vue-flow de capturar
-      e.stopPropagation()
-      return
-    }
+    // Shift+Enter → quebra linha (default do textarea, deixa rolar)
+    if (e.shiftKey) return
+    // Enter sozinho → commita
     e.preventDefault()
-    e.stopPropagation()
     commit()
   }
 }
