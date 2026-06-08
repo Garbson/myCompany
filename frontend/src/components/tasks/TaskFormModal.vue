@@ -193,6 +193,18 @@
         >
           Excluir
         </button>
+        <button
+          v-if="editing"
+          type="button"
+          @click="showFlow = true"
+          class="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-indigo-300 hover:bg-indigo-500/10 rounded-lg transition-colors"
+          title="Fluxograma desta tarefa"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h6v6H4zM14 6h6v4h-6zM14 14h6v4h-6zM10 9h4M14 16H7a1 1 0 01-1-1v-3"/>
+          </svg>
+          Fluxograma
+        </button>
         <div class="flex-1"></div>
         <button
           type="button"
@@ -210,6 +222,15 @@
       </div>
     </form>
   </Modal>
+
+  <!-- Fluxograma da tarefa (reusa o componente generalizado) -->
+  <ProjectFlowModal
+    :show="showFlow"
+    :entity="editing ? { id: editing.id, name: editing.title || form.title || 'Tarefa' } : null"
+    :api-base="editing ? `/tasks/${editing.id}/flow-tabs` : ''"
+    subtitle="Fluxograma da tarefa"
+    @close="showFlow = false"
+  />
 </template>
 
 <script setup>
@@ -218,6 +239,7 @@ import Modal from '../ui/Modal.vue'
 import SubtaskList from './SubtaskList.vue'
 import CommentList from './CommentList.vue'
 import AttachmentList from './AttachmentList.vue'
+import ProjectFlowModal from '../projects/ProjectFlowModal.vue'
 import { useTaskStore } from '../../stores/tasks'
 
 const props = defineProps({
@@ -233,6 +255,7 @@ const emit = defineEmits(['close', 'save', 'delete'])
 
 const taskStore = useTaskStore()
 const descRef = ref(null)
+const showFlow = ref(false)
 
 function autoResize() {
   const ta = descRef.value

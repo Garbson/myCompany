@@ -21,8 +21,8 @@
               </svg>
             </button>
             <div class="min-w-0">
-              <p class="text-xs text-gray-500 leading-none">Fluxograma BPMN</p>
-              <h2 class="text-sm md:text-base font-semibold text-white truncate">{{ project?.name }}</h2>
+              <p class="text-xs text-gray-500 leading-none">{{ subtitle }}</p>
+              <h2 class="text-sm md:text-base font-semibold text-white truncate">{{ targetEntity?.name }}</h2>
             </div>
           </div>
           <div class="flex items-center gap-2 shrink-0">
@@ -153,7 +153,7 @@
 </template>
 
 <script setup>
-import { ref, watch, markRaw, provide, nextTick } from 'vue'
+import { ref, watch, markRaw, provide, nextTick, computed } from 'vue'
 import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
@@ -168,8 +168,21 @@ import api from '../../api'
 import { useToast } from '../../composables/useToast'
 import { hapticLight, hapticSuccess } from '../../services/haptics'
 
-const props = defineProps({ show: Boolean, project: Object })
+const props = defineProps({
+  show: Boolean,
+  // Modo legado (projetos): passa `project` que vira { id, name }
+  project: { type: Object, default: null },
+  // Modo genérico: passa entity + apiBase pra reutilizar com tarefas, etc.
+  // ex: entity={ id, name }, apiBase="/tasks/123/flow-tabs"
+  entity: { type: Object, default: null },
+  apiBase: { type: String, default: '' },
+  subtitle: { type: String, default: 'Fluxograma BPMN' },
+})
 const emit = defineEmits(['close'])
+
+// Derivados que cuidam dos dois modos
+const targetEntity = computed(() => props.entity || props.project)
+const apiBaseUrl = computed(() => props.apiBase || (props.project ? `/projects/${props.project.id}/flow-tabs` : ''))
 const toast = useToast()
 
 const nodes = ref([])
@@ -299,9 +312,10 @@ function scheduleAutosave() {
 }
 
 // Carrega a lista de abas e ativa a primeira (ou a já ativa)
-async function loadTabs(projectId, keepActive = false) {
+async function loadTabs(keepActive = false) {
+  if (!apiBaseUrl.value) return
   try {
-    const { data } = await api.get(`/projects/${projectId}/flow-tabs`)
+    const { data } = await api.get(apiBaseUrl.value)
     tabs.value = data || []
     if (!tabs.value.length) return
     const nextActive = keepActive && tabs.value.find((t) => t.id === activeTabId.value)
@@ -314,12 +328,12 @@ async function loadTabs(projectId, keepActive = false) {
 }
 
 async function loadTab(tabId) {
-  if (!props.project || !tabId) return
+  if (!apiBaseUrl.value || !tabId) return
   loading.value = true
   suppressDirty = true
   activeTabId.value = tabId
   try {
-    const { data } = await api.get(`/projects/${props.project.id}/flow-tabs/${tabId}`)
+    const { data } = await api.get(`${apiBaseUrl.value}/${tabId}`)
     const flow = data.data || { nodes: [], edges: [] }
     nodes.value = (flow.nodes || []).map((n) => ({
       ...n,
@@ -368,11 +382,11 @@ function buildPayload() {
 }
 
 async function saveNow() {
-  if (!props.project || !activeTabId.value) return
+  if (!apiBaseUrl.value || !activeTabId.value) return
   if (saveTimer) clearTimeout(saveTimer)
   saving.value = true
   try {
-    await api.put(`/projects/${props.project.id}/flow-tabs/${activeTabId.value}`, {
+    await api.put(`${apiBaseUrl.value}/${activeTabId.value}`, {
       data: buildPayload(),
     })
     dirty.value = false
@@ -394,14 +408,14 @@ async function switchTab(tabId) {
 }
 
 async function addTab() {
-  if (!props.project) return
+  if (!apiBaseUrl.value) return
   // Salva a aba atual antes
   if (dirty.value) {
     try { await saveNow() } catch {}
   }
   try {
-    const { data } = await api.post(`/projects/${props.project.id}/flow-tabs`, { title: 'Nova aba' })
-    await loadTabs(props.project.id)
+    const { data } = await api.post(apiBaseUrl.value, { title: 'Nova aba' })
+    await loadTabs()
     // Ativa a nova aba e abre o renomear
     activeTabId.value = data.id
     await loadTab(data.id)
@@ -427,7 +441,7 @@ async function commitRename(tab) {
   renamingTabId.value = null
   if (newTitle === tab.title) return
   try {
-    await api.put(`/projects/${props.project.id}/flow-tabs/${tab.id}`, { title: newTitle })
+    await api.put(`${apiBaseUrl.value}/${tab.id}`, { title: newTitle })
     const t = tabs.value.find((x) => x.id === tab.id)
     if (t) t.title = newTitle
   } catch {
@@ -443,14 +457,14 @@ async function askDeleteTab(tab) {
   if (tabs.value.length <= 1) return
   if (!window.confirm(`Excluir a aba “${tab.title}”? Todo o fluxograma dela será removido.`)) return
   try {
-    await api.delete(`/projects/${props.project.id}/flow-tabs/${tab.id}`)
+    await api.delete(`${apiBaseUrl.value}/${tab.id}`)
     const wasActive = tab.id === activeTabId.value
     if (wasActive) {
       activeTabId.value = null
       nodes.value = []
       edges.value = []
     }
-    await loadTabs(props.project.id, !wasActive)
+    await loadTabs(!wasActive)
     hapticLight()
   } catch {
     toast.error('Falha ao excluir aba')
@@ -469,16 +483,16 @@ function clearAll() {
 watch(
   () => props.show,
   async (v) => {
-    if (v && props.project) {
+    if (v && apiBaseUrl.value) {
       activeTabId.value = null
       tabs.value = []
-      await loadTabs(props.project.id)
+      await loadTabs()
     } else {
       if (saveTimer) {
         clearTimeout(saveTimer)
         saveTimer = null
       }
-      if (dirty.value && props.project && activeTabId.value) {
+      if (dirty.value && apiBaseUrl.value && activeTabId.value) {
         try { await saveNow() } catch {}
       }
       nodes.value = []
