@@ -315,12 +315,16 @@ async function save(payload) {
     if (editing.value) {
       await taskStore.update(editing.value.id, payload)
       toast.success('Tarefa atualizada')
+      hapticMedium()
+      closeModal()
     } else {
-      await taskStore.create(payload)
-      toast.success('Tarefa criada')
+      const newTask = await taskStore.create(payload)
+      hapticMedium()
+      toast.success('Tarefa criada — adicione subtarefas, anexos, comentários…')
+      // Mantém o modal aberto em modo edição pra completar a tarefa
+      // sem precisar fechar/reabrir
+      editing.value = newTask
     }
-    hapticMedium()
-    closeModal()
   } catch (e) {
     toast.error('Não foi possível salvar')
   }

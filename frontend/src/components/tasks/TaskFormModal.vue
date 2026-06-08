@@ -308,9 +308,10 @@ const availableDeps = computed(() => {
 })
 
 watch(
-  () => props.show,
-  async (v) => {
-    if (!v) return
+  // reage tanto a show quanto a uma troca de tarefa (incluindo create → edit)
+  [() => props.show, () => props.editing?.id ?? null],
+  async ([show]) => {
+    if (!show) return
     if (props.editing) {
       Object.assign(form, {
         title: props.editing.title || '',
