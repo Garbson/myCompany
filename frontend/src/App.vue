@@ -5,10 +5,15 @@
     <Sidebar />
     <div class="flex-1 min-w-0 flex flex-col h-[100dvh] md:h-full">
       <MobileHeader />
+      <TabBar />
       <main
         class="flex-1 min-w-0 overflow-auto px-4 pt-3 md:px-6 md:pt-0 pb-[calc(var(--safe-bottom)+4.75rem)] md:pb-6"
       >
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <KeepAlive :include="tabsStore.keepAliveNames">
+            <component :is="Component" />
+          </KeepAlive>
+        </router-view>
       </main>
     </div>
     <BottomNav />
@@ -28,6 +33,8 @@ import { onMounted, onUnmounted, watch } from "vue";
 import Sidebar from "./components/layout/Sidebar.vue";
 import MobileHeader from "./components/layout/MobileHeader.vue";
 import BottomNav from "./components/layout/BottomNav.vue";
+import TabBar from "./components/layout/TabBar.vue";
+import { useTabsStore } from "./stores/tabs";
 import UpdateBanner from "./components/UpdateBanner.vue";
 import Toaster from "./components/ui/Toaster.vue";
 import VideoBackground from "./components/VideoBackground.vue";
@@ -36,6 +43,7 @@ import { useAuthStore } from "./stores/auth";
 import { useBackground } from "./composables/useBackground";
 
 const auth = useAuthStore();
+const tabsStore = useTabsStore();
 const { start, stop } = useVersionCheck();
 const { prefetchAll, isWeb } = useBackground();
 
