@@ -12,6 +12,7 @@ import attachmentRoutes from './routes/attachments.js'
 import projectFlowRoutes from './routes/projectFlows.js'
 import taskFlowRoutes from './routes/taskFlows.js'
 import noteRoutes from './routes/notes.js'
+import noteFolderRoutes from './routes/noteFolders.js'
 import aiRoutes from './routes/ai.js'
 import habitRoutes from './routes/habits.js'
 import { startReminderLoop } from './services/reminders.js'
@@ -35,6 +36,7 @@ app.use('/api', attachmentRoutes)
 app.use('/api', projectFlowRoutes)
 app.use('/api', taskFlowRoutes)
 app.use('/api', noteRoutes)
+app.use('/api', noteFolderRoutes)
 app.use('/api', aiRoutes)
 app.use('/api', habitRoutes)
 

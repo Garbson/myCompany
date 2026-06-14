@@ -1,7 +1,7 @@
 import pool from '../database.js'
 
 const SELECT = `
-  SELECT id, user_id, company_id, title, content, created_at, updated_at
+  SELECT id, user_id, company_id, folder_id, title, content, created_at, updated_at
   FROM notes
 `
 
@@ -23,10 +23,10 @@ export async function get(req, res) {
 }
 
 export async function create(req, res) {
-  const { title, content } = req.body
+  const { title, content, folder_id } = req.body
   const [result] = await pool.query(
-    `INSERT INTO notes (user_id, company_id, title, content) VALUES (?, ?, ?, ?)`,
-    [req.userId, req.companyId || null, (title || '').slice(0, 255), content || '']
+    `INSERT INTO notes (user_id, company_id, folder_id, title, content) VALUES (?, ?, ?, ?, ?)`,
+    [req.userId, req.companyId || null, folder_id || null, (title || '').slice(0, 255), content || '']
   )
   const [rows] = await pool.query(`${SELECT} WHERE id = ?`, [result.insertId])
   res.status(201).json(rows[0])
@@ -42,6 +42,10 @@ export async function update(req, res) {
   if (typeof req.body.content === 'string') {
     sets.push('content = ?')
     values.push(req.body.content)
+  }
+  if ('folder_id' in req.body) {
+    sets.push('folder_id = ?')
+    values.push(req.body.folder_id || null)
   }
   if (sets.length === 0) return res.status(400).json({ error: 'Nada para atualizar' })
   values.push(req.params.id, req.userId)

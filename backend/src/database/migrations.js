@@ -72,6 +72,19 @@ const migrations = [
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
     INDEX idx_pft_project (project_id)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  `CREATE TABLE IF NOT EXISTS note_folders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    company_id INT,
+    name VARCHAR(255) NOT NULL,
+    position INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_nf_user (user_id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  `ALTER TABLE notes ADD COLUMN folder_id INT DEFAULT NULL`,
+  `ALTER TABLE notes ADD CONSTRAINT fk_notes_folder FOREIGN KEY (folder_id) REFERENCES note_folders(id) ON DELETE SET NULL`,
 ]
 
 const IGNORABLE_CODES = new Set([
