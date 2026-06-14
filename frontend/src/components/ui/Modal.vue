@@ -8,8 +8,8 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="show" class="fixed inset-0 z-50" @click.self="$emit('close')">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="$emit('close')"></div>
+      <div v-if="show" class="fixed inset-0 z-50">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
         <div
           class="absolute inset-x-0 top-0 flex items-center justify-center p-4 pointer-events-none"
