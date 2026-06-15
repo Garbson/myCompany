@@ -201,6 +201,13 @@ function executeSlashItem(item) {
   }
 
   closeSlashMenu()
+
+  // Para comandos de bloco, restringe a seleção ao bloco atual
+  const { $from } = e.state.selection
+  const blockStart = $from.start()
+  const blockEnd = $from.end()
+  e.chain().focus().setTextSelection({ from: blockStart, to: blockEnd }).run()
+
   item.command(e)
 }
 
@@ -282,6 +289,12 @@ function updateSlashQuery(view) {
 }
 
 function runCmd(fn) {
+  // Salva a seleção e restaura antes de executar, evitando que focus() a perca
+  const e = editor.value
+  if (!e) return
+  const { from, to } = e.state.selection
+  e.commands.focus()
+  e.commands.setTextSelection({ from, to })
   fn()
 }
 
