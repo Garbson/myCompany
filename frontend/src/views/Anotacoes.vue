@@ -35,11 +35,19 @@
       <div class="flex-1 overflow-y-auto overflow-x-hidden py-2 scrollbar-slim">
 
         <!-- Anotações sem pasta -->
-        <div class="mb-1">
+        <div
+          class="mb-1"
+          @dragover.prevent="dragOverFolder = 'root'"
+          @dragleave="dragOverFolder = null"
+          @drop.prevent="dropOnFolder(null)"
+        >
           <button
             @click="selectedFolder = null"
             class="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium transition-colors rounded-lg mx-1"
-            :class="selectedFolder === null ? 'text-blue-400 bg-blue-500/10' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'"
+            :class="[
+              selectedFolder === null ? 'text-blue-400 bg-blue-500/10' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5',
+              dragOverFolder === 'root' ? 'ring-1 ring-blue-500/50 bg-blue-500/5' : ''
+            ]"
             style="width: calc(100% - 8px)"
           >
             <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -72,9 +80,19 @@
         </div>
 
         <!-- Pastas -->
-        <div v-for="folder in folders" :key="folder.id" class="mb-1">
+        <div
+          v-for="folder in folders"
+          :key="folder.id"
+          class="mb-1"
+          @dragover.prevent="dragOverFolder = folder.id"
+          @dragleave="dragOverFolder = null"
+          @drop.prevent="dropOnFolder(folder.id)"
+        >
           <!-- Cabeçalho da pasta -->
-          <div class="flex items-center gap-1 mx-1 group">
+          <div
+            class="flex items-center gap-1 mx-1 group transition-colors rounded-lg"
+            :class="dragOverFolder === folder.id ? 'ring-1 ring-blue-500/50 bg-blue-500/5' : ''"
+          >
             <button
               @click="toggleFolder(folder.id)"
               class="flex-1 flex items-center gap-2 px-2 py-1.5 text-xs font-medium transition-colors rounded-lg"
@@ -313,6 +331,11 @@ const NoteItem = defineComponent({
   setup(props, { emit }) {
     return () => h('div', {
       class: `group relative flex items-start gap-2 px-3 py-2 mx-1 rounded-lg cursor-pointer transition-colors ${props.active ? 'bg-white/10 text-white' : 'hover:bg-white/5 text-gray-400 hover:text-gray-200'}`,
+      draggable: true,
+      onDragstart: (e) => {
+        e.dataTransfer.setData('note-id', String(props.note.id))
+        e.dataTransfer.effectAllowed = 'move'
+      },
       onClick: () => emit('click'),
     }, [
       h('div', { class: 'flex-1 min-w-0' }, [
@@ -365,6 +388,7 @@ const newFolderRef = ref(null)
 const renamingFolder = ref(null)
 const renameFolderRef = ref(null)
 const showMoveMenu = ref(false)
+const dragOverFolder = ref(null)
 const moveMenuStyle = ref({})
 const editTitle = ref('')
 const editContent = ref('')
@@ -465,6 +489,28 @@ async function moveNote(folderId) {
   }
 }
 
+async function dropOnFolder(folderId) {
+  dragOverFolder.value = null
+  const noteId = event.dataTransfer?.getData('note-id')
+  if (!noteId) return
+  const id = Number(noteId)
+  const note = notes.value.find(n => n.id === id)
+  if (!note || note.folder_id === folderId) return
+  try {
+    const { data } = await api.put(`/notes/${id}`, { folder_id: folderId })
+    const idx = notes.value.findIndex(n => n.id === id)
+    if (idx !== -1) notes.value[idx] = data
+    if (activeNote.value?.id === id) activeNote.value = { ...data }
+    if (folderId) {
+      openFolders.value.add(folderId)
+      openFolders.value = new Set(openFolders.value)
+    }
+    toast.success('Anotação movida')
+  } catch {
+    toast.error('Falha ao mover')
+  }
+}
+
 function confirmDelete(note) {
   noteToDelete.value = note
 }
@@ -491,10 +537,13 @@ function startCreateFolder() {
   nextTick(() => newFolderRef.value?.focus())
 }
 
+let creatingFolderLock = false
 async function submitCreateFolder() {
+  if (creatingFolderLock) return
   const name = newFolderName.value.trim()
   creatingFolder.value = false
   if (!name) return
+  creatingFolderLock = true
   try {
     const { data } = await api.post('/note-folders', { name })
     folders.value.push(data)
@@ -503,6 +552,8 @@ async function submitCreateFolder() {
     selectedFolder.value = data.id
   } catch {
     toast.error('Falha ao criar pasta')
+  } finally {
+    creatingFolderLock = false
   }
 }
 
