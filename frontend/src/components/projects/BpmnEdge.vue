@@ -60,7 +60,7 @@ const props = defineProps({
   data: Object,
 })
 
-const { updateEdge } = useVueFlow()
+const { findEdge } = useVueFlow()
 const onDirty = inject('onFlowDirty', null)
 
 const edgePath = computed(() =>
@@ -109,7 +109,8 @@ function commit() {
   if (!editing.value) return
   const newLabel = draft.value.trim()
   if (newLabel !== (props.label || '')) {
-    updateEdge(props.id, { label: newLabel })
+    const edge = findEdge(props.id)
+    if (edge) edge.label = newLabel
     onDirty?.()
   }
   editing.value = false

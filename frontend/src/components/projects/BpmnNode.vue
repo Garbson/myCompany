@@ -6,6 +6,7 @@
         :id="`${pos.id}-t`"
         type="target"
         :position="pos.pos"
+        :connectable-start="false"
         class="bpmn-handle"
         :style="pos.style"
       />
@@ -13,6 +14,7 @@
         :id="`${pos.id}-s`"
         type="source"
         :position="pos.pos"
+        :connectable-end="false"
         class="bpmn-handle"
         :style="pos.style"
       />
