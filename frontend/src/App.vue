@@ -1,5 +1,9 @@
 <template>
-  <div v-if="auth.isLoggedIn" class="flex h-screen overflow-hidden md:p-3 md:gap-3">
+  <div
+    v-if="auth.isLoggedIn"
+    class="flex h-screen overflow-hidden md:p-3 md:gap-3"
+    :class="{ 'notebook-shell': !isFlowPage }"
+  >
     <UpdateBanner />
     <Sidebar />
     <div class="flex-1 min-w-0 flex flex-col h-[100dvh] md:h-full">

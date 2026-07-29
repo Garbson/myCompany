@@ -40,7 +40,7 @@ html, body {
 }
 
 body {
-  /* Textura de papel: grão SVG sutil + vinheta suave */
+  /* Base neutra; o cenário completo aparece apenas fora do Fluxograma. */
   background-image:
     radial-gradient(ellipse 90% 60% at 20% 0%, rgba(184, 89, 61, 0.06) 0%, transparent 60%),
     radial-gradient(ellipse 80% 60% at 85% 100%, rgba(107, 122, 63, 0.05) 0%, transparent 55%),
@@ -48,6 +48,33 @@ body {
   background-size: 100% 100%, 100% 100%, 220px 220px;
   background-attachment: fixed;
   min-height: 100vh;
+}
+
+/* A mesa onde o caderno myPaper repousa. A rota de Fluxogramas não recebe
+ * esta classe, mantendo o canvas exatamente como antes. */
+.notebook-shell {
+  position: relative;
+  isolation: isolate;
+  background-color: #e9dfca;
+  background-image:
+    linear-gradient(115deg, rgba(245, 239, 223, .16), rgba(93, 75, 44, .08)),
+    url('/mypaper-workspace.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+.notebook-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 65% at 50% 48%, transparent 45%, rgba(69, 52, 28, .08) 100%),
+    linear-gradient(90deg, rgba(255,255,255,.05), transparent 18%, transparent 82%, rgba(69,52,28,.04));
+}
+.notebook-shell > .flex-1 {
+  min-height: 0;
 }
 
 /* Headings sempre em serif — tom editorial */
@@ -97,9 +124,36 @@ h1, h2, h3, h4, h5, h6, .font-display {
 /* Páginas do caderno: superfícies irregulares e composição menos "dashboard".
  * A classe não é aplicada à rota de Fluxogramas, preservando o editor. */
 .organic-page {
+  position: relative;
+  isolation: isolate;
+  background-color: rgba(253, 251, 245, .91);
   background-image:
+    radial-gradient(circle at 10px 24px, rgba(72, 61, 39, .28) 0 3px, rgba(221, 211, 190, .95) 3.5px 5px, transparent 5.5px),
     linear-gradient(90deg, transparent 0, transparent 3.1rem, rgba(184, 89, 61, 0.08) 3.1rem, rgba(184, 89, 61, 0.08) 3.16rem, transparent 3.16rem),
     repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, 0.035) 35px, rgba(44, 74, 92, 0.035) 36px);
+  background-size: 100% 48px, 100% 100%, 100% 100%;
+  background-repeat: repeat-y, no-repeat, repeat;
+  border: 1px solid rgba(94, 79, 45, .2);
+  border-radius: 6px 15px 9px 5px;
+  box-shadow:
+    -5px 3px 0 rgba(239, 231, 210, .92),
+    -9px 6px 0 rgba(255, 253, 247, .72),
+    0 18px 46px rgba(65, 48, 22, .18);
+  backdrop-filter: blur(2px);
+}
+.organic-page::after {
+  content: '';
+  position: sticky;
+  z-index: 30;
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin-left: auto;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, transparent 49%, rgba(211, 195, 161, .82) 50%, #f8f2e5 72%);
+  filter: drop-shadow(-2px -2px 2px rgba(75, 59, 31, .08));
 }
 .organic-page .glass,
 .organic-page .paper {
@@ -139,6 +193,14 @@ h1, h2, h3, h4, h5, h6, .font-display {
   border-radius: 5px 15px 8px 12px;
   box-shadow: 0 2px 6px var(--paper-shadow), 0 16px 40px rgba(94,79,45,.1);
   clip-path: polygon(0 .5%, 98% 0, 100% 98.5%, 96% 100%, .5% 99%);
+}
+.notebook-sidebar::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 8px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(68, 52, 28, .09));
 }
 .notebook-sidebar nav,
 .notebook-sidebar > div {
@@ -186,8 +248,14 @@ h1, h2, h3, h4, h5, h6, .font-display {
   .safe-pt-mobile { padding-top: var(--safe-top); }
   .safe-pb-mobile { padding-bottom: var(--safe-bottom); }
   .organic-page {
+    background-color: rgba(253, 251, 245, .96);
     background-position: -2.1rem 0, 0 0;
+    border-width: 0;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
   }
+  .notebook-shell { background-attachment: scroll; background-position: 58% center; }
 }
 
 /* Título de página fixo no topo (desktop) */
