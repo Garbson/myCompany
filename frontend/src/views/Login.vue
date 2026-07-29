@@ -1,71 +1,74 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-4">
-    <div class="glass-strong gradient-border p-8 rounded-2xl w-full max-w-md">
+    <div class="paper-strong gradient-border p-8 rounded-2xl w-full max-w-md">
       <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold text-white">myCompany</h1>
-        <p class="text-gray-400 mt-2">Entre para gerenciar seu negócio</p>
+        <div class="w-14 h-14 rounded-xl bg-terra-500 text-[#FDFBF5] flex items-center justify-center mx-auto mb-4 shadow-paper">
+          <span class="font-serif font-semibold text-3xl leading-none">m</span>
+        </div>
+        <h1 class="font-serif text-3xl font-semibold text-ink-400 tracking-tight">myCompany</h1>
+        <p class="text-ink-100 mt-2 text-sm">Documente. Diagrame. Entregue.</p>
       </div>
 
       <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
-          <label class="block text-sm text-gray-300 mb-1">Email</label>
+          <label class="block text-xs font-semibold text-ink-200 uppercase tracking-wider mb-1.5">Email</label>
           <input
             v-model="form.email"
             type="email"
             required
-            class="w-full px-4 py-3 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            class="input-paper w-full py-2.5"
             placeholder="seu@email.com"
           />
         </div>
         <div>
-          <label class="block text-sm text-gray-300 mb-1">Senha</label>
+          <label class="block text-xs font-semibold text-ink-200 uppercase tracking-wider mb-1.5">Senha</label>
           <input
             v-model="form.password"
             type="password"
             required
-            class="w-full px-4 py-3 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            class="input-paper w-full py-2.5"
             placeholder="Sua senha"
           />
         </div>
-        <p v-if="error" class="text-red-400 text-sm">{{ error }}</p>
+        <p v-if="error" class="text-terra-600 text-sm">{{ error }}</p>
         <button
           type="submit"
           :disabled="loading"
-          class="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-lg transition-colors"
+          class="btn-primary w-full py-3 rounded-lg"
         >
           {{ loading ? 'Entrando...' : 'Entrar' }}
         </button>
       </form>
 
-      <div v-if="showRegister" class="mt-6 pt-6 border-t border-gray-700">
-        <h2 class="text-lg font-medium text-white mb-3">Criar conta</h2>
+      <div v-if="showRegister" class="mt-6 pt-6 border-t border-[var(--paper-border)]">
+        <h2 class="font-serif text-lg font-semibold text-ink-400 mb-3">Criar conta</h2>
         <form @submit.prevent="handleRegister" class="space-y-3">
           <input
             v-model="reg.name"
             type="text"
             required
-            class="w-full px-4 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            class="input-paper w-full py-2"
             placeholder="Nome"
           />
           <input
             v-model="reg.email"
             type="email"
             required
-            class="w-full px-4 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            class="input-paper w-full py-2"
             placeholder="Email"
           />
           <input
             v-model="reg.password"
             type="password"
             required
-            class="w-full px-4 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            class="input-paper w-full py-2"
             placeholder="Senha"
           />
-          <p v-if="regError" class="text-red-400 text-sm">{{ regError }}</p>
+          <p v-if="regError" class="text-terra-600 text-sm">{{ regError }}</p>
           <button
             type="submit"
             :disabled="regLoading"
-            class="w-full py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium rounded-lg transition-colors"
+            class="btn-secondary w-full py-2.5 rounded-lg"
           >
             {{ regLoading ? 'Criando...' : 'Criar conta' }}
           </button>
@@ -74,7 +77,7 @@
 
       <button
         @click="showRegister = !showRegister"
-        class="mt-4 text-sm text-gray-400 hover:text-gray-300 w-full text-center"
+        class="mt-4 text-sm text-ink-100 hover:text-ink-300 w-full text-center transition-colors"
       >
         {{ showRegister ? 'Já tenho conta' : 'Criar uma conta' }}
       </button>

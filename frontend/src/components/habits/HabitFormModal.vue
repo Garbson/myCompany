@@ -11,68 +11,68 @@
           <div
             class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors shrink-0"
             :class="i + 1 === step
-              ? s.color + ' text-white ring-2 ring-offset-2 ring-offset-slate-900'
+              ? s.color + ' text-ink-400 ring-2 ring-offset-2 ring-offset-slate-900'
               : i + 1 < step
-              ? 'bg-green-500/80 text-white'
-              : 'bg-white/10 text-gray-500'"
+              ? 'bg-green-500/80 text-ink-400'
+              : 'bg-[var(--paper-surface-3)] text-ink-50'"
           >
             <svg v-if="i + 1 < step" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
             <span v-else>{{ i + 1 }}</span>
           </div>
-          <div v-if="i < steps.length - 1" class="flex-1 h-px bg-white/10"></div>
+          <div v-if="i < steps.length - 1" class="flex-1 h-px bg-[var(--paper-surface-3)]"></div>
         </div>
       </div>
 
       <div class="px-5 md:px-6 pt-3">
         <p class="text-[11px] uppercase tracking-wider font-semibold" :class="currentStep.colorText">{{ currentStep.label }}</p>
-        <h3 class="text-lg md:text-xl font-bold text-white">{{ currentStep.title }}</h3>
-        <p class="text-xs text-gray-400 mt-0.5">{{ currentStep.subtitle }}</p>
+        <h3 class="text-lg md:text-xl md:text-2xl font-semibold text-ink-400 tracking-tight">{{ currentStep.title }}</h3>
+        <p class="text-xs text-ink-100 mt-0.5">{{ currentStep.subtitle }}</p>
       </div>
 
       <!-- ===== Step 1: Quem você quer ser ===== -->
       <div v-if="step === 1" class="px-5 md:px-6 py-5 space-y-4">
         <div>
-          <label class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1.5">Identidade *</label>
-          <div class="flex items-center bg-slate-900/40 border border-white/5 rounded-lg overflow-hidden focus-within:border-purple-500/60">
-            <span class="text-sm text-gray-400 pl-3 shrink-0">Eu sou alguém que</span>
+          <label class="block text-[11px] uppercase tracking-wider text-ink-50 font-semibold mb-1.5">Identidade *</label>
+          <div class="flex items-center bg-[var(--paper-surface-2)] border border-[var(--paper-border)] rounded-lg overflow-hidden focus-within:border-purple-500/60">
+            <span class="text-sm text-ink-100 pl-3 shrink-0">Eu sou alguém que</span>
             <input
               v-model="form.identity"
               type="text"
               required
               placeholder="lê todos os dias"
-              class="flex-1 bg-transparent px-2 py-2 text-sm text-white placeholder-gray-600 focus:outline-none"
+              class="flex-1 bg-transparent px-2 py-2 text-sm text-ink-400 placeholder-gray-600 focus:outline-none"
             />
           </div>
-          <p class="text-[10px] text-gray-500 mt-1">Cada vez que praticar o hábito, você vota nessa identidade.</p>
+          <p class="text-[10px] text-ink-50 mt-1">Cada vez que praticar o hábito, você vota nessa identidade.</p>
         </div>
 
         <div>
-          <label class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1.5">Hábito *</label>
+          <label class="block text-[11px] uppercase tracking-wider text-ink-50 font-semibold mb-1.5">Hábito *</label>
           <input
             v-model="form.name"
             type="text"
             required
             placeholder="Ex: Ler 30 minutos"
-            class="w-full px-3 py-2 bg-slate-900/40 border border-white/5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/60"
+            class="w-full px-3 py-2 bg-[var(--paper-surface-2)] border border-[var(--paper-border)] rounded-lg text-sm text-ink-400 placeholder-gray-600 focus:outline-none focus:border-purple-500/60"
           />
         </div>
 
         <div>
-          <label class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1.5">Frequência</label>
+          <label class="block text-[11px] uppercase tracking-wider text-ink-50 font-semibold mb-1.5">Frequência</label>
           <div class="flex gap-2">
             <button
               type="button"
               @click="form.frequency = 'daily'"
               class="flex-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors"
-              :class="form.frequency === 'daily' ? 'bg-purple-500/90 text-white' : 'glass-light text-gray-400 hover:text-white'"
+              :class="form.frequency === 'daily' ? 'bg-purple-500/90 text-ink-400' : 'glass-light text-ink-100 hover:text-ink-400'"
             >Todo dia</button>
             <button
               type="button"
               @click="form.frequency = 'specific_days'"
               class="flex-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors"
-              :class="form.frequency === 'specific_days' ? 'bg-purple-500/90 text-white' : 'glass-light text-gray-400 hover:text-white'"
+              :class="form.frequency === 'specific_days' ? 'bg-purple-500/90 text-ink-400' : 'glass-light text-ink-100 hover:text-ink-400'"
             >Dias específicos</button>
           </div>
           <div v-if="form.frequency === 'specific_days'" class="mt-3 flex gap-1.5 flex-wrap">
@@ -84,8 +84,8 @@
               :class="[
                 'w-9 h-9 rounded-lg text-xs font-semibold transition-colors',
                 form.recurrence_days.includes(d.idx)
-                  ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30'
-                  : 'glass-light text-gray-400 hover:text-white',
+                  ? 'bg-purple-500 text-ink-400 shadow-lg shadow-purple-500/30'
+                  : 'glass-light text-ink-100 hover:text-ink-400',
               ]"
             >{{ d.label }}</button>
           </div>
@@ -94,47 +94,47 @@
 
       <!-- ===== Step 2: Torne ÓBVIO ===== -->
       <div v-if="step === 2" class="px-5 md:px-6 py-5 space-y-4">
-        <div class="rounded-lg bg-blue-500/5 border border-blue-500/20 p-3 text-[11px] text-blue-200/80 leading-relaxed">
+        <div class="rounded-lg bg-blue-500/5 border border-terra-500/20 p-3 text-[11px] text-blue-200/80 leading-relaxed">
           💡 Cérebros gostam de gatilhos previsíveis. Defina <b>quando</b>, <b>onde</b> e/ou <b>depois de qual hábito</b> você vai praticar. Pelo menos um é obrigatório.
         </div>
 
         <div>
-          <label class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1.5">Horário</label>
+          <label class="block text-[11px] uppercase tracking-wider text-ink-50 font-semibold mb-1.5">Horário</label>
           <input
             v-model="form.cue_time"
             type="time"
-            class="w-full px-3 py-2 bg-slate-900/40 border border-white/5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500/60"
+            class="w-full px-3 py-2 bg-[var(--paper-surface-2)] border border-[var(--paper-border)] rounded-lg text-sm text-ink-400 focus:outline-none focus:border-indigo_ink-500/60"
           />
         </div>
 
         <div>
-          <label class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1.5">Local</label>
+          <label class="block text-[11px] uppercase tracking-wider text-ink-50 font-semibold mb-1.5">Local</label>
           <input
             v-model="form.cue_location"
             type="text"
             placeholder="Ex: Mesa do café"
-            class="w-full px-3 py-2 bg-slate-900/40 border border-white/5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60"
+            class="w-full px-3 py-2 bg-[var(--paper-surface-2)] border border-[var(--paper-border)] rounded-lg text-sm text-ink-400 placeholder-gray-600 focus:outline-none focus:border-indigo_ink-500/60"
           />
         </div>
 
         <div>
-          <label class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1.5">Empilhar depois de</label>
-          <div class="flex items-center bg-slate-900/40 border border-white/5 rounded-lg overflow-hidden focus-within:border-blue-500/60">
-            <span class="text-sm text-gray-400 pl-3 shrink-0">Depois de</span>
+          <label class="block text-[11px] uppercase tracking-wider text-ink-50 font-semibold mb-1.5">Empilhar depois de</label>
+          <div class="flex items-center bg-[var(--paper-surface-2)] border border-[var(--paper-border)] rounded-lg overflow-hidden focus-within:border-terra-500/60">
+            <span class="text-sm text-ink-100 pl-3 shrink-0">Depois de</span>
             <input
               v-model="form.stack_after"
               type="text"
               placeholder="escovar os dentes"
-              class="flex-1 bg-transparent px-2 py-2 text-sm text-white placeholder-gray-600 focus:outline-none"
+              class="flex-1 bg-transparent px-2 py-2 text-sm text-ink-400 placeholder-gray-600 focus:outline-none"
             />
-            <span class="text-sm text-gray-400 pr-3 shrink-0">eu vou…</span>
+            <span class="text-sm text-ink-100 pr-3 shrink-0">eu vou…</span>
           </div>
-          <p class="text-[10px] text-gray-500 mt-1">Pegue um hábito que você já faz no automático e empilhe o novo logo em seguida.</p>
+          <p class="text-[10px] text-ink-50 mt-1">Pegue um hábito que você já faz no automático e empilhe o novo logo em seguida.</p>
 
           <!-- Sugestões de hábitos âncora -->
           <div class="mt-3 space-y-2.5">
             <div v-for="group in anchorHabits" :key="group.label">
-              <p class="text-[10px] text-gray-600 mb-1 flex items-center gap-1">
+              <p class="text-[10px] text-ink-50 mb-1 flex items-center gap-1">
                 <span>{{ group.icon }}</span>
                 <span class="uppercase tracking-wider font-semibold">{{ group.label }}</span>
               </p>
@@ -147,7 +147,7 @@
                   class="px-2 py-1 text-[11px] rounded-md transition-colors"
                   :class="form.stack_after === opt
                     ? 'bg-blue-500/30 text-blue-200 ring-1 ring-blue-400/50'
-                    : 'glass-light text-gray-400 hover:text-white hover:bg-white/10'"
+                    : 'glass-light text-ink-100 hover:text-ink-400 hover:bg-[var(--paper-surface-3)]'"
                 >{{ opt }}</button>
               </div>
             </div>
@@ -167,7 +167,7 @@
             v-model="form.temptation_bundle"
             rows="2"
             placeholder="Ex: Só ouço meu podcast favorito enquanto estou correndo"
-            class="w-full px-3 py-2 bg-slate-900/40 border border-white/5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-pink-500/60 resize-none"
+            class="w-full px-3 py-2 bg-[var(--paper-surface-2)] border border-[var(--paper-border)] rounded-lg text-sm text-ink-400 placeholder-gray-600 focus:outline-none focus:border-pink-500/60 resize-none"
           ></textarea>
         </div>
 
@@ -182,9 +182,9 @@
             type="text"
             required
             placeholder="Ex: Ler 1 página"
-            class="w-full px-3 py-2 bg-slate-900/40 border border-white/5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/60"
+            class="w-full px-3 py-2 bg-[var(--paper-surface-2)] border border-[var(--paper-border)] rounded-lg text-sm text-ink-400 placeholder-gray-600 focus:outline-none focus:border-emerald-500/60"
           />
-          <p class="text-[10px] text-gray-500 mt-1">Em dias preguiçosos, faça só isso. O importante é não quebrar a sequência.</p>
+          <p class="text-[10px] text-ink-50 mt-1">Em dias preguiçosos, faça só isso. O importante é não quebrar a sequência.</p>
         </div>
       </div>
 
@@ -195,45 +195,45 @@
         </div>
 
         <div>
-          <label class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1.5">Recompensa imediata *</label>
+          <label class="block text-[11px] uppercase tracking-wider text-ink-50 font-semibold mb-1.5">Recompensa imediata *</label>
           <textarea
             v-model="form.reward"
             rows="3"
             required
             placeholder="Ex: Café especial / marcar no app + ouvir 1 música / banho longo"
-            class="w-full px-3 py-2 bg-slate-900/40 border border-white/5 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500/60 resize-none"
+            class="w-full px-3 py-2 bg-[var(--paper-surface-2)] border border-[var(--paper-border)] rounded-lg text-sm text-ink-400 placeholder-gray-600 focus:outline-none focus:border-amber-500/60 resize-none"
           ></textarea>
         </div>
 
         <!-- Resumo -->
         <div class="rounded-xl glass-light p-4 mt-4 space-y-2">
-          <p class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Resumo</p>
-          <p class="text-sm text-white"><b>{{ form.name }}</b></p>
+          <p class="text-[11px] uppercase tracking-wider text-ink-50 font-semibold">Resumo</p>
+          <p class="text-sm text-ink-400"><b>{{ form.name }}</b></p>
           <p v-if="form.identity" class="text-xs text-purple-300">Eu sou alguém que {{ form.identity }}</p>
-          <p v-if="cueText" class="text-xs text-blue-300">📌 {{ cueText }}</p>
+          <p v-if="cueText" class="text-xs text-terra-500">📌 {{ cueText }}</p>
           <p v-if="form.two_minute_version" class="text-xs text-emerald-300">⚡ Mín: {{ form.two_minute_version }}</p>
           <p v-if="form.reward" class="text-xs text-amber-300">🎉 {{ form.reward }}</p>
         </div>
       </div>
 
       <!-- Footer -->
-      <div class="flex items-center gap-3 px-5 py-3 md:px-6 border-t border-white/5 bg-slate-950/60">
+      <div class="flex items-center gap-3 px-5 py-3 md:px-6 border-t border-[var(--paper-border)] bg-[var(--paper-bg)]/60">
         <button
           v-if="step > 1"
           type="button"
           @click="step--"
-          class="px-3 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg transition-colors"
+          class="px-3 py-2 text-sm text-ink-100 hover:bg-[var(--paper-surface-2)] rounded-lg transition-colors"
         >← Voltar</button>
         <div class="flex-1"></div>
         <button
           type="button"
           @click="$emit('close')"
-          class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg transition-colors"
+          class="px-4 py-2 text-sm text-ink-100 hover:bg-[var(--paper-surface-2)] rounded-lg transition-colors"
         >Cancelar</button>
         <button
           type="submit"
           :disabled="!canAdvance"
-          class="px-5 py-2 text-sm bg-gradient-to-br from-purple-500 to-indigo-600 text-white rounded-lg shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+          class="px-5 py-2 text-sm bg-terra-500 text-ink-400 rounded-lg shadow-lg shadow-paper hover:shadow-paper-lg transition-all font-medium disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {{ step < 4 ? 'Próximo →' : (editing ? 'Salvar' : 'Criar hábito') }}
         </button>
@@ -303,7 +303,7 @@ const anchorHabits = [
 
 const steps = [
   { label: 'Passo 1', title: 'Quem você quer se tornar', subtitle: 'Hábitos viram identidade. Comece pelo "quem", não pelo "o quê".', color: 'bg-purple-500', colorText: 'text-purple-300' },
-  { label: 'Passo 2 — 1ª Lei', title: 'Torne óbvio', subtitle: 'Defina o gatilho: quando, onde e/ou após qual hábito.', color: 'bg-blue-500', colorText: 'text-blue-300' },
+  { label: 'Passo 2 — 1ª Lei', title: 'Torne óbvio', subtitle: 'Defina o gatilho: quando, onde e/ou após qual hábito.', color: 'bg-blue-500', colorText: 'text-terra-500' },
   { label: 'Passo 3 — 2ª + 3ª Lei', title: 'Torne atraente e fácil', subtitle: 'Empacote a tentação e crie uma versão mínima impossível de falhar.', color: 'bg-emerald-500', colorText: 'text-emerald-300' },
   { label: 'Passo 4 — 4ª Lei', title: 'Torne satisfatório', subtitle: 'Recompensa imediata fecha o ciclo. Sem ela, o cérebro não repete.', color: 'bg-amber-500', colorText: 'text-amber-300' },
 ]

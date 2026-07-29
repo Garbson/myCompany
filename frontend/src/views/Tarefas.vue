@@ -2,12 +2,12 @@
   <div>
     <div class="hidden md:flex items-center justify-between mb-6 md-sticky-title">
       <div>
-        <h1 class="text-2xl font-bold text-white tracking-tight">Tarefas</h1>
-        <p class="text-xs text-gray-500 mt-0.5">{{ filteredTasks.length }} {{ filteredTasks.length === 1 ? 'tarefa' : 'tarefas' }}</p>
+        <h1 class="text-2xl font-bold text-ink-400 tracking-tight">Tarefas</h1>
+        <p class="text-xs text-ink-50 mt-0.5">{{ filteredTasks.length }} {{ filteredTasks.length === 1 ? 'tarefa' : 'tarefas' }}</p>
       </div>
       <button
         @click="openCreate"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-terra-500 text-ink-400 text-sm font-medium rounded-lg hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -19,7 +19,7 @@
     <!-- FAB mobile -->
     <button
       @click="openCreate"
-      class="md:hidden fixed z-30 right-4 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-xl shadow-blue-500/50 hover:shadow-blue-500/70 active:scale-95 transition-all flex items-center justify-center w-14 h-14 ring-1 ring-white/20"
+      class="md:hidden fixed z-30 right-4 bg-terra-500 text-ink-400 rounded-full shadow-xl shadow-paper hover:shadow-paper-lg active:scale-95 transition-all flex items-center justify-center w-14 h-14 ring-1 ring-white/20"
       style="bottom: calc(var(--safe-bottom) + 5rem)"
       aria-label="Nova tarefa"
     >
@@ -30,8 +30,8 @@
 
     <!-- Frase motivacional -->
     <div v-if="workMode" class="glass rounded-xl p-4 mb-4 text-center">
-      <p class="text-sm text-gray-300 italic">"{{ currentQuote.text }}"</p>
-      <p class="text-xs text-gray-500 mt-1">— {{ currentQuote.author }}</p>
+      <p class="text-sm text-ink-200 italic">"{{ currentQuote.text }}"</p>
+      <p class="text-xs text-ink-50 mt-1">— {{ currentQuote.author }}</p>
     </div>
 
     <!-- Filtros -->
@@ -42,7 +42,7 @@
           :key="f.key"
           @click="activeFilter = f.key"
           class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap"
-          :class="activeFilter === f.key ? 'bg-blue-500/90 text-white shadow-lg shadow-blue-500/30' : 'glass-light text-gray-400 hover:text-white'"
+          :class="activeFilter === f.key ? 'bg-terra-500 text-ink-400 shadow-lg shadow-paper' : 'glass-light text-ink-100 hover:text-ink-400'"
         >
           {{ f.label }}
           <span class="ml-1 opacity-60">({{ f.count }})</span>
@@ -50,7 +50,7 @@
         <button
           @click="showCompleted = !showCompleted"
           class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap"
-          :class="showCompleted ? 'bg-green-500/90 text-white shadow-lg shadow-green-500/30' : 'glass-light text-gray-400 hover:text-white'"
+          :class="showCompleted ? 'bg-olive-500 text-ink-400 shadow-lg shadow-green-500/30' : 'glass-light text-ink-100 hover:text-ink-400'"
           :title="showCompleted ? 'Ocultar concluídas' : 'Mostrar concluídas'"
         >
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -61,7 +61,7 @@
         </button>
         <select
           v-model="projectFilter"
-          class="hidden md:block md:ml-auto px-3 py-1.5 text-xs bg-slate-900/60 border border-white/10 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500"
+          class="hidden md:block md:ml-auto px-3 py-1.5 text-xs bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-200 focus:outline-none focus:border-indigo_ink-500"
           @change="applyProjectFilter"
         >
           <option value="">Todos os projetos</option>
@@ -70,7 +70,7 @@
       </div>
       <select
         v-model="projectFilter"
-        class="md:hidden w-full px-3 py-2 text-xs bg-slate-900/60 border border-white/10 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500"
+        class="md:hidden w-full px-3 py-2 text-xs bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-200 focus:outline-none focus:border-indigo_ink-500"
         @change="applyProjectFilter"
       >
         <option value="">Todos os projetos</option>
@@ -83,24 +83,24 @@
       <div
         v-for="task in filteredTasks"
         :key="task.id"
-        class="flex items-center gap-3 px-4 py-3 md:px-5 md:py-3.5 glass rounded-xl glow-hover active:bg-white/5 cursor-pointer group"
+        class="flex items-center gap-3 px-4 py-3 md:px-5 md:py-3.5 glass rounded-xl glow-hover active:bg-[var(--paper-surface-2)] cursor-pointer group"
         @click="editTask(task)"
       >
         <!-- Status checkbox -->
         <button
           @click.stop="toggleStatus(task)"
           class="w-6 h-6 rounded-full border-2 shrink-0 transition-colors flex items-center justify-center"
-          :class="task.status === 'done' ? 'bg-green-500 border-green-500' : 'border-gray-600 hover:border-blue-500'"
+          :class="task.status === 'done' ? 'bg-olive-500 border-green-500' : 'border-gray-600 hover:border-terra-500'"
           :aria-label="task.status === 'done' ? 'Marcar como pendente' : 'Concluir'"
         >
-          <svg v-if="task.status === 'done'" class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-if="task.status === 'done'" class="w-3.5 h-3.5 text-ink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
           </svg>
         </button>
 
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2 min-w-0">
-            <p class="flex-1 min-w-0 text-sm text-gray-200 break-words" :class="{ 'line-through opacity-50': task.status === 'done' }">
+            <p class="flex-1 min-w-0 text-sm text-ink-300 break-words" :class="{ 'line-through opacity-50': task.status === 'done' }">
               {{ task.title }}
             </p>
             <span
@@ -114,7 +114,7 @@
               </svg>
             </span>
           </div>
-          <p v-if="task.description" class="hidden md:block text-xs text-gray-500 truncate max-w-md mt-0.5">
+          <p v-if="task.description" class="hidden md:block text-xs text-ink-50 truncate max-w-md mt-0.5">
             {{ task.description }}
           </p>
           <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
@@ -134,14 +134,14 @@
               </svg>
               {{ dueLabel(task.due_date) }}
             </span>
-            <span v-if="task.project_name" class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 truncate max-w-[50%]">
+            <span v-if="task.project_name" class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo_ink-500 truncate max-w-[50%]">
               {{ task.project_name }}
             </span>
           </div>
         </div>
 
         <div v-if="task.assigned_name" class="hidden sm:flex items-center gap-1.5 shrink-0">
-          <div class="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-[10px] font-medium text-gray-300">
+          <div class="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-[10px] font-medium text-ink-200">
             {{ task.assigned_name.charAt(0).toUpperCase() }}
           </div>
         </div>
@@ -151,7 +151,7 @@
           <button
             v-if="task.status !== 'done'"
             @click.stop="moveTask(task, task.status === 'todo' ? 'in_progress' : 'done')"
-            class="p-1.5 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-md transition-colors"
+            class="p-1.5 text-ink-50 hover:text-olive-500 hover:bg-olive-500/10 rounded-md transition-colors"
             :title="task.status === 'todo' ? 'Iniciar' : 'Concluir'"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -161,7 +161,7 @@
           </button>
           <button
             @click.stop="confirmDelete(task)"
-            class="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
+            class="p-1.5 text-ink-50 hover:text-terra-600 hover:bg-terra-500/10 rounded-md transition-colors"
             title="Excluir tarefa"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -171,7 +171,7 @@
         </div>
       </div>
 
-      <p v-if="filteredTasks.length === 0" class="text-center text-gray-500 py-12 text-sm">
+      <p v-if="filteredTasks.length === 0" class="text-center text-ink-50 py-12 text-sm">
         Nenhuma tarefa
       </p>
     </div>
@@ -279,20 +279,20 @@ function dueLabel(dateStr) {
 function dueBadgeClass(dateStr) {
   const days = daysUntil(dateStr)
   if (days === null) return ''
-  if (days < 0) return 'bg-red-500/20 text-red-300 ring-1 ring-red-500/30'
+  if (days < 0) return 'bg-terra-500/20 text-terra-500 ring-1 ring-red-500/30'
   if (days === 0) return 'bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/30 animate-pulse'
-  if (days <= 2) return 'bg-yellow-500/20 text-yellow-300'
-  return 'bg-white/5 text-gray-400'
+  if (days <= 2) return 'bg-[#C89A3F]/20 text-yellow-300'
+  return 'bg-[var(--paper-surface-2)] text-ink-100'
 }
 
 function difficultyBadge(d) {
-  return { easy: 'bg-green-500/20 text-green-400', medium: 'bg-yellow-500/20 text-yellow-400', hard: 'bg-red-500/20 text-red-400' }[d] || ''
+  return { easy: 'bg-olive-500/20 text-olive-500', medium: 'bg-[#C89A3F]/20 text-[#C89A3F]', hard: 'bg-terra-500/20 text-terra-600' }[d] || ''
 }
 function difficultyLabel(d) {
   return { easy: 'Fácil', medium: 'Médio', hard: 'Difícil' }[d] || d
 }
 function statusBadge(s) {
-  return { todo: 'bg-gray-500/20 text-gray-400', in_progress: 'bg-blue-500/20 text-blue-400', done: 'bg-green-500/20 text-green-400' }[s] || ''
+  return { todo: 'bg-gray-500/20 text-ink-100', in_progress: 'bg-blue-500/20 text-terra-600', done: 'bg-olive-500/20 text-olive-500' }[s] || ''
 }
 function statusLabel(s) {
   return { todo: 'A fazer', in_progress: 'Em andamento', done: 'Concluído' }[s] || s

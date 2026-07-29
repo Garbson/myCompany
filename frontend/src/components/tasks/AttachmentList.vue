@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="flex items-center justify-between mb-2">
-      <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+      <h4 class="text-xs font-semibold text-ink-100 uppercase tracking-wide">
         Anexos
-        <span v-if="items.length" class="ml-1 text-gray-500 normal-case font-normal">{{ items.length }}</span>
+        <span v-if="items.length" class="ml-1 text-ink-50 normal-case font-normal">{{ items.length }}</span>
       </h4>
       <label
-        class="text-xs px-2.5 py-1 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 cursor-pointer transition-colors inline-flex items-center gap-1"
+        class="text-xs px-2.5 py-1 rounded-lg bg-terra-500/15 hover:bg-blue-500/25 text-terra-500 cursor-pointer transition-colors inline-flex items-center gap-1"
         :class="{ 'opacity-50 cursor-wait': uploading }"
       >
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -24,10 +24,10 @@
         class="flex items-center gap-3 px-3 py-2 glass-light rounded-lg group"
       >
         <div class="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center" :class="iconBg(a.mime_type)">
-          <svg v-if="isImage(a.mime_type)" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <svg v-if="isImage(a.mime_type)" class="w-4 h-4 text-ink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <svg v-else class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <svg v-else class="w-4 h-4 text-ink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
         </div>
@@ -37,12 +37,12 @@
           rel="noopener"
           class="flex-1 min-w-0 group/link"
         >
-          <p class="text-sm text-gray-200 group-hover/link:text-blue-300 truncate transition-colors">{{ a.filename }}</p>
-          <p class="text-[10px] text-gray-500">{{ formatSize(a.size_bytes) }} · {{ a.user_name || 'Usuário' }}</p>
+          <p class="text-sm text-ink-300 group-hover/link:text-terra-500 truncate transition-colors">{{ a.filename }}</p>
+          <p class="text-[10px] text-ink-50">{{ formatSize(a.size_bytes) }} · {{ a.user_name || 'Usuário' }}</p>
         </a>
         <button
           @click="remove(a)"
-          class="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-400 transition-opacity"
+          class="opacity-0 group-hover:opacity-100 text-ink-50 hover:text-terra-600 transition-opacity"
           aria-label="Apagar"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -51,11 +51,11 @@
         </button>
       </li>
     </ul>
-    <p v-else-if="!uploading" class="text-xs text-gray-500 text-center py-2">Nenhum anexo</p>
+    <p v-else-if="!uploading" class="text-xs text-ink-50 text-center py-2">Nenhum anexo</p>
 
-    <div v-if="uploading" class="mt-2 text-xs text-gray-400 flex items-center gap-2">
-      <div class="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
-        <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all" :style="{ width: progress + '%' }"></div>
+    <div v-if="uploading" class="mt-2 text-xs text-ink-100 flex items-center gap-2">
+      <div class="flex-1 h-1 bg-[var(--paper-surface-2)] rounded-full overflow-hidden">
+        <div class="h-full bg-terra-500 transition-all" :style="{ width: progress + '%' }"></div>
       </div>
       <span class="tabular-nums">{{ progress }}%</span>
     </div>
@@ -151,7 +151,7 @@ function iconBg(mime) {
   if (isImage(mime)) return 'bg-gradient-to-br from-pink-500 to-fuchsia-600'
   if (mime?.includes('pdf')) return 'bg-gradient-to-br from-red-500 to-orange-600'
   if (mime?.includes('zip') || mime?.includes('rar')) return 'bg-gradient-to-br from-yellow-500 to-amber-600'
-  return 'bg-gradient-to-br from-blue-500 to-indigo-600'
+  return 'bg-terra-500'
 }
 function formatSize(b) {
   if (!b) return ''

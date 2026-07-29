@@ -6,17 +6,17 @@
       :key="tab.path"
       class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all shrink-0 max-w-[160px]"
       :class="isActive(tab.path)
-        ? 'bg-white/10 text-white'
-        : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'"
+        ? 'bg-[var(--paper-surface)] text-ink-400 border border-[var(--paper-border)] shadow-paper'
+        : 'text-ink-100 hover:text-ink-300 hover:bg-[var(--paper-surface-2)]'"
       @click="navigate(tab.path)"
     >
-      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
         <path stroke-linecap="round" stroke-linejoin="round" :d="tab.icon" />
       </svg>
       <span class="truncate">{{ tab.label }}</span>
       <button
         class="shrink-0 rounded p-0.5 transition-colors opacity-0 group-hover:opacity-100"
-        :class="isActive(tab.path) ? 'opacity-100 hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-white/10 text-gray-600 hover:text-gray-300'"
+        :class="isActive(tab.path) ? 'opacity-100 hover:bg-[var(--paper-surface-3)] text-ink-100 hover:text-ink-400' : 'hover:bg-[var(--paper-surface-3)] text-ink-50 hover:text-ink-300'"
         @click.stop="closeTab(tab.path)"
         aria-label="Fechar aba"
       >
@@ -30,8 +30,8 @@
     <button
       ref="addBtnRef"
       @click="togglePicker"
-      class="flex items-center justify-center w-7 h-7 rounded-lg text-gray-600 hover:text-gray-300 hover:bg-white/5 transition-colors shrink-0"
-      :class="tabs.length === 0 ? 'gap-1.5 w-auto px-2.5 text-xs text-gray-500' : ''"
+      class="flex items-center justify-center w-7 h-7 rounded-lg text-ink-50 hover:text-ink-300 hover:bg-[var(--paper-surface-2)] transition-colors shrink-0"
+      :class="tabs.length === 0 ? 'gap-1.5 w-auto px-2.5 text-xs' : ''"
       aria-label="Nova aba"
     >
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -53,27 +53,27 @@
     >
       <div
         v-if="showPicker"
-        class="fixed w-48 glass-strong rounded-xl overflow-hidden z-[200] py-1 shadow-xl"
+        class="fixed w-52 paper-strong rounded-xl overflow-hidden z-[200] py-1"
         :style="pickerStyle"
       >
-        <p class="px-3 pt-1 pb-1.5 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Abrir seção</p>
+        <p class="px-3 pt-1.5 pb-1 text-[10px] font-semibold text-ink-50 uppercase tracking-widest">Abrir seção</p>
         <button
           v-for="section in availableSections"
           :key="section.path"
           @click="openTab(section)"
           class="w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors"
           :class="tabsStore.isOpen(section.path)
-            ? 'text-gray-600 cursor-default'
-            : 'text-gray-300 hover:bg-white/5 hover:text-white'"
+            ? 'text-ink-50 cursor-default'
+            : 'text-ink-200 hover:bg-[var(--paper-surface-3)] hover:text-ink-400'"
           :disabled="tabsStore.isOpen(section.path)"
         >
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
             <path stroke-linecap="round" stroke-linejoin="round" :d="section.icon" />
           </svg>
           <span class="flex-1 text-left">{{ section.label }}</span>
           <svg
             v-if="tabsStore.isOpen(section.path)"
-            class="w-3 h-3 shrink-0 text-blue-500"
+            class="w-3 h-3 shrink-0 text-olive-500"
             fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"
           >
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />

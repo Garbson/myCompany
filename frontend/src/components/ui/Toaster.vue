@@ -17,7 +17,7 @@
         <div
           v-for="t in toasts"
           :key="t.id"
-          class="pointer-events-auto glass-strong rounded-xl flex items-center gap-3 px-4 py-3 min-w-[260px] max-w-full shadow-2xl"
+          class="pointer-events-auto paper-strong rounded-xl flex items-center gap-3 px-4 py-3 min-w-[260px] max-w-full"
           :class="ringClass(t.type)"
           @click="dismiss(t.id)"
         >
@@ -25,14 +25,14 @@
             class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
             :class="iconBg(t.type)"
           >
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <svg class="w-4 h-4 text-[#FDFBF5]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
               <path v-if="t.type === 'success'" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
               <path v-else-if="t.type === 'error'" stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               <path v-else-if="t.type === 'warning'" stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M5.07 19h13.86A2 2 0 0021 17V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002.07 2z" />
               <path v-else stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <p class="text-sm text-white font-medium flex-1">{{ t.message }}</p>
+          <p class="text-sm text-ink-300 font-medium flex-1">{{ t.message }}</p>
         </div>
       </TransitionGroup>
     </div>
@@ -46,13 +46,11 @@ import { useToast } from '../../composables/useToast'
 const props = defineProps({
   placement: {
     type: String,
-    default: 'auto', // 'auto' = bottom no mobile, top no desktop
+    default: 'auto',
   },
 })
 
 const { toasts, dismiss } = useToast()
-
-const isMobile = computed(() => typeof window !== 'undefined' && window.matchMedia?.('(max-width: 767px)').matches)
 
 const position = computed(() => {
   if (props.placement === 'top') return 'top-0 pt-3'
@@ -71,19 +69,19 @@ const positionStyle = computed(() => {
 
 function ringClass(type) {
   return {
-    success: 'ring-1 ring-green-400/30 shadow-green-500/20',
-    error: 'ring-1 ring-red-400/30 shadow-red-500/20',
-    warning: 'ring-1 ring-yellow-400/30 shadow-yellow-500/20',
-    info: 'ring-1 ring-blue-400/30 shadow-blue-500/20',
+    success: 'ring-1 ring-olive-500/40',
+    error:   'ring-1 ring-terra-500/40',
+    warning: 'ring-1 ring-[#C89A3F]/40',
+    info:    'ring-1 ring-indigo_ink-500/40',
   }[type] || ''
 }
 
 function iconBg(type) {
   return {
-    success: 'bg-gradient-to-br from-green-400 to-green-600',
-    error: 'bg-gradient-to-br from-red-400 to-red-600',
-    warning: 'bg-gradient-to-br from-yellow-400 to-orange-500',
-    info: 'bg-gradient-to-br from-blue-400 to-indigo-600',
-  }[type] || 'bg-gray-700'
+    success: 'bg-olive-500',
+    error:   'bg-terra-500',
+    warning: 'bg-[#C89A3F]',
+    info:    'bg-indigo_ink-500',
+  }[type] || 'bg-paper-300'
 }
 </script>

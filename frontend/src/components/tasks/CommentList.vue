@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+    <h4 class="text-xs font-semibold text-ink-100 uppercase tracking-wide mb-2">
       Comentários
-      <span v-if="items.length" class="ml-1 text-gray-500 normal-case font-normal">{{ items.length }}</span>
+      <span v-if="items.length" class="ml-1 text-ink-50 normal-case font-normal">{{ items.length }}</span>
     </h4>
 
     <div v-if="items.length" class="relative space-y-3 mb-3 pl-5">
@@ -10,18 +10,18 @@
       <div class="absolute left-[7px] top-1 bottom-1 w-px bg-gradient-to-b from-blue-500/40 via-white/10 to-transparent"></div>
 
       <div v-for="c in items" :key="c.id" class="relative group">
-        <div class="absolute -left-5 top-2.5 w-3 h-3 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 ring-2 ring-slate-900 shadow-lg shadow-blue-500/30"></div>
+        <div class="absolute -left-5 top-2.5 w-3 h-3 rounded-full bg-terra-500 ring-2 ring-slate-900 shadow-lg shadow-paper"></div>
         <div class="glass-light rounded-lg p-3">
           <div class="flex items-center justify-between gap-2 mb-1">
-            <p class="text-xs font-medium text-gray-300 truncate">
+            <p class="text-xs font-medium text-ink-200 truncate">
               {{ c.user_name || 'Você' }}
             </p>
             <div class="flex items-center gap-2 shrink-0">
-              <time class="text-[10px] text-gray-500">{{ formatDate(c.created_at) }}</time>
+              <time class="text-[10px] text-ink-50">{{ formatDate(c.created_at) }}</time>
               <button
                 v-if="canDelete(c)"
                 @click="remove(c)"
-                class="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-400 transition-opacity"
+                class="opacity-0 group-hover:opacity-100 text-ink-50 hover:text-terra-600 transition-opacity"
                 aria-label="Apagar"
               >
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -30,7 +30,7 @@
               </button>
             </div>
           </div>
-          <p class="text-sm text-gray-200 whitespace-pre-wrap break-words">{{ c.body }}</p>
+          <p class="text-sm text-ink-300 whitespace-pre-wrap break-words">{{ c.body }}</p>
         </div>
       </div>
     </div>
@@ -40,12 +40,12 @@
         v-model="newBody"
         type="text"
         placeholder="Escrever comentário…"
-        class="flex-1 px-3 py-2 text-sm bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+        class="flex-1 px-3 py-2 text-sm bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 placeholder-gray-500 focus:outline-none focus:border-indigo_ink-500"
       />
       <button
         type="submit"
         :disabled="!newBody.trim()"
-        class="px-3 py-2 text-xs font-medium bg-blue-500/90 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+        class="px-3 py-2 text-xs font-medium bg-terra-500 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-ink-400 rounded-lg transition-colors"
       >
         Enviar
       </button>

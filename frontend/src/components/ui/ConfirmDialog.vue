@@ -13,29 +13,29 @@
         class="fixed inset-0 z-[60] flex items-center justify-center p-4"
         @click.self="$emit('cancel')"
       >
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 bg-ink-400/40 backdrop-blur-sm"></div>
         <div
-          class="relative glass-strong gradient-border rounded-2xl w-full max-w-sm overflow-hidden"
+          class="relative paper-strong rounded-2xl w-full max-w-sm overflow-hidden"
           style="padding-bottom: var(--safe-bottom)"
         >
           <div class="p-5">
-            <h3 class="text-base font-semibold text-white mb-1">{{ title }}</h3>
-            <p v-if="message" class="text-sm text-gray-400">{{ message }}</p>
+            <h3 class="font-serif text-lg font-semibold text-ink-400 mb-1 tracking-tight">{{ title }}</h3>
+            <p v-if="message" class="text-sm text-ink-100">{{ message }}</p>
           </div>
-          <div class="flex border-t border-white/5">
+          <div class="flex border-t border-[var(--paper-border)]">
             <button
               @click="$emit('cancel')"
-              class="flex-1 py-3.5 text-sm font-medium text-gray-300 hover:bg-white/5 transition-colors"
+              class="flex-1 py-3.5 text-sm font-medium text-ink-200 hover:bg-[var(--paper-surface-3)] transition-colors"
             >
               {{ cancelLabel }}
             </button>
             <button
               @click="$emit('confirm')"
-              class="flex-1 py-3.5 text-sm font-semibold transition-colors border-l border-white/5"
+              class="flex-1 py-3.5 text-sm font-semibold transition-colors border-l border-[var(--paper-border)]"
               :class="
                 danger
-                  ? 'text-red-400 hover:bg-red-500/10'
-                  : 'text-blue-400 hover:bg-blue-500/10'
+                  ? 'text-terra-600 hover:bg-terra-500/10'
+                  : 'text-indigo_ink-500 hover:bg-indigo_ink-500/10'
               "
             >
               {{ confirmLabel }}

@@ -7,12 +7,12 @@
       :class="activeNote && isMobile ? 'hidden' : 'w-full md:w-64 lg:w-72'"
     >
       <!-- Cabeçalho -->
-      <div class="flex items-center justify-between px-4 py-3 border-b border-white/5 shrink-0">
-        <h1 class="text-base font-semibold text-white">Anotações</h1>
+      <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--paper-border)] shrink-0">
+        <h1 class="text-base font-semibold text-ink-400">Anotações</h1>
         <div class="flex items-center gap-1">
           <button
             @click="startCreateFolder"
-            class="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
+            class="p-1.5 rounded-lg text-ink-50 hover:text-ink-200 hover:bg-[var(--paper-surface-2)] transition-colors"
             title="Nova pasta"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -21,7 +21,7 @@
           </button>
           <button
             @click="createNote(null)"
-            class="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
+            class="p-1.5 rounded-lg text-ink-50 hover:text-ink-200 hover:bg-[var(--paper-surface-2)] transition-colors"
             title="Nova anotação"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -45,7 +45,7 @@
             @click="selectedFolder = null"
             class="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium transition-colors rounded-lg mx-1"
             :class="[
-              selectedFolder === null ? 'text-blue-400 bg-blue-500/10' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5',
+              selectedFolder === null ? 'text-terra-600 bg-terra-500/10' : 'text-ink-50 hover:text-ink-200 hover:bg-[var(--paper-surface-2)]',
               dragOverFolder === 'root' ? 'ring-1 ring-blue-500/50 bg-blue-500/5' : ''
             ]"
             style="width: calc(100% - 8px)"
@@ -54,7 +54,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
             Todas as anotações
-            <span class="ml-auto text-gray-600">{{ notes.length }}</span>
+            <span class="ml-auto text-ink-50">{{ notes.length }}</span>
           </button>
 
           <template v-if="selectedFolder === null">
@@ -69,7 +69,7 @@
             <button
               v-if="selectedFolder === null"
               @click="createNote(null)"
-              class="w-full flex items-center gap-2 px-4 py-1.5 text-xs text-gray-600 hover:text-gray-400 transition-colors"
+              class="w-full flex items-center gap-2 px-4 py-1.5 text-xs text-ink-50 hover:text-ink-100 transition-colors"
             >
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
@@ -96,7 +96,7 @@
             <button
               @click="toggleFolder(folder.id)"
               class="flex-1 flex items-center gap-2 px-2 py-1.5 text-xs font-medium transition-colors rounded-lg"
-              :class="selectedFolder === folder.id ? 'text-blue-400 bg-blue-500/10' : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'"
+              :class="selectedFolder === folder.id ? 'text-terra-600 bg-terra-500/10' : 'text-ink-100 hover:text-ink-300 hover:bg-[var(--paper-surface-2)]'"
               @click.right.prevent="startRenameFolder(folder)"
             >
               <svg
@@ -114,18 +114,18 @@
                 v-else
                 ref="renameFolderRef"
                 v-model="renamingFolder.name"
-                class="flex-1 bg-transparent outline-none text-white text-xs min-w-0"
+                class="flex-1 bg-transparent outline-none text-ink-400 text-xs min-w-0"
                 @blur="submitRenameFolder"
                 @keydown.enter.prevent="submitRenameFolder"
                 @keydown.escape.prevent="renamingFolder = null"
                 @click.stop
               />
-              <span class="ml-auto text-gray-600 shrink-0">{{ notesByFolder(folder.id).length }}</span>
+              <span class="ml-auto text-ink-50 shrink-0">{{ notesByFolder(folder.id).length }}</span>
             </button>
             <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
               <button
                 @click.stop="createNote(folder.id)"
-                class="p-1 rounded text-gray-600 hover:text-gray-300 hover:bg-white/5 transition-colors"
+                class="p-1 rounded text-ink-50 hover:text-ink-200 hover:bg-[var(--paper-surface-2)] transition-colors"
                 title="Nova anotação nesta pasta"
               >
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -134,7 +134,7 @@
               </button>
               <button
                 @click.stop="startRenameFolder(folder)"
-                class="p-1 rounded text-gray-600 hover:text-gray-300 hover:bg-white/5 transition-colors"
+                class="p-1 rounded text-ink-50 hover:text-ink-200 hover:bg-[var(--paper-surface-2)] transition-colors"
                 title="Renomear"
               >
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -143,7 +143,7 @@
               </button>
               <button
                 @click.stop="confirmDeleteFolder(folder)"
-                class="p-1 rounded text-gray-600 hover:text-red-400 hover:bg-white/5 transition-colors"
+                class="p-1 rounded text-ink-50 hover:text-terra-600 hover:bg-[var(--paper-surface-2)] transition-colors"
                 title="Excluir pasta"
               >
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -165,7 +165,7 @@
             />
             <button
               @click="createNote(folder.id)"
-              class="w-full flex items-center gap-2 px-4 py-1.5 text-xs text-gray-600 hover:text-gray-400 transition-colors"
+              class="w-full flex items-center gap-2 px-4 py-1.5 text-xs text-ink-50 hover:text-ink-100 transition-colors"
             >
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
@@ -177,15 +177,15 @@
 
         <!-- Criar pasta inline -->
         <div v-if="creatingFolder" class="mx-1 px-2 py-1.5">
-          <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/5">
-            <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[var(--paper-surface-2)]">
+            <svg class="w-3.5 h-3.5 text-ink-100 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
             </svg>
             <input
               ref="newFolderRef"
               v-model="newFolderName"
               placeholder="Nome da pasta"
-              class="flex-1 bg-transparent outline-none text-xs text-white placeholder-gray-600 min-w-0"
+              class="flex-1 bg-transparent outline-none text-xs text-ink-400 placeholder-gray-600 min-w-0"
               @keydown.enter.prevent="submitCreateFolder"
               @keydown.escape.prevent="creatingFolder = false"
               @blur="submitCreateFolder"
@@ -195,13 +195,13 @@
 
         <!-- Empty state -->
         <div v-if="notes.length === 0 && folders.length === 0 && !loading" class="px-4 py-8 text-center">
-          <p class="text-xs text-gray-600">Nenhuma anotação ainda</p>
+          <p class="text-xs text-ink-50">Nenhuma anotação ainda</p>
         </div>
       </div>
     </div>
 
     <!-- Divisor -->
-    <div class="hidden md:block w-px bg-white/5 shrink-0 self-stretch"></div>
+    <div class="hidden md:block w-px bg-[var(--paper-surface-2)] shrink-0 self-stretch"></div>
 
     <!-- ── PAINEL DIREITO: editor ── -->
     <div
@@ -210,12 +210,12 @@
     >
       <template v-if="activeNote">
         <!-- Toolbar do editor -->
-        <div class="flex items-center gap-2 px-4 py-2 border-b border-white/5 shrink-0">
+        <div class="flex items-center gap-2 px-4 py-2 border-b border-[var(--paper-border)] shrink-0">
           <!-- Voltar (mobile) -->
           <button
             v-if="isMobile"
             @click="activeNote = null"
-            class="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors mr-1"
+            class="p-1.5 rounded-lg text-ink-50 hover:text-ink-400 hover:bg-[var(--paper-surface-2)] transition-colors mr-1"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
@@ -223,18 +223,18 @@
           </button>
 
           <div class="flex-1 min-w-0">
-            <span v-if="savingNote" class="text-[10px] text-blue-400 flex items-center gap-1">
+            <span v-if="savingNote" class="text-[10px] text-terra-600 flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
               Salvando…
             </span>
-            <span v-else class="text-[10px] text-gray-600">{{ formatDate(activeNote.updated_at) }}</span>
+            <span v-else class="text-[10px] text-ink-50">{{ formatDate(activeNote.updated_at) }}</span>
           </div>
 
           <!-- Mover para pasta -->
           <div class="relative">
             <button
               @click="showMoveMenu = !showMoveMenu"
-              class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
+              class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-ink-50 hover:text-ink-200 hover:bg-[var(--paper-surface-2)] transition-colors"
               title="Mover para pasta"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -246,11 +246,11 @@
             <Teleport to="body">
               <Transition enter-active-class="transition duration-100 ease-out" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100" leave-active-class="transition duration-75 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
                 <div v-if="showMoveMenu" class="fixed glass-strong rounded-xl overflow-hidden z-[200] py-1 w-44 shadow-xl" :style="moveMenuStyle">
-                  <button @click="moveNote(null)" class="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors" :class="!activeNote.folder_id ? 'text-blue-400' : 'text-gray-300 hover:bg-white/5 hover:text-white'">
+                  <button @click="moveNote(null)" class="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors" :class="!activeNote.folder_id ? 'text-terra-600' : 'text-ink-200 hover:bg-[var(--paper-surface-2)] hover:text-ink-400'">
                     Sem pasta
                   </button>
-                  <div class="h-px bg-white/5 my-1"></div>
-                  <button v-for="f in folders" :key="f.id" @click="moveNote(f.id)" class="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors" :class="activeNote.folder_id === f.id ? 'text-blue-400' : 'text-gray-300 hover:bg-white/5 hover:text-white'">
+                  <div class="h-px bg-[var(--paper-surface-2)] my-1"></div>
+                  <button v-for="f in folders" :key="f.id" @click="moveNote(f.id)" class="w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors" :class="activeNote.folder_id === f.id ? 'text-terra-600' : 'text-ink-200 hover:bg-[var(--paper-surface-2)] hover:text-ink-400'">
                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
                     {{ f.name }}
                   </button>
@@ -260,7 +260,7 @@
             </Teleport>
           </div>
 
-          <button @click="confirmDelete(activeNote)" class="p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-white/5 transition-colors">
+          <button @click="confirmDelete(activeNote)" class="p-1.5 rounded-lg text-ink-50 hover:text-terra-600 hover:bg-[var(--paper-surface-2)] transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
             </svg>
@@ -272,7 +272,7 @@
           <input
             v-model="editTitle"
             placeholder="Título"
-            class="w-full bg-transparent border-none outline-none text-2xl md:text-3xl font-bold text-white placeholder-gray-700 mb-4 block"
+            class="w-full bg-transparent border-none outline-none text-2xl md:text-3xl font-bold text-ink-400 placeholder-gray-700 mb-4 block"
             @input="debounceSave"
           />
           <RichEditor v-model="editContent" @update:modelValue="debounceSave" />
@@ -282,12 +282,12 @@
       <!-- Empty state quando nenhuma nota selecionada -->
       <div v-else class="flex-1 flex flex-col items-center justify-center gap-3 text-center px-8">
         <div class="w-16 h-16 rounded-2xl glass-light flex items-center justify-center">
-          <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+          <svg class="w-8 h-8 text-ink-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
           </svg>
         </div>
-        <p class="text-sm text-gray-500">Selecione uma anotação ou crie uma nova</p>
-        <button @click="createNote(null)" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-500 transition-colors">
+        <p class="text-sm text-ink-50">Selecione uma anotação ou crie uma nova</p>
+        <button @click="createNote(null)" class="px-4 py-2 bg-terra-500 text-ink-400 text-sm rounded-lg hover:bg-blue-500 transition-colors">
           Nova anotação
         </button>
       </div>
@@ -330,7 +330,7 @@ const NoteItem = defineComponent({
   emits: ['click', 'delete'],
   setup(props, { emit }) {
     return () => h('div', {
-      class: `group relative flex items-start gap-2 px-3 py-2 mx-1 rounded-lg cursor-pointer transition-colors ${props.active ? 'bg-white/10 text-white' : 'hover:bg-white/5 text-gray-400 hover:text-gray-200'}`,
+      class: `group relative flex items-start gap-2 px-3 py-2 mx-1 rounded-lg cursor-pointer transition-colors ${props.active ? 'bg-[var(--paper-surface-3)] text-ink-400' : 'hover:bg-[var(--paper-surface-2)] text-ink-100 hover:text-ink-300'}`,
       draggable: true,
       onDragstart: (e) => {
         e.dataTransfer.setData('note-id', String(props.note.id))
@@ -339,11 +339,11 @@ const NoteItem = defineComponent({
       onClick: () => emit('click'),
     }, [
       h('div', { class: 'flex-1 min-w-0' }, [
-        h('p', { class: 'text-xs font-medium truncate' + (props.active ? ' text-white' : '') }, props.note.title || 'Sem título'),
-        h('p', { class: 'text-[10px] text-gray-600 mt-0.5 truncate' }, previewContent(props.note.content)),
+        h('p', { class: 'text-xs font-medium truncate' + (props.active ? ' text-ink-400' : '') }, props.note.title || 'Sem título'),
+        h('p', { class: 'text-[10px] text-ink-50 mt-0.5 truncate' }, previewContent(props.note.content)),
       ]),
       h('button', {
-        class: 'shrink-0 p-1 rounded opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 transition-colors',
+        class: 'shrink-0 p-1 rounded opacity-0 group-hover:opacity-100 text-ink-50 hover:text-terra-600 transition-colors',
         onClick: (e) => { e.stopPropagation(); emit('delete') },
       }, [
         h('svg', { class: 'w-3 h-3', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24', 'stroke-width': '2' }, [

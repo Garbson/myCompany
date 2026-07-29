@@ -44,12 +44,6 @@ const routes = [
     meta: { auth: true }
   },
   {
-    path: '/rotina',
-    name: 'Rotina',
-    component: () => import('../views/Rotina.vue'),
-    meta: { auth: true }
-  },
-  {
     path: '/configuracoes',
     name: 'Configurações',
     component: () => import('../views/Configuracoes.vue'),

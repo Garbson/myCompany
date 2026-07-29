@@ -8,40 +8,40 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="show" class="fixed inset-0 z-50 flex flex-col bg-slate-950/95 backdrop-blur-xl">
+      <div v-if="show" class="fixed inset-0 z-50 flex flex-col bg-[var(--paper-bg)]/95 backdrop-blur-xl">
         <!-- Header -->
         <header
-          class="shrink-0 glass border-b border-white/5 flex items-center justify-between px-4 md:px-6 h-14"
+          class="shrink-0 glass border-b border-[var(--paper-border)] flex items-center justify-between px-4 md:px-6 h-14"
           style="padding-top: var(--safe-top); padding-left: max(var(--safe-left), 1rem); padding-right: max(var(--safe-right), 1rem)"
         >
           <div class="flex items-center gap-3 min-w-0">
-            <button @click="$emit('close')" class="text-gray-400 hover:text-white p-1 -m-1 transition-colors shrink-0" aria-label="Fechar">
+            <button @click="$emit('close')" class="text-ink-100 hover:text-ink-400 p-1 -m-1 transition-colors shrink-0" aria-label="Fechar">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <div class="min-w-0">
-              <p class="text-xs text-gray-500 leading-none">{{ subtitle }}</p>
-              <h2 class="text-sm md:text-base font-semibold text-white truncate">{{ targetEntity?.name }}</h2>
+              <p class="text-xs text-ink-50 leading-none">{{ subtitle }}</p>
+              <h2 class="text-sm md:text-base font-semibold text-ink-400 truncate">{{ targetEntity?.name }}</h2>
             </div>
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <span v-if="saving" class="text-xs text-blue-400 flex items-center gap-1.5">
+            <span v-if="saving" class="text-xs text-terra-600 flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
               Salvando…
             </span>
-            <span v-else-if="dirty" class="text-xs text-yellow-400 flex items-center gap-1.5">
+            <span v-else-if="dirty" class="text-xs text-[#C89A3F] flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
               Não salvo
             </span>
-            <span v-else-if="loadedOnce" class="text-xs text-gray-500 hidden sm:flex items-center gap-1.5">
+            <span v-else-if="loadedOnce" class="text-xs text-ink-50 hidden sm:flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
               Salvo
             </span>
             <button
               @click="saveNow"
               :disabled="!dirty || saving"
-              class="px-3 py-1.5 text-xs font-medium bg-gradient-to-br from-indigo-500 to-purple-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all"
+              class="px-3 py-1.5 text-xs font-medium bg-terra-500 disabled:opacity-40 disabled:cursor-not-allowed text-ink-400 rounded-lg shadow-lg shadow-paper hover:shadow-paper-lg transition-all"
             >
               Salvar
             </button>
@@ -49,14 +49,14 @@
         </header>
 
         <!-- Abas -->
-        <div class="shrink-0 border-b border-white/5 bg-slate-950/60 px-3 md:px-6 flex items-stretch overflow-x-auto scrollbar-none">
+        <div class="shrink-0 border-b border-[var(--paper-border)] bg-[var(--paper-bg)]/60 px-3 md:px-6 flex items-stretch overflow-x-auto scrollbar-none">
           <div
             v-for="t in tabs"
             :key="t.id"
             class="group relative flex items-center gap-2 px-3 md:px-4 py-2 border-b-2 cursor-pointer whitespace-nowrap transition-colors"
             :class="t.id === activeTabId
-              ? 'border-indigo-400 text-white bg-white/5'
-              : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-white/[0.03]'"
+              ? 'border-indigo-400 text-ink-400 bg-[var(--paper-surface-2)]'
+              : 'border-transparent text-ink-100 hover:text-ink-300 hover:bg-[var(--paper-surface-2)]'"
             @click="switchTab(t.id)"
             @dblclick.stop="startRenameTab(t)"
           >
@@ -65,7 +65,7 @@
               ref="renameInputRef"
               v-model="renameDraft"
               type="text"
-              class="bg-slate-900/80 border border-indigo-400/60 rounded px-2 py-0.5 text-xs text-white outline-none w-32"
+              class="bg-[var(--paper-surface)] border border-indigo-400/60 rounded px-2 py-0.5 text-xs text-ink-400 outline-none w-32"
               @blur="commitRename(t)"
               @keydown.enter.prevent="commitRename(t)"
               @keydown.esc.prevent="cancelRename"
@@ -75,7 +75,7 @@
             <button
               v-if="tabs.length > 1 && renamingTabId !== t.id"
               @click.stop="askDeleteTab(t)"
-              class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-red-400 p-0.5 -mr-1"
+              class="opacity-0 group-hover:opacity-100 transition-opacity text-ink-50 hover:text-terra-600 p-0.5 -mr-1"
               :title="`Excluir aba “${t.title}”`"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -85,7 +85,7 @@
           </div>
           <button
             @click="addTab"
-            class="shrink-0 inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+            class="shrink-0 inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-ink-100 hover:text-ink-400 hover:bg-[var(--paper-surface-2)] transition-colors"
             title="Nova aba"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -96,21 +96,21 @@
         </div>
 
         <!-- Toolbar -->
-        <div class="shrink-0 glass-light border-b border-white/5 px-3 md:px-6 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
+        <div class="shrink-0 glass-light border-b border-[var(--paper-border)] px-3 md:px-6 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
           <button
             v-for="t in nodeKinds"
             :key="t.kind"
             @click="addNode(t.kind)"
-            class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium glass-light rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+            class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium glass-light rounded-lg text-ink-200 hover:text-ink-400 hover:bg-[var(--paper-surface-3)] transition-colors"
             :title="t.hint"
           >
             <span v-html="t.icon" class="text-[14px]"></span>
             {{ t.label }}
           </button>
-          <div class="w-px h-5 bg-white/10 mx-1"></div>
+          <div class="w-px h-5 bg-[var(--paper-surface-3)] mx-1"></div>
           <button
             @click="clearAll"
-            class="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+            class="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-terra-600 hover:bg-terra-500/10 rounded-lg transition-colors"
           >
             Limpar
           </button>
@@ -157,12 +157,12 @@
           </div>
 
           <div v-if="loading" class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="glass-strong rounded-xl px-4 py-3 text-sm text-gray-300">Carregando…</div>
+            <div class="glass-strong rounded-xl px-4 py-3 text-sm text-ink-200">Carregando…</div>
           </div>
           <div v-else-if="nodes.length === 0" class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="text-center max-w-xs">
-              <p class="text-sm text-gray-400 mb-1">Sem nós ainda</p>
-              <p class="text-xs text-gray-600">Use a barra acima pra adicionar eventos, tarefas, gateways…</p>
+              <p class="text-sm text-ink-100 mb-1">Sem nós ainda</p>
+              <p class="text-xs text-ink-50">Use a barra acima pra adicionar eventos, tarefas, gateways…</p>
             </div>
           </div>
         </div>

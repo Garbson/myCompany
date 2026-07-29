@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="flex items-center justify-between mb-6 md-sticky-title">
-      <h1 class="text-xl font-bold text-white">Leads</h1>
-      <button @click="openCreate" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+      <h1 class="text-xl md:text-2xl font-semibold text-ink-400 tracking-tight">Leads</h1>
+      <button @click="openCreate" class="px-4 py-2 bg-terra-500 text-ink-400 text-sm font-medium rounded-lg hover:bg-terra-600">
         + Novo lead
       </button>
     </div>
@@ -12,7 +12,7 @@
       <div v-for="col in pipeline" :key="col.key" class="glass rounded-xl glow-hover p-3 min-w-[200px] flex-shrink-0 flex-1">
         <div class="flex items-center justify-between mb-3 px-1">
           <h3 class="text-xs font-semibold" :class="col.color">{{ col.label }}</h3>
-          <span class="text-[10px] glass-light px-1.5 py-0.5 rounded-full text-gray-400">{{ leadStore.byStatus(col.key).length }}</span>
+          <span class="text-[10px] glass-light px-1.5 py-0.5 rounded-full text-ink-100">{{ leadStore.byStatus(col.key).length }}</span>
         </div>
         <div class="space-y-2">
           <div
@@ -21,15 +21,15 @@
             class="glass-light p-3 rounded-lg cursor-pointer glow-hover"
             @click="editLead(lead)"
           >
-            <p class="text-sm font-medium text-gray-200">{{ lead.name }}</p>
-            <p v-if="lead.company" class="text-xs text-gray-500 mt-0.5">{{ lead.company }}</p>
-            <p v-if="lead.value_estimate > 0" class="text-xs font-medium text-green-400 mt-1">{{ formatCurrency(lead.value_estimate) }}</p>
+            <p class="text-sm font-medium text-ink-300">{{ lead.name }}</p>
+            <p v-if="lead.company" class="text-xs text-ink-50 mt-0.5">{{ lead.company }}</p>
+            <p v-if="lead.value_estimate > 0" class="text-xs font-medium text-olive-500 mt-1">{{ formatCurrency(lead.value_estimate) }}</p>
             <div class="flex mt-2">
-              <button v-if="col.prev" @click.stop="moveLead(lead, col.prev)" class="text-gray-600 hover:text-gray-400 text-xs">◀</button>
-              <button v-if="col.next" @click.stop="moveLead(lead, col.next)" class="text-gray-600 hover:text-blue-400 text-xs ml-auto">▶</button>
+              <button v-if="col.prev" @click.stop="moveLead(lead, col.prev)" class="text-ink-50 hover:text-ink-100 text-xs">◀</button>
+              <button v-if="col.next" @click.stop="moveLead(lead, col.next)" class="text-ink-50 hover:text-terra-600 text-xs ml-auto">▶</button>
             </div>
           </div>
-          <p v-if="leadStore.byStatus(col.key).length === 0" class="text-center text-xs text-gray-600 py-6">Vazio</p>
+          <p v-if="leadStore.byStatus(col.key).length === 0" class="text-center text-xs text-ink-50 py-6">Vazio</p>
         </div>
       </div>
     </div>
@@ -38,27 +38,27 @@
     <Modal :show="showModal" :title="editing ? 'Editar lead' : 'Novo lead'" @close="closeModal">
       <form @submit.prevent="save" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Nome *</label>
-          <input v-model="form.name" type="text" required class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          <label class="block text-sm font-medium text-ink-200 mb-1">Nome *</label>
+          <input v-model="form.name" type="text" required class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
-            <input v-model="form.email" type="email" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <label class="block text-sm font-medium text-ink-200 mb-1">Email</label>
+            <input v-model="form.email" type="email" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Telefone</label>
-            <input v-model="form.phone" type="text" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <label class="block text-sm font-medium text-ink-200 mb-1">Telefone</label>
+            <input v-model="form.phone" type="text" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Empresa</label>
-          <input v-model="form.company" type="text" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          <label class="block text-sm font-medium text-ink-200 mb-1">Empresa</label>
+          <input v-model="form.company" type="text" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
-            <select v-model="form.status" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500">
+            <label class="block text-sm font-medium text-ink-200 mb-1">Status</label>
+            <select v-model="form.status" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500">
               <option value="novo">Novo</option>
               <option value="contato">Em contato</option>
               <option value="negociando">Negociando</option>
@@ -67,13 +67,13 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Valor estimado</label>
-            <input v-model="form.value_estimate" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <label class="block text-sm font-medium text-ink-200 mb-1">Valor estimado</label>
+            <input v-model="form.value_estimate" type="number" step="0.01" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Tipo de pagamento</label>
-          <select v-model="form.payment_type" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500">
+          <label class="block text-sm font-medium text-ink-200 mb-1">Tipo de pagamento</label>
+          <select v-model="form.payment_type" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500">
             <option value="pagamento_unico">Pagamento único</option>
             <option value="parcelado">Parcelado</option>
             <option value="recorrente">Mensalidade (recorrente)</option>
@@ -83,29 +83,29 @@
         </div>
         <div v-if="leadFormHasSetup || leadFormHasInstallments || leadFormHasMonthly" class="glass-light rounded-lg p-3 space-y-3">
           <div v-if="leadFormHasSetup">
-            <label class="block text-xs font-medium text-gray-400 mb-1">Valor de implantação</label>
-            <input v-model.number="form.setup_value" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <label class="block text-xs font-medium text-ink-100 mb-1">Valor de implantação</label>
+            <input v-model.number="form.setup_value" type="number" step="0.01" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
           </div>
           <div v-if="leadFormHasInstallments || leadFormHasSingle">
-            <label class="block text-xs font-medium text-gray-400 mb-1">{{ leadFormHasSingle ? 'Valor total' : 'Valor das parcelas (total)' }}</label>
-            <input v-model.number="form.value_estimate" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <label class="block text-xs font-medium text-ink-100 mb-1">{{ leadFormHasSingle ? 'Valor total' : 'Valor das parcelas (total)' }}</label>
+            <input v-model.number="form.value_estimate" type="number" step="0.01" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
           </div>
           <div v-if="leadFormHasMonthly">
-            <label class="block text-xs font-medium text-gray-400 mb-1">Valor da mensalidade</label>
-            <input v-model.number="form.monthly_fee" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <label class="block text-xs font-medium text-ink-100 mb-1">Valor da mensalidade</label>
+            <input v-model.number="form.monthly_fee" type="number" step="0.01" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Notas</label>
-          <textarea v-model="form.notes" rows="2" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"></textarea>
+          <label class="block text-sm font-medium text-ink-200 mb-1">Notas</label>
+          <textarea v-model="form.notes" rows="2" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500"></textarea>
         </div>
 
         <div class="flex gap-3 pt-2">
-          <button v-if="editing && editing.status === 'ganho'" type="button" @click="createProjectFromLead" class="px-4 py-2 text-sm text-white bg-green-600 hover:bg-green-700 rounded-lg">Criar projeto</button>
-          <button v-if="editing" type="button" @click="deleteLead" class="px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg">Excluir</button>
+          <button v-if="editing && editing.status === 'ganho'" type="button" @click="createProjectFromLead" class="px-4 py-2 text-sm text-ink-400 bg-olive-600 hover:bg-olive-700 rounded-lg">Criar projeto</button>
+          <button v-if="editing" type="button" @click="deleteLead" class="px-4 py-2 text-sm text-terra-600 hover:bg-terra-500/10 rounded-lg">Excluir</button>
           <div class="flex-1"></div>
-          <button type="button" @click="closeModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Salvar</button>
+          <button type="button" @click="closeModal" class="px-4 py-2 text-sm text-ink-100 hover:bg-[var(--paper-surface-2)] rounded-lg">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-sm bg-terra-500 text-ink-400 rounded-lg hover:bg-terra-600">Salvar</button>
         </div>
       </form>
     </Modal>
@@ -114,12 +114,12 @@
     <Modal :show="showProjectModal" title="Criar projeto" @close="showProjectModal = false">
       <form @submit.prevent="saveProject" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Nome do projeto *</label>
-          <input v-model="projectForm.name" type="text" required class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          <label class="block text-sm font-medium text-ink-200 mb-1">Nome do projeto *</label>
+          <input v-model="projectForm.name" type="text" required class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Tipo de pagamento</label>
-          <select v-model="projectForm.payment_type" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500">
+          <label class="block text-sm font-medium text-ink-200 mb-1">Tipo de pagamento</label>
+          <select v-model="projectForm.payment_type" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500">
             <option value="pagamento_unico">Pagamento único</option>
             <option value="parcelado">Parcelado</option>
             <option value="recorrente">Mensalidade (recorrente)</option>
@@ -127,32 +127,32 @@
             <option value="implantacao_recorrente">Implantação + Mensalidade</option>
           </select>
         </div>
-        <div v-if="leadHasSetup" class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-lg">
-          <label class="block text-sm font-medium text-gray-300 mb-1">Valor de implantação</label>
-          <input v-model.number="projectForm.setup_value" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+        <div v-if="leadHasSetup" class="bg-terra-500/10 border border-terra-500/20 p-3 rounded-lg">
+          <label class="block text-sm font-medium text-ink-200 mb-1">Valor de implantação</label>
+          <input v-model.number="projectForm.setup_value" type="number" step="0.01" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
         </div>
         <div v-if="leadHasInstallments || leadHasSingle">
-          <label class="block text-sm font-medium text-gray-300 mb-1">{{ leadHasSingle ? 'Valor total' : 'Valor das parcelas (total)' }}</label>
-          <input v-model.number="projectForm.total_value" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          <label class="block text-sm font-medium text-ink-200 mb-1">{{ leadHasSingle ? 'Valor total' : 'Valor das parcelas (total)' }}</label>
+          <input v-model.number="projectForm.total_value" type="number" step="0.01" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
         </div>
         <div v-if="leadHasMonthly">
-          <label class="block text-sm font-medium text-gray-300 mb-1">Valor da mensalidade</label>
-          <input v-model.number="projectForm.monthly_fee" type="number" step="0.01" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          <label class="block text-sm font-medium text-ink-200 mb-1">Valor da mensalidade</label>
+          <input v-model.number="projectForm.monthly_fee" type="number" step="0.01" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Data início</label>
-            <input v-model="projectForm.start_date" type="date" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <label class="block text-sm font-medium text-ink-200 mb-1">Data início</label>
+            <input v-model="projectForm.start_date" type="date" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Prazo final</label>
-            <input v-model="projectForm.end_date" type="date" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+            <label class="block text-sm font-medium text-ink-200 mb-1">Prazo final</label>
+            <input v-model="projectForm.end_date" type="date" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
           </div>
         </div>
         <div class="flex gap-3 pt-2">
           <div class="flex-1"></div>
-          <button type="button" @click="showProjectModal = false" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">Criar projeto</button>
+          <button type="button" @click="showProjectModal = false" class="px-4 py-2 text-sm text-ink-100 hover:bg-[var(--paper-surface-2)] rounded-lg">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-sm bg-olive-600 text-ink-400 rounded-lg hover:bg-green-700">Criar projeto</button>
         </div>
       </form>
     </Modal>
@@ -169,11 +169,11 @@ const leadStore = useLeadStore()
 const projectStore = useProjectStore()
 
 const pipeline = [
-  { key: 'novo', label: 'Novos', color: 'text-gray-400', prev: null, next: 'contato', nextLabel: 'Contato' },
-  { key: 'contato', label: 'Em contato', color: 'text-blue-400', prev: 'novo', next: 'negociando', nextLabel: 'Negociar' },
-  { key: 'negociando', label: 'Negociando', color: 'text-yellow-400', prev: 'contato', next: 'ganho', nextLabel: 'Ganhar' },
-  { key: 'ganho', label: 'Ganhos', color: 'text-green-400', prev: 'negociando', next: 'perdido', nextLabel: 'Perder' },
-  { key: 'perdido', label: 'Perdidos', color: 'text-red-400', prev: 'ganho', next: null, nextLabel: '' }
+  { key: 'novo', label: 'Novos', color: 'text-ink-100', prev: null, next: 'contato', nextLabel: 'Contato' },
+  { key: 'contato', label: 'Em contato', color: 'text-terra-600', prev: 'novo', next: 'negociando', nextLabel: 'Negociar' },
+  { key: 'negociando', label: 'Negociando', color: 'text-[#C89A3F]', prev: 'contato', next: 'ganho', nextLabel: 'Ganhar' },
+  { key: 'ganho', label: 'Ganhos', color: 'text-olive-500', prev: 'negociando', next: 'perdido', nextLabel: 'Perder' },
+  { key: 'perdido', label: 'Perdidos', color: 'text-terra-600', prev: 'ganho', next: null, nextLabel: '' }
 ]
 
 const showModal = ref(false)

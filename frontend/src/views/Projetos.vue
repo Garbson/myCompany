@@ -1,21 +1,24 @@
 <template>
   <div>
     <div class="flex items-center justify-between mb-6 md-sticky-title">
-      <h1 class="text-xl font-bold text-white">Projetos</h1>
-      <button @click="openCreateProject" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700">
-        + Projeto
+      <h1 class="font-serif text-2xl md:text-3xl font-semibold text-ink-400 tracking-tight">Projetos</h1>
+      <button @click="openCreateProject" class="btn-primary">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Novo projeto
       </button>
     </div>
 
     <!-- Frase motivacional -->
     <div v-if="workMode" class="glass rounded-xl glow-hover p-4 mb-4 text-center">
-      <p class="text-sm text-gray-300 italic">"{{ currentQuote.text }}"</p>
-      <p class="text-xs text-gray-500 mt-1">— {{ currentQuote.author }}</p>
+      <p class="text-sm text-ink-200 italic">"{{ currentQuote.text }}"</p>
+      <p class="text-xs text-ink-50 mt-1">— {{ currentQuote.author }}</p>
     </div>
 
     <div class="space-y-3">
       <div v-for="project in projectTasks" :key="project.id" class="glass rounded-xl glow-hover overflow-hidden">
-        <div class="p-4 cursor-pointer hover:bg-white/5 transition-colors" @click="toggle(project.id)">
+        <div class="p-4 cursor-pointer hover:bg-[var(--paper-surface-2)] transition-colors" @click="toggle(project.id)">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3 min-w-0">
               <span class="text-lg shrink-0">{{ expanded === project.id ? '▼' : '▶' }}</span>
@@ -25,17 +28,17 @@
                 :title="`Prioridade ${priorityLabel(project.priority)}`"
               ></span>
               <div class="min-w-0">
-                <p class="text-sm font-medium text-gray-200 truncate">{{ project.name }}</p>
-                <p class="text-xs text-gray-500">
+                <p class="text-sm font-medium text-ink-300 truncate">{{ project.name }}</p>
+                <p class="text-xs text-ink-50">
                   {{ project.openCount }} pendente{{ project.openCount !== 1 ? 's' : '' }}
-                  <span v-if="project.doneCount" class="text-gray-600">· {{ project.doneCount }} concluída{{ project.doneCount !== 1 ? 's' : '' }}</span>
+                  <span v-if="project.doneCount" class="text-ink-50">· {{ project.doneCount }} concluída{{ project.doneCount !== 1 ? 's' : '' }}</span>
                 </p>
               </div>
             </div>
             <div class="flex items-center gap-1">
               <button
                 @click.stop="openFlow(project)"
-                class="text-gray-600 hover:text-indigo-400 transition-colors p-1"
+                class="text-ink-50 hover:text-indigo_ink-500 transition-colors p-1"
                 title="Fluxograma do projeto"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,7 +47,7 @@
               </button>
               <button
                 @click.stop="openEditProject(project)"
-                class="text-gray-600 hover:text-blue-400 transition-colors p-1"
+                class="text-ink-50 hover:text-terra-600 transition-colors p-1"
                 title="Editar projeto"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,7 +56,7 @@
               </button>
               <button
                 @click.stop="askDeleteProject(project)"
-                class="text-gray-600 hover:text-red-400 transition-colors p-1"
+                class="text-ink-50 hover:text-terra-600 transition-colors p-1"
                 title="Excluir projeto"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,14 +76,14 @@
           </div>
         </div>
 
-        <div v-if="expanded === project.id" class="border-t border-white/5 p-4 bg-slate-950/40">
+        <div v-if="expanded === project.id" class="border-t border-[var(--paper-border)] p-4 bg-[var(--paper-bg)]/40">
           <div class="flex items-center justify-between mb-3 gap-2 flex-wrap">
-            <p class="text-xs font-medium text-gray-400">Tarefas do projeto</p>
+            <p class="text-xs font-medium text-ink-100">Tarefas do projeto</p>
             <div class="flex items-center gap-2">
               <button
                 @click.stop="showCompleted = !showCompleted"
                 class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors"
-                :class="showCompleted ? 'bg-green-500/90 text-white shadow-md shadow-green-500/20' : 'glass-light text-gray-400 hover:text-white'"
+                :class="showCompleted ? 'bg-olive-500 text-ink-400 shadow-md shadow-paper' : 'glass-light text-ink-100 hover:text-ink-400'"
                 :title="showCompleted ? 'Ocultar concluídas' : 'Mostrar concluídas'"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -91,7 +94,7 @@
               </button>
               <button
                 @click.stop="openCreateTask(project)"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors shadow-md shadow-blue-600/20"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-terra-500 text-ink-400 rounded-lg hover:bg-blue-500 transition-colors shadow-md shadow-blue-600/20"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -104,21 +107,21 @@
             <div
               v-for="task in visibleTasksFor(project)"
               :key="task.id"
-              class="flex items-center gap-3 px-4 py-2 glass-light rounded-lg glow-hover hover:border-gray-700 cursor-pointer transition-colors"
+              class="flex items-center gap-3 px-4 py-2 glass-light rounded-lg glow-hover hover:border-[var(--paper-border-strong)] cursor-pointer transition-colors"
               @click.stop="openEditTask(task)"
             >
               <button
                 @click.stop="toggleTaskStatus(task)"
                 class="w-5 h-5 rounded-full border-2 shrink-0 transition-colors flex items-center justify-center"
-                :class="task.status === 'done' ? 'bg-green-500 border-green-500' : 'border-gray-600 hover:border-blue-500'"
+                :class="task.status === 'done' ? 'bg-olive-500 border-green-500' : 'border-gray-600 hover:border-terra-500'"
                 :aria-label="task.status === 'done' ? 'Marcar como pendente' : 'Concluir'"
               >
-                <svg v-if="task.status === 'done'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-if="task.status === 'done'" class="w-3 h-3 text-ink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                 </svg>
               </button>
               <div class="flex-1 min-w-0">
-                <p class="text-sm text-gray-200 truncate" :class="{ 'line-through opacity-50': task.status === 'done' }">{{ task.title }}</p>
+                <p class="text-sm text-ink-300 truncate" :class="{ 'line-through opacity-50': task.status === 'done' }">{{ task.title }}</p>
               </div>
               <span v-if="task.is_recurring" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 shrink-0" title="Tarefa recorrente">↻</span>
               <span class="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0" :class="difficultyBadge(task.difficulty)">
@@ -128,14 +131,14 @@
                 {{ statusLabel(task.status) }}
               </span>
             </div>
-            <p v-if="project.tasks.length === 0" class="text-center text-gray-600 py-6 text-sm">
-              Nenhuma tarefa vinculada — clique em <span class="text-blue-400">Nova tarefa</span> pra começar
+            <p v-if="project.tasks.length === 0" class="text-center text-ink-50 py-6 text-sm">
+              Nenhuma tarefa vinculada — clique em <span class="text-terra-600">Nova tarefa</span> pra começar
             </p>
           </div>
         </div>
       </div>
 
-      <p v-if="projectTasks.length === 0" class="text-center text-gray-500 py-12 text-sm">
+      <p v-if="projectTasks.length === 0" class="text-center text-ink-50 py-12 text-sm">
         Nenhum projeto cadastrado
       </p>
     </div>
@@ -144,16 +147,16 @@
     <Modal :show="showProjectModal" :title="editingProject ? 'Editar projeto' : 'Novo projeto'" @close="closeProjectModal">
       <form @submit.prevent="saveProject" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Nome *</label>
-          <input v-model="projectForm.name" type="text" required class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-indigo-500" />
+          <label class="block text-sm font-medium text-ink-200 mb-1">Nome *</label>
+          <input v-model="projectForm.name" type="text" required class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo-500" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
-          <textarea v-model="projectForm.description" rows="2" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-indigo-500"></textarea>
+          <label class="block text-sm font-medium text-ink-200 mb-1">Descrição</label>
+          <textarea v-model="projectForm.description" rows="2" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo-500"></textarea>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1.5">Prioridade</label>
+          <label class="block text-sm font-medium text-ink-200 mb-1.5">Prioridade</label>
           <div class="grid grid-cols-3 gap-2">
             <button
               v-for="p in priorityOptions"
@@ -163,21 +166,21 @@
               class="px-3 py-2 text-xs font-semibold rounded-lg transition-colors"
               :class="projectForm.priority === p.value
                 ? p.activeClass
-                : 'glass-light text-gray-400 hover:text-white hover:bg-white/10'"
+                : 'glass-light text-ink-100 hover:text-ink-400 hover:bg-[var(--paper-surface-3)]'"
             >
               {{ p.label }}
             </button>
           </div>
         </div>
 
-        <div v-if="editingProject" class="pt-3 border-t border-white/5">
+        <div v-if="editingProject" class="pt-3 border-t border-[var(--paper-border)]">
           <AttachmentList entity-type="project" :entity-id="editingProject.id" />
         </div>
 
         <div class="flex gap-3 pt-2">
           <div class="flex-1"></div>
-          <button type="button" @click="closeProjectModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg transition-colors">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-lg shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all font-medium">{{ editingProject ? 'Salvar' : 'Criar' }}</button>
+          <button type="button" @click="closeProjectModal" class="px-4 py-2 text-sm text-ink-100 hover:bg-[var(--paper-surface-2)] rounded-lg transition-colors">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-sm bg-terra-500 text-ink-400 rounded-lg shadow-lg shadow-paper hover:shadow-paper-lg transition-all font-medium">{{ editingProject ? 'Salvar' : 'Criar' }}</button>
         </div>
       </form>
     </Modal>
@@ -265,17 +268,17 @@ const editingProject = ref(null)
 const projectForm = reactive({ name: '', description: '', priority: 'medium' })
 
 const priorityOptions = [
-  { value: 'low',    label: 'Baixa', activeClass: 'bg-slate-500/30 text-slate-200 ring-1 ring-slate-400/40' },
+  { value: 'low',    label: 'Baixa', activeClass: 'bg-slate-500/30 text-ink-300 ring-1 ring-slate-400/40' },
   { value: 'medium', label: 'Média', activeClass: 'bg-amber-500/30 text-amber-200 ring-1 ring-amber-400/40' },
   { value: 'high',   label: 'Alta',  activeClass: 'bg-red-500/30 text-red-200 ring-1 ring-red-400/40' },
 ]
 
 function priorityBadge(p) {
   return {
-    low:    'bg-slate-500/20 text-slate-300',
+    low:    'bg-slate-500/20 text-ink-200',
     medium: 'bg-amber-500/20 text-amber-300',
-    high:   'bg-red-500/20 text-red-300',
-  }[p] || 'bg-slate-500/20 text-slate-300'
+    high:   'bg-terra-500/20 text-terra-500',
+  }[p] || 'bg-slate-500/20 text-ink-200'
 }
 function priorityDot(p) {
   return {
@@ -356,13 +359,13 @@ function toggle(id) {
 }
 
 function difficultyBadge(d) {
-  return { easy: 'bg-green-500/20 text-green-400', medium: 'bg-yellow-500/20 text-yellow-400', hard: 'bg-red-500/20 text-red-400' }[d] || ''
+  return { easy: 'bg-olive-500/20 text-olive-500', medium: 'bg-[#C89A3F]/20 text-[#C89A3F]', hard: 'bg-terra-500/20 text-terra-600' }[d] || ''
 }
 function difficultyLabel(d) {
   return { easy: 'Fácil', medium: 'Médio', hard: 'Difícil' }[d] || d
 }
 function statusBadge(s) {
-  return { todo: 'bg-gray-500/20 text-gray-400', in_progress: 'bg-blue-500/20 text-blue-400', done: 'bg-green-500/20 text-green-400', ativo: 'bg-blue-500/20 text-blue-400', concluido: 'bg-green-500/20 text-green-400', cancelado: 'bg-red-500/20 text-red-400' }[s] || ''
+  return { todo: 'bg-gray-500/20 text-ink-100', in_progress: 'bg-blue-500/20 text-terra-600', done: 'bg-olive-500/20 text-olive-500', ativo: 'bg-blue-500/20 text-terra-600', concluido: 'bg-olive-500/20 text-olive-500', cancelado: 'bg-terra-500/20 text-terra-600' }[s] || ''
 }
 function statusLabel(s) {
   return { todo: 'A fazer', in_progress: 'Em andamento', done: 'Concluído', ativo: 'Ativo', concluido: 'Concluído', cancelado: 'Cancelado' }[s] || s

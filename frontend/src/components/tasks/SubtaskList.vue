@@ -1,20 +1,20 @@
 <template>
   <div>
     <div class="flex items-center justify-between mb-2">
-      <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+      <h4 class="text-xs font-semibold text-ink-100 uppercase tracking-wide">
         Subtarefas
-        <span v-if="items.length" class="ml-1 text-gray-500 normal-case font-normal">
+        <span v-if="items.length" class="ml-1 text-ink-50 normal-case font-normal">
           {{ doneCount }}/{{ items.length }}
         </span>
       </h4>
       <div v-if="items.length" class="flex items-center gap-2">
-        <div class="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden">
+        <div class="w-20 h-1.5 bg-[var(--paper-surface-2)] rounded-full overflow-hidden">
           <div
-            class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all"
+            class="h-full bg-terra-500 transition-all"
             :style="{ width: progress + '%' }"
           ></div>
         </div>
-        <span class="text-[10px] text-gray-500 tabular-nums">{{ progress }}%</span>
+        <span class="text-[10px] text-ink-50 tabular-nums">{{ progress }}%</span>
       </div>
     </div>
 
@@ -22,24 +22,24 @@
       <li
         v-for="s in items"
         :key="s.id"
-        class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white/5 group"
+        class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[var(--paper-surface-2)] group"
       >
         <button
           @click="toggle(s)"
           class="w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors"
-          :class="s.is_done ? 'bg-green-500 border-green-500' : 'border-white/20 hover:border-blue-400'"
+          :class="s.is_done ? 'bg-olive-500 border-green-500' : 'border-[var(--paper-border-strong)] hover:border-blue-400'"
         >
-          <svg v-if="s.is_done" class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
+          <svg v-if="s.is_done" class="w-2.5 h-2.5 text-ink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </button>
         <span
-          class="flex-1 text-sm text-gray-200 break-words"
+          class="flex-1 text-sm text-ink-300 break-words"
           :class="{ 'line-through opacity-50': s.is_done }"
         >{{ s.title }}</span>
         <button
           @click="remove(s)"
-          class="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-400 transition-opacity"
+          class="opacity-0 group-hover:opacity-100 text-ink-50 hover:text-terra-600 transition-opacity"
           aria-label="Remover"
         >
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -54,12 +54,12 @@
         v-model="newTitle"
         type="text"
         placeholder="+ Adicionar subtarefa"
-        class="flex-1 px-3 py-1.5 text-sm bg-slate-900/60 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+        class="flex-1 px-3 py-1.5 text-sm bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 placeholder-gray-500 focus:outline-none focus:border-indigo_ink-500 transition-colors"
       />
       <button
         v-if="newTitle.trim()"
         type="submit"
-        class="px-3 py-1.5 text-xs bg-blue-500/90 hover:bg-blue-500 text-white rounded-lg transition-colors"
+        class="px-3 py-1.5 text-xs bg-terra-500 hover:bg-blue-500 text-ink-400 rounded-lg transition-colors"
       >
         Adicionar
       </button>

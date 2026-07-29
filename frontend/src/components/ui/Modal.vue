@@ -9,7 +9,7 @@
       leave-to-class="opacity-0"
     >
       <div v-if="show" class="fixed inset-0 z-50">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 bg-ink-400/40 backdrop-blur-sm"></div>
 
         <div
           class="absolute inset-x-0 top-0 flex items-center justify-center p-4 pointer-events-none"
@@ -29,9 +29,9 @@
               :class="sizeClass"
             >
               <!-- Header sticky -->
-              <div class="flex items-center justify-between px-4 py-3 md:py-4 border-b border-white/5 shrink-0">
-                <h3 class="text-base font-semibold text-white">{{ title }}</h3>
-                <button @click="$emit('close')" class="text-gray-500 hover:text-white p-1 -m-1 transition-colors" aria-label="Fechar">
+              <div class="flex items-center justify-between px-4 py-3 md:py-4 border-b border-[var(--paper-border)] shrink-0">
+                <h3 class="text-base font-semibold text-ink-400">{{ title }}</h3>
+                <button @click="$emit('close')" class="text-ink-50 hover:text-ink-400 p-1 -m-1 transition-colors" aria-label="Fechar">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>

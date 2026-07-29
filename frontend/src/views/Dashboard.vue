@@ -3,86 +3,85 @@
     <!-- Hello header (desktop) -->
     <div class="hidden md:flex items-end justify-between mb-6 md-sticky-title">
       <div>
-        <h1 class="text-2xl font-bold text-white tracking-tight">{{ greeting }}, {{ firstName }}</h1>
-        <p class="text-sm text-gray-500 mt-0.5">{{ todayLabel }}</p>
+        <h1 class="text-2xl font-bold text-ink-400 tracking-tight">{{ greeting }}, {{ firstName }}</h1>
+        <p class="text-sm text-ink-50 mt-0.5">{{ todayLabel }}</p>
       </div>
     </div>
 
     <!-- Dashboard pessoal - frase + relógio -->
     <div class="flex flex-col-reverse md:flex-row md:items-stretch gap-3 mb-4 md:mb-6">
       <div class="flex-1 glass rounded-xl glow-hover p-4 md:p-5 flex flex-col justify-center">
-        <p class="text-sm text-gray-300 italic leading-relaxed">"{{ currentQuote.text }}"</p>
-        <p class="text-xs text-gray-500 mt-1.5">— {{ currentQuote.author }}</p>
+        <p class="text-sm text-ink-200 italic leading-relaxed">"{{ currentQuote.text }}"</p>
+        <p class="text-xs text-ink-50 mt-1.5">— {{ currentQuote.author }}</p>
       </div>
-      <div class="glass-strong rounded-xl px-5 py-3 font-mono text-xl md:text-3xl font-bold text-white tabular-nums tracking-[0.18em] flex items-center justify-center shrink-0 md:min-w-[200px] relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-indigo-500/10 pointer-events-none"></div>
-        <span class="relative z-10" style="text-shadow: 0 0 24px rgba(96, 165, 250, 0.4)">{{ clock.now }}</span>
+      <div class="paper-strong rounded-xl px-5 py-3 font-mono text-xl md:text-3xl font-bold text-ink-400 tabular-nums tracking-[0.18em] flex items-center justify-center shrink-0 md:min-w-[200px] relative overflow-hidden">
+        <span class="relative z-10 text-terra-600">{{ clock.now }}</span>
       </div>
     </div>
 
     <!-- Cards de tarefas -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-      <div class="glass rounded-xl glow-hover p-4 hover:border-gray-700 transition-colors">
-        <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total</p>
-        <p class="text-2xl font-bold text-white mt-1.5">{{ taskStore.tasks.length }}</p>
+      <div class="glass rounded-xl glow-hover p-4 hover:border-[var(--paper-border-strong)] transition-colors">
+        <p class="text-xs text-ink-50 font-medium uppercase tracking-wide">Total</p>
+        <p class="text-2xl font-bold text-ink-400 mt-1.5">{{ taskStore.tasks.length }}</p>
       </div>
-      <div class="glass rounded-xl glow-hover p-4 hover:border-yellow-500/30 transition-colors">
-        <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">A fazer</p>
-        <p class="text-2xl font-bold text-yellow-400 mt-1.5">{{ tasksByStatus.todo }}</p>
+      <div class="glass rounded-xl glow-hover p-4 hover:border-[#C89A3F]/30 transition-colors">
+        <p class="text-xs text-ink-50 font-medium uppercase tracking-wide">A fazer</p>
+        <p class="text-2xl font-bold text-[#C89A3F] mt-1.5">{{ tasksByStatus.todo }}</p>
       </div>
-      <div class="glass rounded-xl glow-hover p-4 hover:border-blue-500/30 transition-colors">
-        <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Em andamento</p>
-        <p class="text-2xl font-bold text-blue-400 mt-1.5">{{ tasksByStatus.in_progress }}</p>
+      <div class="glass rounded-xl glow-hover p-4 hover:border-terra-500/30 transition-colors">
+        <p class="text-xs text-ink-50 font-medium uppercase tracking-wide">Em andamento</p>
+        <p class="text-2xl font-bold text-terra-600 mt-1.5">{{ tasksByStatus.in_progress }}</p>
       </div>
-      <div class="glass rounded-xl glow-hover p-4 hover:border-green-500/30 transition-colors">
-        <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Concluídas</p>
-        <p class="text-2xl font-bold text-green-400 mt-1.5">{{ tasksByStatus.done }}</p>
+      <div class="glass rounded-xl glow-hover p-4 hover:border-olive-500/30 transition-colors">
+        <p class="text-xs text-ink-50 font-medium uppercase tracking-wide">Concluídas</p>
+        <p class="text-2xl font-bold text-olive-500 mt-1.5">{{ tasksByStatus.done }}</p>
       </div>
     </div>
 
     <!-- Progresso + Dificuldade -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
       <div class="glass rounded-xl glow-hover p-4">
-        <h3 class="text-sm font-semibold text-white mb-4">Progresso</h3>
+        <h3 class="text-sm font-semibold text-ink-400 mb-4">Progresso</h3>
         <div class="space-y-3">
           <div v-for="s in statusBars" :key="s.key">
             <div class="flex justify-between text-xs mb-1">
               <span :class="s.color">{{ s.label }}</span>
-              <span class="text-gray-400">{{ s.count }}</span>
+              <span class="text-ink-100">{{ s.count }}</span>
             </div>
-            <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
+            <div class="w-full bg-[var(--paper-surface-2)] rounded-full h-2 overflow-hidden">
               <div class="h-2 rounded-full transition-all" :class="s.barColor" :style="{ width: s.pct + '%' }"></div>
             </div>
           </div>
         </div>
       </div>
       <div class="glass rounded-xl glow-hover p-4">
-        <h3 class="text-sm font-semibold text-white mb-4">Por dificuldade</h3>
+        <h3 class="text-sm font-semibold text-ink-400 mb-4">Por dificuldade</h3>
         <div class="space-y-3">
           <div>
             <div class="flex justify-between text-xs mb-1">
-              <span class="text-green-400">Fácil</span>
-              <span class="text-gray-400">{{ tasksByDifficulty.easy }}</span>
+              <span class="text-olive-500">Fácil</span>
+              <span class="text-ink-100">{{ tasksByDifficulty.easy }}</span>
             </div>
-            <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
-              <div class="h-2 rounded-full bg-green-500" :style="{ width: (tasksByDifficulty.easy / max(taskStore.tasks.length) * 100) + '%' }"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between text-xs mb-1">
-              <span class="text-yellow-400">Médio</span>
-              <span class="text-gray-400">{{ tasksByDifficulty.medium }}</span>
-            </div>
-            <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
-              <div class="h-2 rounded-full bg-yellow-500" :style="{ width: (tasksByDifficulty.medium / max(taskStore.tasks.length) * 100) + '%' }"></div>
+            <div class="w-full bg-[var(--paper-surface-2)] rounded-full h-2 overflow-hidden">
+              <div class="h-2 rounded-full bg-olive-500" :style="{ width: (tasksByDifficulty.easy / max(taskStore.tasks.length) * 100) + '%' }"></div>
             </div>
           </div>
           <div>
             <div class="flex justify-between text-xs mb-1">
-              <span class="text-red-400">Difícil</span>
-              <span class="text-gray-400">{{ tasksByDifficulty.hard }}</span>
+              <span class="text-[#C89A3F]">Médio</span>
+              <span class="text-ink-100">{{ tasksByDifficulty.medium }}</span>
             </div>
-            <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
+            <div class="w-full bg-[var(--paper-surface-2)] rounded-full h-2 overflow-hidden">
+              <div class="h-2 rounded-full bg-[#C89A3F]" :style="{ width: (tasksByDifficulty.medium / max(taskStore.tasks.length) * 100) + '%' }"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-terra-600">Difícil</span>
+              <span class="text-ink-100">{{ tasksByDifficulty.hard }}</span>
+            </div>
+            <div class="w-full bg-[var(--paper-surface-2)] rounded-full h-2 overflow-hidden">
               <div class="h-2 rounded-full bg-red-500" :style="{ width: (tasksByDifficulty.hard / max(taskStore.tasks.length) * 100) + '%' }"></div>
             </div>
           </div>
@@ -92,7 +91,7 @@
 
     <!-- Próximas tarefas (ordenadas por dificuldade: fácil primeiro) -->
     <div class="glass rounded-xl glow-hover p-4">
-      <h3 class="text-sm font-semibold text-white mb-3">Próximas tarefas</h3>
+      <h3 class="text-sm font-semibold text-ink-400 mb-3">Próximas tarefas</h3>
       <div class="space-y-1">
         <div
           v-for="task in nextTasks"
@@ -103,10 +102,10 @@
           <span class="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0" :class="difficultyBadge(task.difficulty)">
             {{ difficultyLabel(task.difficulty) }}
           </span>
-          <span class="text-sm text-gray-200 flex-1 truncate" :class="{ 'line-through opacity-50': task.status === 'done' }">{{ task.title }}</span>
+          <span class="text-sm text-ink-300 flex-1 truncate" :class="{ 'line-through opacity-50': task.status === 'done' }">{{ task.title }}</span>
           <span
             v-if="task.dependency_id && task.dependency_status !== 'done'"
-            class="inline-flex items-center justify-center shrink-0 w-5 h-5 rounded bg-yellow-500/20 text-yellow-400"
+            class="inline-flex items-center justify-center shrink-0 w-5 h-5 rounded bg-[#C89A3F]/20 text-[#C89A3F]"
             :title="'Depende de: ' + task.dependency_title"
             aria-label="Tem dependência"
           >
@@ -117,9 +116,9 @@
           <span class="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0" :class="statusBadge(task.status)">
             {{ statusLabel(task.status) }}
           </span>
-          <span v-if="task.project_name" class="text-[10px] text-indigo-400">{{ task.project_name }}</span>
+          <span v-if="task.project_name" class="text-[10px] text-indigo_ink-500">{{ task.project_name }}</span>
         </div>
-        <p v-if="nextTasks.length === 0" class="text-center text-gray-600 py-6 text-sm">Nenhuma tarefa — crie uma!</p>
+        <p v-if="nextTasks.length === 0" class="text-center text-ink-50 py-6 text-sm">Nenhuma tarefa — crie uma!</p>
       </div>
     </div>
 
@@ -127,25 +126,25 @@
     <Modal :show="showTaskModal" title="Editar tarefa" @close="closeTaskModal">
       <form @submit.prevent="saveTask" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Título *</label>
-          <input v-model="taskForm.title" type="text" required class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500" />
+          <label class="block text-sm font-medium text-ink-200 mb-1">Título *</label>
+          <input v-model="taskForm.title" type="text" required class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
-          <textarea v-model="taskForm.description" rows="2" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"></textarea>
+          <label class="block text-sm font-medium text-ink-200 mb-1">Descrição</label>
+          <textarea v-model="taskForm.description" rows="2" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500"></textarea>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Dificuldade</label>
-            <select v-model="taskForm.difficulty" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500">
+            <label class="block text-sm font-medium text-ink-200 mb-1">Dificuldade</label>
+            <select v-model="taskForm.difficulty" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500">
               <option value="easy">Fácil</option>
               <option value="medium">Média</option>
               <option value="hard">Difícil</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
-            <select v-model="taskForm.status" class="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500">
+            <label class="block text-sm font-medium text-ink-200 mb-1">Status</label>
+            <select v-model="taskForm.status" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500">
               <option value="todo">A fazer</option>
               <option value="in_progress">Em andamento</option>
               <option value="done">Concluído</option>
@@ -153,10 +152,10 @@
           </div>
         </div>
         <div class="flex gap-3 pt-2">
-          <button type="button" @click="deleteTaskFromDash" class="px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg">Excluir</button>
+          <button type="button" @click="deleteTaskFromDash" class="px-4 py-2 text-sm text-terra-600 hover:bg-terra-500/10 rounded-lg">Excluir</button>
           <div class="flex-1"></div>
-          <button type="button" @click="closeTaskModal" class="px-4 py-2 text-sm text-gray-400 hover:bg-white/5 rounded-lg">Cancelar</button>
-          <button type="submit" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Salvar</button>
+          <button type="button" @click="closeTaskModal" class="px-4 py-2 text-sm text-ink-100 hover:bg-[var(--paper-surface-2)] rounded-lg">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-sm bg-terra-500 text-ink-400 rounded-lg hover:bg-terra-600">Salvar</button>
         </div>
       </form>
     </Modal>
@@ -164,44 +163,44 @@
 
   <!-- Dashboard normal (financeiro) -->
   <div v-else>
-    <h1 class="text-xl font-bold text-white mb-6">Dashboard</h1>
+    <h1 class="text-xl font-bold text-ink-400 mb-6">Dashboard</h1>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
       <div class="glass rounded-xl glow-hover p-4">
-        <p class="text-xs text-gray-500">Recebido este mês</p>
-        <p class="text-lg font-bold text-green-400 mt-1">{{ fmt(d.finance?.receivedThisMonth) }}</p>
+        <p class="text-xs text-ink-50">Recebido este mês</p>
+        <p class="text-lg font-bold text-olive-500 mt-1">{{ fmt(d.finance?.receivedThisMonth) }}</p>
       </div>
       <div class="glass rounded-xl glow-hover p-4">
-        <p class="text-xs text-gray-500">A receber (total pendente)</p>
-        <p class="text-lg font-bold text-blue-400 mt-1">{{ fmt(d.finance?.totalPending) }}</p>
+        <p class="text-xs text-ink-50">A receber (total pendente)</p>
+        <p class="text-lg font-bold text-terra-600 mt-1">{{ fmt(d.finance?.totalPending) }}</p>
       </div>
       <div class="glass rounded-xl glow-hover p-4">
-        <p class="text-xs text-gray-500">Implantação pendente</p>
-        <p class="text-lg font-bold text-yellow-400 mt-1">{{ fmt(d.finance?.setupPending) }}</p>
+        <p class="text-xs text-ink-50">Implantação pendente</p>
+        <p class="text-lg font-bold text-[#C89A3F] mt-1">{{ fmt(d.finance?.setupPending) }}</p>
       </div>
       <div class="glass rounded-xl glow-hover p-4">
-        <p class="text-xs text-gray-500">Recorrente / mês</p>
-        <p class="text-lg font-bold text-purple-400 mt-1">{{ fmt(d.finance?.monthlyRecurring) }}</p>
+        <p class="text-xs text-ink-50">Recorrente / mês</p>
+        <p class="text-lg font-bold text-terra-500 mt-1">{{ fmt(d.finance?.monthlyRecurring) }}</p>
       </div>
       <div class="glass rounded-xl glow-hover p-4">
-        <p class="text-xs text-gray-500">Projetos ativos</p>
-        <p class="text-lg font-bold text-indigo-400 mt-1">{{ d.finance?.activeProjects || 0 }} <span v-if="d.finance?.annualCount" class="text-xs text-gray-500">+{{ d.finance.annualCount }} anual</span></p>
+        <p class="text-xs text-ink-50">Projetos ativos</p>
+        <p class="text-lg font-bold text-indigo_ink-500 mt-1">{{ d.finance?.activeProjects || 0 }} <span v-if="d.finance?.annualCount" class="text-xs text-ink-50">+{{ d.finance.annualCount }} anual</span></p>
       </div>
       <div class="glass rounded-xl glow-hover p-4">
-        <p class="text-xs text-gray-500">Tarefas pendentes</p>
-        <p class="text-lg font-bold text-orange-400 mt-1">{{ pendingTasks }}</p>
+        <p class="text-xs text-ink-50">Tarefas pendentes</p>
+        <p class="text-lg font-bold text-terra-500 mt-1">{{ pendingTasks }}</p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
       <div class="glass rounded-xl glow-hover p-4">
-        <h3 class="text-sm font-semibold text-white mb-4">Projeção de recebimentos (6 meses)</h3>
+        <h3 class="text-sm font-semibold text-ink-400 mb-4">Projeção de recebimentos (6 meses)</h3>
         <div class="h-64">
           <canvas ref="projectionChart"></canvas>
         </div>
       </div>
       <div class="glass rounded-xl glow-hover p-4">
-        <h3 class="text-sm font-semibold text-white mb-4">Visão geral da receita</h3>
+        <h3 class="text-sm font-semibold text-ink-400 mb-4">Visão geral da receita</h3>
         <div class="h-64 flex items-center justify-center">
           <canvas ref="revenueChart"></canvas>
         </div>
@@ -210,20 +209,20 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div class="glass rounded-xl glow-hover p-4">
-        <h3 class="text-sm font-semibold text-white mb-3">Tarefas</h3>
+        <h3 class="text-sm font-semibold text-ink-400 mb-3">Tarefas</h3>
         <div class="space-y-2">
           <div class="flex justify-between text-sm" v-for="(label, key) in { todo: 'A fazer', in_progress: 'Em andamento', done: 'Concluídas' }" :key="key">
-            <span class="text-gray-400">{{ label }}</span>
-            <span class="font-medium text-white bg-white/10 px-2 py-0.5 rounded text-xs ring-1 ring-white/5">{{ d.tasks?.[key] || 0 }}</span>
+            <span class="text-ink-100">{{ label }}</span>
+            <span class="font-medium text-ink-400 bg-[var(--paper-surface-3)] px-2 py-0.5 rounded text-xs ring-1 ring-[var(--paper-border)]">{{ d.tasks?.[key] || 0 }}</span>
           </div>
         </div>
       </div>
       <div class="glass rounded-xl glow-hover p-4">
-        <h3 class="text-sm font-semibold text-white mb-3">Leads</h3>
+        <h3 class="text-sm font-semibold text-ink-400 mb-3">Leads</h3>
         <div class="space-y-2">
           <div class="flex justify-between text-sm" v-for="(count, status) in d.leads" :key="status">
-            <span class="text-gray-400 capitalize">{{ status }}</span>
-            <span class="font-medium text-white bg-white/10 px-2 py-0.5 rounded text-xs ring-1 ring-white/5">{{ count }}</span>
+            <span class="text-ink-100 capitalize">{{ status }}</span>
+            <span class="font-medium text-ink-400 bg-[var(--paper-surface-3)] px-2 py-0.5 rounded text-xs ring-1 ring-[var(--paper-border)]">{{ count }}</span>
           </div>
         </div>
       </div>
@@ -323,9 +322,9 @@ const tasksByDifficulty = computed(() => ({
 const total = computed(() => taskStore.tasks.length || 1)
 
 const statusBars = computed(() => [
-  { key: 'todo', label: 'A fazer', count: tasksByStatus.value.todo, color: 'text-yellow-400', barColor: 'bg-yellow-500', pct: Math.round(tasksByStatus.value.todo / total.value * 100) },
-  { key: 'in_progress', label: 'Em andamento', count: tasksByStatus.value.in_progress, color: 'text-blue-400', barColor: 'bg-blue-500', pct: Math.round(tasksByStatus.value.in_progress / total.value * 100) },
-  { key: 'done', label: 'Concluídas', count: tasksByStatus.value.done, color: 'text-green-400', barColor: 'bg-green-500', pct: Math.round(tasksByStatus.value.done / total.value * 100) }
+  { key: 'todo', label: 'A fazer', count: tasksByStatus.value.todo, color: 'text-[#C89A3F]', barColor: 'bg-yellow-500', pct: Math.round(tasksByStatus.value.todo / total.value * 100) },
+  { key: 'in_progress', label: 'Em andamento', count: tasksByStatus.value.in_progress, color: 'text-terra-600', barColor: 'bg-blue-500', pct: Math.round(tasksByStatus.value.in_progress / total.value * 100) },
+  { key: 'done', label: 'Concluídas', count: tasksByStatus.value.done, color: 'text-olive-500', barColor: 'bg-green-500', pct: Math.round(tasksByStatus.value.done / total.value * 100) }
 ])
 
 const nextTasks = computed(() => {
@@ -340,13 +339,13 @@ const nextTasks = computed(() => {
 
 function max(n) { return n || 1 }
 function difficultyBadge(d) {
-  return { easy: 'bg-green-500/20 text-green-400', medium: 'bg-yellow-500/20 text-yellow-400', hard: 'bg-red-500/20 text-red-400' }[d] || ''
+  return { easy: 'bg-olive-500/20 text-olive-500', medium: 'bg-[#C89A3F]/20 text-[#C89A3F]', hard: 'bg-terra-500/20 text-terra-600' }[d] || ''
 }
 function difficultyLabel(d) {
   return { easy: 'Fácil', medium: 'Médio', hard: 'Difícil' }[d] || d
 }
 function statusBadge(s) {
-  return { todo: 'bg-gray-500/20 text-gray-400', in_progress: 'bg-blue-500/20 text-blue-400', done: 'bg-green-500/20 text-green-400' }[s] || ''
+  return { todo: 'bg-gray-500/20 text-ink-100', in_progress: 'bg-blue-500/20 text-terra-600', done: 'bg-olive-500/20 text-olive-500' }[s] || ''
 }
 function statusLabel(s) {
   return { todo: 'A fazer', in_progress: 'Em andamento', done: 'Concluído' }[s] || s
@@ -382,8 +381,8 @@ function buildCharts() {
           label: 'Previsto',
           data: proj.map(p => p.total),
           backgroundColor: proj.map((_, i) => {
-            const colors = ['#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF', '#EC4899']
-            return colors[i] || '#3B82F6'
+            const colors = ['#B8593D', '#6B7A3F', '#2C4A5C', '#C89A3F', '#994932', '#556231']
+            return colors[i % colors.length]
           }),
           borderRadius: 8,
           borderSkipped: false
@@ -394,8 +393,8 @@ function buildCharts() {
         maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => fmt(ctx.raw) } } },
         scales: {
-          x: { ticks: { color: '#9CA3AF', font: { size: 11 } }, grid: { display: false } },
-          y: { ticks: { color: '#9CA3AF', font: { size: 10 }, callback: (v) => fmt(v) }, grid: { color: '#1F2937' } }
+          x: { ticks: { color: '#6B6558', font: { size: 11 } }, grid: { display: false } },
+          y: { ticks: { color: '#8A8172', font: { size: 10 }, callback: (v) => fmt(v) }, grid: { color: 'rgba(94, 79, 45, 0.10)' } }
         }
       }
     })
@@ -413,17 +412,17 @@ function buildCharts() {
         labels: ['Recebido', 'A receber', 'Mensal/mês', 'Anual/ano'],
         datasets: [{
           data: [totalReceived, totalPending, monthlyR, annualR],
-          backgroundColor: ['#22C55E', '#3B82F6', '#A855F7', '#F59E0B'],
-          borderColor: '#111827',
+          backgroundColor: ['#6B7A3F', '#B8593D', '#2C4A5C', '#C89A3F'],
+          borderColor: '#FDFBF5',
           borderWidth: 3,
-          hoverBorderColor: '#374151'
+          hoverBorderColor: '#F7F1E1'
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'bottom', labels: { color: '#9CA3AF', padding: 16, font: { size: 11 }, usePointStyle: true } },
+          legend: { position: 'bottom', labels: { color: '#6B6558', padding: 16, font: { size: 11 }, usePointStyle: true } },
           tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ${fmt(ctx.raw)}` } }
         }
       }

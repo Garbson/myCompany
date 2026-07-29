@@ -14,12 +14,12 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useBackground } from '../composables/useBackground'
+import { computed } from "vue";
+import { useBackground } from "../composables/useBackground";
 
-const { current, isWeb } = useBackground()
+const { current, isWeb } = useBackground();
 
-const show = computed(() => isWeb() && !!current.value?.src)
+const show = computed(() => isWeb() && !!current.value?.src);
 </script>
 
 <style scoped>
@@ -35,10 +35,14 @@ const show = computed(() => isWeb() && !!current.value?.src)
   height: 100%;
   object-fit: cover;
 }
-/* Overlay bem sutil — só pra dar leitura ao conteúdo sem escurecer o vídeo */
+/* Overlay creme translúcido sobre o vídeo — mantém a legibilidade do tema paper */
 .video-bg-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(5, 7, 20, 0.18), rgba(5, 7, 20, 0.28));
+  background: linear-gradient(
+    180deg,
+    rgba(245, 239, 223, 0.88),
+    rgba(245, 239, 223, 0.94)
+  );
 }
 </style>
