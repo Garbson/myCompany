@@ -204,8 +204,9 @@
             </span>
             <button
               @click="toggleFullscreen"
-              class="shrink-0 p-1.5 rounded-lg text-ink-100 hover:text-ink-400 hover:bg-[var(--paper-surface-3)] transition-colors"
+              class="flow-fullscreen-button shrink-0 inline-flex items-center gap-2 px-2.5 py-1.5 transition-all"
               :title="fullscreen ? 'Sair da tela cheia (Esc)' : 'Tela cheia'"
+              :aria-label="fullscreen ? 'Sair da tela cheia' : 'Ver fluxograma em tela cheia'"
             >
               <svg v-if="!fullscreen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/>
@@ -213,6 +214,9 @@
               <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 4v4H5m10 0V4h4m0 12h-4v4M9 20v-4H5"/>
               </svg>
+              <span class="hidden lg:inline text-[11px] font-semibold whitespace-nowrap">
+                {{ fullscreen ? 'Sair' : 'Tela cheia' }}
+              </span>
             </button>
           </div>
 
@@ -646,5 +650,20 @@ watch(() => active.value?.id, (newId, oldId) => {
   width: 100vw;
   height: 100vh;
   padding: 0;
+}
+.flow-fullscreen-button {
+  position: relative;
+  z-index: 10;
+  color: #7a3927;
+  background: rgba(253, 251, 245, .94);
+  border: 1px solid rgba(184, 89, 61, .32);
+  border-radius: 3px;
+  box-shadow: 0 4px 10px rgba(74, 57, 29, .1);
+}
+.flow-fullscreen-button:hover {
+  color: #5f2c1f;
+  background: #fdfbf5;
+  border-color: rgba(184, 89, 61, .55);
+  transform: translateY(-1px);
 }
 </style>
