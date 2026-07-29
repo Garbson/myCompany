@@ -540,7 +540,7 @@ watch(() => dashboard.data, () => {
 .stat-strip i { width:22px; height:1px; background:var(--paper-border-strong); transform:rotate(-12deg); }
 .stat-strip .stat-done strong { color:var(--accent-olive); }
 .ruled-sheet,.progress-sheet,.calendar-sheet { position:relative; border:1px solid rgba(112,91,48,.1); border-radius:3px; box-shadow:0 16px 40px rgba(75,61,32,.1),0 2px 4px rgba(75,61,32,.08); }
-.ruled-sheet { padding:1.6rem 1.7rem 1.3rem 3.5rem; background-color:#f3e5a9; background-image:linear-gradient(90deg,transparent 0,transparent 2.45rem,rgba(184,89,61,.18) 2.45rem,rgba(184,89,61,.18) 2.52rem,transparent 2.52rem),repeating-linear-gradient(0deg,transparent 0,transparent 35px,rgba(44,74,92,.09) 35px,rgba(44,74,92,.09) 36px); }
+.ruled-sheet { padding:1.6rem 1.7rem 1.3rem 3.5rem; background-color:#f3e5a9; }
 .sheet-title { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:.9rem; }
 .sheet-title h2,.calendar-head h2 { font-size:1.35rem; font-weight:600; margin-top:.12rem; }
 .hand-note { font-family:'Fraunces',serif; font-style:italic; color:var(--accent-olive); transform:rotate(3deg); border-bottom:2px solid rgba(107,122,63,.35); }

@@ -169,7 +169,7 @@
         <div
           ref="focusRootRef"
           class="flex-1 min-h-0 flex flex-col overflow-hidden"
-          :class="fullscreen ? 'fullscreen-flow bg-[var(--paper-bg)]' : ''"
+          :class="fullscreen ? 'fullscreen-flow' : ''"
         >
           <!-- Header do fluxograma -->
           <div class="flex items-center gap-3 px-4 py-3 border-b border-[var(--paper-border)] shrink-0">

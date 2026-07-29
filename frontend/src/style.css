@@ -151,16 +151,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
 .organic-page .paper {
   --postit-color: rgba(246, 229, 161, .94);
   background-color: var(--postit-color);
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent 0,
-      transparent 31px,
-      rgba(44,74,92,.10) 31px,
-      rgba(44,74,92,.10) 32px
-    );
-  background-size: 100% 32px;
-  background-position: 0 8px;
+  background-image: none;
   border-radius: 3px;
   border-color: rgba(112,91,48,.10);
   clip-path: none;
@@ -184,10 +175,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
 .organic-page .glass-light,
 .organic-page .paper-light {
   background-color: rgba(255, 252, 239, .70);
-  background-image:
-    repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(44,74,92,.07) 31px, rgba(44,74,92,.07) 32px);
-  background-size: 100% 32px;
-  background-position: 0 8px;
+  background-image: none;
   border-radius: 3px;
   border-style: dashed;
 }
@@ -196,10 +184,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
   border-radius: 3px;
   box-shadow: 0 10px 22px rgba(74,57,29,.10);
   background-color: rgba(255, 244, 194, .90);
-  background-image:
-    repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(44,74,92,.09) 31px, rgba(44,74,92,.09) 32px);
-  background-size: 100% 32px;
-  background-position: 0 8px;
+  background-image: none;
   transform: none;
 }
 .organic-page h1 {
@@ -235,9 +220,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
 }
 .notes-editor-postit {
   background-color: rgba(255, 244, 194, .95);
-  background-image:
-    repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(44, 74, 92, .10) 31px, rgba(44, 74, 92, .10) 32px);
-  background-position: 0 8px;
+  background-image: none;
 }
 .flow-board-postit {
   background-color: rgba(205, 218, 177, .95);
@@ -272,6 +255,18 @@ h1, h2, h3, h4, h5, h6, .font-display {
 .flow-board-postit:has(.fullscreen-flow) {
   border: 0;
   box-shadow: none;
+}
+.fullscreen-flow {
+  background-color: #f8f1df;
+  background-image:
+    radial-gradient(ellipse 90% 60% at 18% 0%, rgba(255,255,255,.42), transparent 62%),
+    radial-gradient(ellipse 80% 55% at 90% 100%, rgba(107,122,63,.035), transparent 58%),
+    linear-gradient(90deg, transparent 0, transparent 74px, rgba(184,89,61,.20) 74px, rgba(184,89,61,.20) 75px, transparent 75px),
+    repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(44,74,92,.105) 31px, rgba(44,74,92,.105) 32px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .36 0 0 0 0 .26 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='.22'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 32px, 210px 210px;
+  background-position: center, center, left top, left top, left top;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat;
 }
 .notebook-sidebar {
   position: relative;
