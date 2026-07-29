@@ -4,11 +4,15 @@
     <div
       :style="{
         position: 'absolute',
-        transform: `translate(-50%, -50%) translate(${labelPos.x}px, ${labelPos.y}px)`,
+        transform: `translate(-50%, -50%) translate(${labelFinalPos.x}px, ${labelFinalPos.y}px)`,
         pointerEvents: 'all',
+        cursor: editing ? 'text' : (dragging ? 'grabbing' : 'grab'),
       }"
       class="bpmn-edge-label nodrag nopan"
+      :class="{ 'is-dragging': dragging }"
       @dblclick.stop="startEdit"
+      @pointerdown="startDrag"
+      @click.stop
     >
       <input
         v-if="editing"
@@ -26,12 +30,10 @@
       <span
         v-else-if="label"
         class="bpmn-edge-label-text"
-        @mousedown.stop
       >{{ label }}</span>
       <span
         v-else
         class="bpmn-edge-label-empty"
-        @mousedown.stop
         aria-hidden="true"
       ></span>
     </div>
@@ -60,7 +62,7 @@ const props = defineProps({
   data: Object,
 })
 
-const { findEdge } = useVueFlow()
+const { findEdge, getViewport } = useVueFlow()
 const onDirty = inject('onFlowDirty', null)
 
 const edgePath = computed(() =>
@@ -80,6 +82,70 @@ const labelPos = computed(() => ({
   x: edgePath.value[1] ?? (props.sourceX + props.targetX) / 2,
   y: edgePath.value[2] ?? (props.sourceY + props.targetY) / 2,
 }))
+
+const labelOffset = computed(() => ({
+  x: Number(props.data?.labelOffset?.x) || 0,
+  y: Number(props.data?.labelOffset?.y) || 0,
+}))
+
+const labelFinalPos = computed(() => ({
+  x: labelPos.value.x + labelOffset.value.x,
+  y: labelPos.value.y + labelOffset.value.y,
+}))
+
+// === Drag pra reposicionar o label ao longo do canvas ===
+const dragging = ref(false)
+let dragStart = null
+
+function startDrag(e) {
+  if (editing.value) return
+  // Só botão esquerdo, e não dispara se estiver editando input dentro
+  if (e.button !== undefined && e.button !== 0) return
+  e.stopPropagation()
+  const initial = { x: labelOffset.value.x, y: labelOffset.value.y }
+  dragStart = {
+    px: e.clientX,
+    py: e.clientY,
+    initialX: initial.x,
+    initialY: initial.y,
+    moved: false,
+  }
+  window.addEventListener('pointermove', onDragMove)
+  window.addEventListener('pointerup', onDragEnd, { once: true })
+}
+
+function onDragMove(e) {
+  if (!dragStart) return
+  const { zoom } = getViewport()
+  const dx = (e.clientX - dragStart.px) / (zoom || 1)
+  const dy = (e.clientY - dragStart.py) / (zoom || 1)
+  if (!dragStart.moved && Math.hypot(dx, dy) > 2) {
+    dragStart.moved = true
+    dragging.value = true
+  }
+  if (!dragging.value) return
+  const edge = findEdge(props.id)
+  if (!edge) return
+  edge.data = {
+    ...(edge.data || {}),
+    labelOffset: {
+      x: Math.round(dragStart.initialX + dx),
+      y: Math.round(dragStart.initialY + dy),
+    },
+  }
+}
+
+function onDragEnd() {
+  window.removeEventListener('pointermove', onDragMove)
+  const moved = dragStart?.moved
+  dragStart = null
+  if (dragging.value) {
+    dragging.value = false
+    onDirty?.()
+  }
+  // Se não moveu, foi um click limpo — deixa passar (dblclick ainda funciona)
+  return moved
+}
 
 const mergedStyle = computed(() => {
   const base = {
@@ -126,8 +192,13 @@ function cancel() {
   font-size: 11px;
   font-weight: 500;
   text-align: center;
-  cursor: default;
   user-select: none;
+  touch-action: none;
+}
+.bpmn-edge-label.is-dragging .bpmn-edge-label-text,
+.bpmn-edge-label.is-dragging .bpmn-edge-label-empty {
+  opacity: 0.85;
+  box-shadow: 0 0 0 2px rgba(184, 89, 61, 0.55);
 }
 .bpmn-edge-label-text {
   display: inline-block;

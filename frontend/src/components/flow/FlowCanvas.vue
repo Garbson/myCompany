@@ -297,14 +297,18 @@ function serialize() {
       }
       return { id: n.id, type: 'bpmn', position: n.position, data }
     }),
-    edges: edges.value.map((e) => ({
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      sourceHandle: e.sourceHandle,
-      targetHandle: e.targetHandle,
-      label: e.label || '',
-    })),
+    edges: edges.value.map((e) => {
+      const out = {
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        sourceHandle: e.sourceHandle,
+        targetHandle: e.targetHandle,
+        label: e.label || '',
+      }
+      if (e.data && Object.keys(e.data).length) out.data = e.data
+      return out
+    }),
   }
 }
 
