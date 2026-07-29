@@ -166,45 +166,64 @@
     <!-- ── PAINEL DIREITO: canvas + título ── -->
     <div class="flex-1 min-w-0 flex flex-col overflow-hidden" :class="{ 'hidden md:flex': !active }">
       <template v-if="active">
-        <!-- Header do fluxograma -->
-        <div class="flex items-center gap-3 px-4 py-3 border-b border-[var(--paper-border)] shrink-0">
-          <button
-            @click="active = null"
-            class="md:hidden p-1 text-ink-100 hover:text-ink-400"
-            aria-label="Voltar"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-            </svg>
-          </button>
-          <input
-            v-model="active.title"
-            type="text"
-            placeholder="Sem título"
-            class="flex-1 min-w-0 font-serif text-xl md:text-2xl font-semibold text-ink-400 tracking-tight bg-transparent outline-none placeholder-ink-50"
-            @input="scheduleSave(); onTitleInput()"
-          />
-          <span v-if="saving" class="text-xs text-indigo_ink-500 flex items-center gap-1.5 shrink-0">
-            <span class="w-1.5 h-1.5 rounded-full bg-indigo_ink-500 animate-pulse"></span>
-            Salvando…
-          </span>
-          <span v-else-if="dirty" class="text-xs text-[#C89A3F] flex items-center gap-1.5 shrink-0">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#C89A3F]"></span>
-            Não salvo
-          </span>
-          <span v-else class="text-xs text-ink-50 hidden sm:flex items-center gap-1.5 shrink-0">
-            <span class="w-1.5 h-1.5 rounded-full bg-olive-500"></span>
-            Salvo
-          </span>
-        </div>
+        <div
+          ref="focusRootRef"
+          class="flex-1 min-h-0 flex flex-col overflow-hidden"
+          :class="fullscreen ? 'fullscreen-flow bg-[var(--paper-bg)]' : ''"
+        >
+          <!-- Header do fluxograma -->
+          <div class="flex items-center gap-3 px-4 py-3 border-b border-[var(--paper-border)] shrink-0">
+            <button
+              @click="active = null"
+              v-if="!fullscreen"
+              class="md:hidden p-1 text-ink-100 hover:text-ink-400"
+              aria-label="Voltar"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <input
+              v-model="active.title"
+              type="text"
+              placeholder="Sem título"
+              class="flex-1 min-w-0 font-serif text-xl md:text-2xl font-semibold text-ink-400 tracking-tight bg-transparent outline-none placeholder-ink-50"
+              @input="scheduleSave(); onTitleInput()"
+            />
+            <span v-if="saving" class="text-xs text-indigo_ink-500 flex items-center gap-1.5 shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-indigo_ink-500 animate-pulse"></span>
+              Salvando…
+            </span>
+            <span v-else-if="dirty" class="text-xs text-[#C89A3F] flex items-center gap-1.5 shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#C89A3F]"></span>
+              Não salvo
+            </span>
+            <span v-else class="text-xs text-ink-50 hidden sm:flex items-center gap-1.5 shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-olive-500"></span>
+              Salvo
+            </span>
+            <button
+              @click="toggleFullscreen"
+              class="shrink-0 p-1.5 rounded-lg text-ink-100 hover:text-ink-400 hover:bg-[var(--paper-surface-3)] transition-colors"
+              :title="fullscreen ? 'Sair da tela cheia (Esc)' : 'Tela cheia'"
+            >
+              <svg v-if="!fullscreen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/>
+              </svg>
+              <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 4v4H5m10 0V4h4m0 12h-4v4M9 20v-4H5"/>
+              </svg>
+            </button>
+          </div>
 
-        <!-- Canvas -->
-        <div class="flex-1 min-h-0 relative">
-          <FlowCanvas
-            :key="active.id"
-            v-model="flowData"
-            @change="onCanvasChange"
-          />
+          <!-- Canvas -->
+          <div class="flex-1 min-h-0 relative">
+            <FlowCanvas
+              :key="active.id"
+              v-model="flowData"
+              @change="onCanvasChange"
+            />
+          </div>
         </div>
       </template>
 
@@ -286,6 +305,34 @@ const renameFolderInput = ref(null)
 
 const deleting = ref(null)
 const deletingFolder = ref(null)
+
+// === Fullscreen (foco no fluxo) ===
+const focusRootRef = ref(null)
+const fullscreen = ref(false)
+
+function isBrowserFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement)
+}
+
+async function toggleFullscreen() {
+  const el = focusRootRef.value
+  if (!el) return
+  if (!isBrowserFullscreen()) {
+    try {
+      if (el.requestFullscreen) await el.requestFullscreen()
+      else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen()
+    } catch {}
+  } else {
+    try {
+      if (document.exitFullscreen) await document.exitFullscreen()
+      else if (document.webkitExitFullscreen) await document.webkitExitFullscreen()
+    } catch {}
+  }
+}
+
+function onFullscreenChange() {
+  fullscreen.value = isBrowserFullscreen()
+}
 
 const isMobile = computed(() =>
   typeof window !== 'undefined' && window.matchMedia?.('(max-width: 767px)').matches
@@ -565,18 +612,31 @@ async function openById(id) {
 
 // === Lifecycle ===
 onMounted(async () => {
+  document.addEventListener('fullscreenchange', onFullscreenChange)
+  document.addEventListener('webkitfullscreenchange', onFullscreenChange)
   await loadAll()
   if (route.query.open) await openById(route.query.open)
 })
-
-watch(() => route.query.open, (v) => { if (v) openById(v) })
 onUnmounted(() => {
+  document.removeEventListener('fullscreenchange', onFullscreenChange)
+  document.removeEventListener('webkitfullscreenchange', onFullscreenChange)
   if (saveTimer) clearTimeout(saveTimer)
   if (dirty.value && active.value) { saveNow().catch(() => {}) }
 })
+
+watch(() => route.query.open, (v) => { if (v) openById(v) })
 
 // Salva antes de trocar de fluxograma / fechar
 watch(() => active.value?.id, (newId, oldId) => {
   if (oldId && newId !== oldId && dirty.value) saveNow().catch(() => {})
 })
 </script>
+
+<style scoped>
+/* Quando fullscreen, o container preenche a tela (o browser já dá 100vw/100vh) */
+.fullscreen-flow {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+}
+</style>

@@ -388,7 +388,7 @@ function startResize(e) {
   position: relative;
   display: inline-block;          /* contorna apenas o shape — handles ficam no perímetro real */
   font-family: inherit;
-  color: #fff;
+  color: #1F1B15;
 }
 
 .bpmn-shape-wrap {
@@ -560,7 +560,7 @@ function startResize(e) {
   border: 1.5px solid rgba(255, 255, 255, 0.6);
   border-radius: 2px;
   line-height: 1;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(253, 251, 245, 0.95);
 }
 
 /* === Datastore === */
@@ -597,7 +597,7 @@ function startResize(e) {
   word-break: break-word;
   white-space: pre-wrap;
   line-height: 1.3;
-  color: #fff;
+  color: #1F1B15;
   user-select: none;
   cursor: text;
 }
@@ -620,13 +620,13 @@ function startResize(e) {
   width: max-content;
   max-width: 220px;
   padding: 3px 10px;
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(253, 251, 245, 0.85);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 8px;
   font-size: 12px;
   font-weight: 500;
-  color: #e2e8f0;
+  color: #2E2A22;
   text-align: center;
   white-space: pre-wrap;
   overflow-wrap: break-word;
@@ -637,11 +637,11 @@ function startResize(e) {
 
 /* === Editor de label (textarea — suporta Shift+Enter pra quebrar linha) === */
 .bpmn-label-input {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(253, 251, 245, 0.95);
   border: 1px solid rgba(96, 165, 250, 0.7);
   border-radius: 6px;
   padding: 3px 8px;
-  color: #fff;
+  color: #1F1B15;
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -655,7 +655,7 @@ function startResize(e) {
   white-space: pre-wrap;
 }
 .bpmn-label-input-inside {
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(253, 251, 245, 0.85);
   border-color: rgba(96, 165, 250, 0.6);
 }
 
@@ -665,17 +665,17 @@ function startResize(e) {
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-  background: rgba(15, 23, 42, 0.35);
+  background: rgba(253, 251, 245, 0.55);
   border: 1px dashed rgba(255, 255, 255, 0.18);
   border-radius: 8px;
   padding: 8px 10px;
-  color: #e2e8f0;
+  color: #2E2A22;
   line-height: 1.35;
   transition: border-color 0.15s, background 0.15s;
 }
 .bpmn-node.is-selected .bpmn-text-node {
   border-color: rgba(168, 85, 247, 0.7);
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(253, 251, 245, 0.75);
 }
 .bpmn-text-content {
   flex: 1;
@@ -694,8 +694,8 @@ function startResize(e) {
   height: 100%;
   min-height: 60px;
   resize: none;
-  background: rgba(0, 0, 0, 0.45);
-  color: #fff;
+  background: rgba(253, 251, 245, 0.85);
+  color: #1F1B15;
   border: 1px solid rgba(96, 165, 250, 0.6);
   border-radius: 6px;
   padding: 6px 8px;
@@ -725,7 +725,7 @@ function startResize(e) {
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
+  color: #2E2A22;
   border: none;
   border-radius: 5px;
   font-size: 11px;
@@ -735,13 +735,13 @@ function startResize(e) {
 }
 .bpmn-text-btn:hover {
   background: rgba(96, 165, 250, 0.25);
-  color: #fff;
+  color: #1F1B15;
 }
 .bpmn-text-size {
   min-width: 22px;
   text-align: center;
   font-size: 10px;
-  color: #94a3b8;
+  color: #6B6558;
   font-variant-numeric: tabular-nums;
 }
 .bpmn-resize-handle {

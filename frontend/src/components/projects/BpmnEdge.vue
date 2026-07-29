@@ -55,7 +55,7 @@ const props = defineProps({
   label: String,
   selected: Boolean,
   animated: Boolean,
-  markerEnd: Object,
+  markerEnd: [Object, String],
   style: [Object, String],
   data: Object,
 })
