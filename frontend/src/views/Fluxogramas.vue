@@ -251,11 +251,14 @@
 
 <script setup>
 import { computed, defineComponent, h, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import api from '../api'
 import { useToast } from '../composables/useToast'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import FlowCanvas from '../components/flow/FlowCanvas.vue'
 
+const route = useRoute()
+const router = useRouter()
 const toast = useToast()
 
 const folders = ref([])
@@ -530,8 +533,43 @@ const FlowItem = defineComponent({
   }
 })
 
+// === Deep link ?open=id ===
+async function openById(id) {
+  const num = Number(id)
+  if (!num) return
+  if (active.value?.id === num) return
+  // Se ainda não carregou a lista, espera pra achar folder_id e abrir a pasta
+  if (flows.value.length === 0) {
+    try { await loadAll() } catch {}
+  }
+  const listItem = flows.value.find((f) => f.id === num)
+  if (listItem?.folder_id) {
+    openFolders.value.add(listItem.folder_id)
+    openFolders.value = new Set(openFolders.value)
+  }
+  try {
+    const { data } = await api.get(`/flowcharts/${num}`)
+    active.value = { ...data }
+    suppressDirty = true
+    flowData.value = data.data || { nodes: [], edges: [] }
+    dirty.value = false
+    setTimeout(() => { suppressDirty = false }, 100)
+    // Se veio via query, limpa pra não reabrir ao mudar de aba e voltar
+    if (route.query.open) {
+      router.replace({ path: '/fluxogramas', query: {} })
+    }
+  } catch {
+    toast.error('Fluxograma não encontrado')
+  }
+}
+
 // === Lifecycle ===
-onMounted(() => { loadAll() })
+onMounted(async () => {
+  await loadAll()
+  if (route.query.open) await openById(route.query.open)
+})
+
+watch(() => route.query.open, (v) => { if (v) openById(v) })
 onUnmounted(() => {
   if (saveTimer) clearTimeout(saveTimer)
   if (dirty.value && active.value) { saveNow().catch(() => {}) }

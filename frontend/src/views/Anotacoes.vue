@@ -317,12 +317,16 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { defineComponent, h } from 'vue'
 import api from '../api'
 import RichEditor from '../components/ui/RichEditor.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import { useToast } from '../composables/useToast'
 import { hapticLight, hapticSuccess } from '../services/haptics'
+
+const route = useRoute()
+const router = useRouter()
 
 // ── NoteItem inline ──
 const NoteItem = defineComponent({
@@ -603,5 +607,38 @@ function formatDate(s) {
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
-onMounted(load)
+async function openById(id) {
+  const num = Number(id)
+  if (!num) return
+  if (activeNote.value?.id === num) return
+  if (notes.value.length === 0) {
+    try { await load() } catch {}
+  }
+  let note = notes.value.find((n) => n.id === num)
+  if (!note) {
+    try {
+      const { data } = await api.get(`/notes/${num}`)
+      note = data
+    } catch {
+      toast.error('Anotação não encontrada')
+      return
+    }
+  }
+  if (note.folder_id) {
+    openFolders.value.add(note.folder_id)
+    openFolders.value = new Set(openFolders.value)
+    selectedFolder.value = note.folder_id
+  }
+  openNote(note)
+  if (route.query.open) {
+    router.replace({ path: '/anotacoes', query: {} })
+  }
+}
+
+onMounted(async () => {
+  await load()
+  if (route.query.open) await openById(route.query.open)
+})
+
+watch(() => route.query.open, (v) => { if (v) openById(v) })
 </script>

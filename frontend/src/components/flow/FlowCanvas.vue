@@ -67,11 +67,50 @@
         </div>
       </div>
     </div>
+
+    <!-- Picker de anotações (pra linkar num nó) -->
+    <Teleport to="body">
+      <div
+        v-if="notePicker.show"
+        class="fixed inset-0 z-[500] flex items-start justify-center pt-24 px-4"
+        @click.self="cancelNotePicker"
+      >
+        <div class="absolute inset-0 bg-ink-400/40 backdrop-blur-sm"></div>
+        <div class="relative paper-strong rounded-2xl w-full max-w-md overflow-hidden">
+          <div class="p-3 border-b border-[var(--paper-border)]">
+            <input
+              v-model="notePicker.query"
+              type="text"
+              placeholder="Buscar anotação…"
+              class="w-full px-3 py-2 bg-[var(--paper-surface-2)] border border-[var(--paper-border)] rounded-lg text-sm text-ink-300 placeholder-ink-50 outline-none focus:border-terra-500"
+              autofocus
+            />
+          </div>
+          <div class="max-h-80 overflow-y-auto scrollbar-slim py-1">
+            <p v-if="notePicker.loading" class="px-4 py-6 text-center text-xs text-ink-50">Carregando…</p>
+            <p v-else-if="filteredNotePickerItems.length === 0" class="px-4 py-6 text-center text-xs text-ink-50">
+              {{ notePicker.items.length === 0 ? 'Nenhuma anotação criada ainda' : 'Nenhum resultado' }}
+            </p>
+            <button
+              v-for="n in filteredNotePickerItems"
+              :key="n.id"
+              @click="pickNoteChoose(n)"
+              class="w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-[var(--paper-surface-3)]"
+            >
+              <svg class="w-4 h-4 text-ink-50 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p class="text-sm text-ink-300 truncate flex-1">{{ n.title || 'Sem título' }}</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, markRaw, provide, computed } from 'vue'
+import { ref, reactive, watch, markRaw, provide, computed } from 'vue'
 import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
@@ -79,6 +118,7 @@ import { MiniMap } from '@vue-flow/minimap'
 import BpmnNode from '../projects/BpmnNode.vue'
 import BpmnEdge from '../projects/BpmnEdge.vue'
 import { hapticLight } from '../../services/haptics'
+import api from '../../api'
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
 import '@vue-flow/controls/dist/style.css'
@@ -251,6 +291,10 @@ function serialize() {
         data.height = d.height || 80
         data.fontSize = d.fontSize || 16
       }
+      if (d.linkedNoteId) {
+        data.linkedNoteId = d.linkedNoteId
+        data.linkedNoteTitle = d.linkedNoteTitle || ''
+      }
       return { id: n.id, type: 'bpmn', position: n.position, data }
     }),
     edges: edges.value.map((e) => ({
@@ -272,6 +316,51 @@ function emitChange() {
 
 // Callback usado pelo BpmnNode / BpmnEdge quando edita label
 provide('onFlowDirty', () => emitChange())
+
+// ── Picker de anotações (pra linkar num nó) ──
+const notePicker = reactive({
+  show: false,
+  query: '',
+  loading: false,
+  items: [],
+  resolver: null,
+})
+
+const filteredNotePickerItems = computed(() => {
+  if (!notePicker.query) return notePicker.items
+  const q = notePicker.query.toLowerCase()
+  return notePicker.items.filter((n) => (n.title || '').toLowerCase().includes(q))
+})
+
+async function openNotePicker() {
+  notePicker.show = true
+  notePicker.query = ''
+  notePicker.loading = true
+  try {
+    const { data } = await api.get('/notes')
+    notePicker.items = data || []
+  } catch {
+    notePicker.items = []
+  } finally {
+    notePicker.loading = false
+  }
+  return new Promise((resolve) => { notePicker.resolver = resolve })
+}
+function pickNoteChoose(note) {
+  notePicker.show = false
+  const r = notePicker.resolver
+  notePicker.resolver = null
+  r?.(note)
+}
+function cancelNotePicker() {
+  notePicker.show = false
+  const r = notePicker.resolver
+  notePicker.resolver = null
+  r?.(null)
+}
+
+// BpmnNode chama esta função quando o usuário clica "Linkar doc"
+provide('onPickNoteFor', () => openNotePicker())
 
 // Carrega valor externo quando muda (troca de fluxograma)
 watch(

@@ -1,5 +1,54 @@
 <template>
   <div class="bpmn-node group" :class="[`bpmn-kind-${kind}`, { 'is-selected': selected }]">
+    <!-- Menu de link para doc (aparece só quando selecionado) -->
+    <div
+      v-if="selected && typeof onPickNoteFor === 'function'"
+      class="bpmn-link-menu nodrag nopan"
+      @pointerdown.stop
+      @mousedown.stop
+    >
+      <button
+        v-if="!linkedNoteId"
+        type="button"
+        class="bpmn-link-btn"
+        @click.stop="pickNote"
+        title="Linkar uma anotação a este nó"
+      >
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+        Linkar doc
+      </button>
+      <button
+        v-else
+        type="button"
+        class="bpmn-link-btn bpmn-link-btn-danger"
+        @click.stop="unlinkNote"
+        title="Remover link com anotação"
+      >
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Desvincular
+      </button>
+    </div>
+
+    <!-- Badge de doc linkada -->
+    <button
+      v-if="linkedNoteId && !editing"
+      type="button"
+      class="bpmn-linked-badge nodrag nopan"
+      @click.stop="openLinkedNote"
+      @pointerdown.stop
+      @mousedown.stop
+      :title="`Abrir anotação: ${linkedNoteTitle}`"
+    >
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <span class="bpmn-linked-badge-title">{{ linkedNoteTitle }}</span>
+    </button>
+
     <!-- 4 handles em cada lado, cada um servindo de source E target -->
     <template v-for="pos in handlePositions" :key="pos.id">
       <Handle
@@ -175,7 +224,11 @@
 
 <script setup>
 import { computed, ref, nextTick, inject, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { Handle, Position, useVueFlow } from '@vue-flow/core'
+
+const router = useRouter()
+const onPickNoteFor = inject('onPickNoteFor', null)
 
 const props = defineProps({
   id: String,
@@ -202,6 +255,30 @@ const textFontSize = computed(() => props.data?.fontSize || 16)
 const labelOutside = computed(() =>
   ['start', 'end', 'event', 'timer', 'message', 'error', 'decision', 'parallel', 'document', 'datastore'].includes(kind.value)
 )
+
+const linkedNoteId = computed(() => props.data?.linkedNoteId || null)
+const linkedNoteTitle = computed(() => props.data?.linkedNoteTitle || '')
+
+function openLinkedNote() {
+  if (!linkedNoteId.value) return
+  router.push({ path: '/anotacoes', query: { open: linkedNoteId.value } })
+}
+
+async function pickNote() {
+  if (typeof onPickNoteFor !== 'function') return
+  const note = await onPickNoteFor()
+  if (!note) return
+  updateNodeData(props.id, {
+    linkedNoteId: note.id,
+    linkedNoteTitle: note.title || 'Sem título',
+  })
+  onDirty?.()
+}
+
+function unlinkNote() {
+  updateNodeData(props.id, { linkedNoteId: null, linkedNoteTitle: '' })
+  onDirty?.()
+}
 
 const handlePositions = [
   { id: 'top', pos: Position.Top, style: {} },
@@ -682,6 +759,71 @@ function startResize(e) {
 .bpmn-node:hover .bpmn-resize-handle,
 .bpmn-node.is-selected .bpmn-resize-handle {
   opacity: 1;
+}
+
+/* === Linked note badge + menu === */
+.bpmn-link-menu {
+  position: absolute;
+  top: -36px;
+  right: 0;
+  display: flex;
+  gap: 4px;
+  z-index: 5;
+}
+.bpmn-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #2E2A22;
+  background: rgba(253, 251, 245, 0.95);
+  border: 1px solid rgba(94, 79, 45, 0.20);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(94, 79, 45, 0.18);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.bpmn-link-btn:hover {
+  background: #FDFBF5;
+  border-color: rgba(184, 89, 61, 0.55);
+  color: #B8593D;
+}
+.bpmn-link-btn-danger:hover {
+  color: #B8593D;
+  border-color: rgba(184, 89, 61, 0.55);
+}
+.bpmn-linked-badge {
+  position: absolute;
+  top: -12px;
+  right: -6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #FDFBF5;
+  background: #B8593D;
+  border: 1.5px solid #FDFBF5;
+  border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(184, 89, 61, 0.35);
+  cursor: pointer;
+  max-width: 140px;
+  transition: transform 0.15s, background 0.15s;
+  z-index: 4;
+}
+.bpmn-linked-badge:hover {
+  transform: scale(1.05);
+  background: #994932;
+}
+.bpmn-linked-badge-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 110px;
 }
 
 /* === Handles (4 lados) === */

@@ -92,6 +92,52 @@
 
     <!-- Editor -->
     <editor-content :editor="editor" class="prose-editor" />
+
+    <!-- Picker de fluxograma -->
+    <Teleport to="body">
+      <div
+        v-if="flowPicker.show"
+        class="fixed inset-0 z-[500] flex items-start justify-center pt-24 px-4"
+        @click.self="closeFlowPicker"
+      >
+        <div class="absolute inset-0 bg-ink-400/40 backdrop-blur-sm"></div>
+        <div class="relative paper-strong rounded-2xl w-full max-w-md overflow-hidden shadow-paper-lg">
+          <div class="p-3 border-b border-[var(--paper-border)]">
+            <div class="relative">
+              <svg class="w-4 h-4 text-ink-50 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.35-4.35" stroke-linecap="round" />
+              </svg>
+              <input
+                v-model="flowPicker.query"
+                type="text"
+                placeholder="Buscar fluxograma…"
+                class="w-full pl-9 pr-3 py-2 bg-[var(--paper-surface-2)] border border-[var(--paper-border)] rounded-lg text-sm text-ink-300 placeholder-ink-50 outline-none focus:border-terra-500"
+                autofocus
+              />
+            </div>
+          </div>
+          <div class="max-h-80 overflow-y-auto scrollbar-slim py-1">
+            <p v-if="flowPicker.loading" class="px-4 py-6 text-center text-xs text-ink-50">Carregando…</p>
+            <p v-else-if="filteredFlowPickerItems.length === 0" class="px-4 py-6 text-center text-xs text-ink-50">
+              {{ flowPicker.items.length === 0 ? 'Nenhum fluxograma criado ainda' : 'Nenhum resultado' }}
+            </p>
+            <button
+              v-for="fc in filteredFlowPickerItems"
+              :key="fc.id"
+              @click="insertFlowEmbed(fc)"
+              class="w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-[var(--paper-surface-3)]"
+            >
+              <div class="w-7 h-7 rounded-lg bg-terra-500/12 text-terra-600 flex items-center justify-center shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h4a2 2 0 012 2v4M4 14a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2V4zM14 14a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4z" />
+                </svg>
+              </div>
+              <p class="text-sm text-ink-300 truncate flex-1">{{ fc.title || 'Sem título' }}</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -107,6 +153,8 @@ import TaskItem from '@tiptap/extension-task-item'
 import Underline from '@tiptap/extension-underline'
 import Highlight from '@tiptap/extension-highlight'
 import Typography from '@tiptap/extension-typography'
+import { FlowEmbed } from '../editor/FlowEmbedExtension.js'
+import api from '../../api'
 
 const ToolBtn = defineComponent({
   props: { active: Boolean },
@@ -148,6 +196,7 @@ const slashItems = [
   { id: 'quote', label: 'Citação', description: 'Bloco de citação', icon: '<svg class="w-4 h-4 text-ink-200" viewBox="0 0 24 24" fill="currentColor"><path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 0 1-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z"/></svg>', command: (e) => e.chain().focus().toggleBlockquote().run() },
   { id: 'code', label: 'Bloco de código', description: 'Código formatado', icon: '<svg class="w-4 h-4 text-ink-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', command: (e) => e.chain().focus().toggleCodeBlock().run() },
   { id: 'divider', label: 'Divisor', description: 'Linha horizontal', icon: '<svg class="w-4 h-4 text-ink-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>', command: (e) => e.chain().focus().setHorizontalRule().run() },
+  { id: 'flow', label: 'Fluxograma', description: 'Embeda um fluxograma existente', icon: '<svg class="w-4 h-4 text-terra-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h4a2 2 0 012 2v4M4 14a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2V4zM14 14a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4z"/></svg>', custom: 'flowPicker' },
   { id: 'bold', label: 'Negrito', description: 'Texto em negrito', icon: '<svg class="w-4 h-4 text-ink-200" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>', command: (e) => e.chain().focus().toggleBold().run() },
   { id: 'italic', label: 'Itálico', description: 'Texto em itálico', icon: '<svg class="w-4 h-4 text-ink-200" viewBox="0 0 24 24" fill="currentColor"><line x1="19" y1="4" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="20" x2="5" y2="20" stroke="currentColor" stroke-width="2"/><line x1="15" y1="4" x2="9" y2="20" stroke="currentColor" stroke-width="2"/></svg>', command: (e) => e.chain().focus().toggleItalic().run() },
   { id: 'underline', label: 'Sublinhado', description: 'Texto sublinhado', icon: '<svg class="w-4 h-4 text-ink-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" y1="20" x2="20" y2="20"/></svg>', command: (e) => e.chain().focus().toggleUnderline().run() },
@@ -202,6 +251,12 @@ function executeSlashItem(item) {
 
   closeSlashMenu()
 
+  // Ações customizadas (que abrem outra UI)
+  if (item.custom === 'flowPicker') {
+    openFlowPicker()
+    return
+  }
+
   // Para comandos de bloco, restringe a seleção ao bloco atual
   const { $from } = e.state.selection
   const blockStart = $from.start()
@@ -209,6 +264,48 @@ function executeSlashItem(item) {
   e.chain().focus().setTextSelection({ from: blockStart, to: blockEnd }).run()
 
   item.command(e)
+}
+
+// ── Flow picker ──
+const flowPicker = reactive({
+  show: false,
+  query: '',
+  loading: false,
+  items: [],
+})
+
+async function openFlowPicker() {
+  flowPicker.show = true
+  flowPicker.query = ''
+  flowPicker.loading = true
+  try {
+    const { data } = await api.get('/flowcharts')
+    flowPicker.items = data || []
+  } catch {
+    flowPicker.items = []
+  } finally {
+    flowPicker.loading = false
+  }
+}
+
+function closeFlowPicker() {
+  flowPicker.show = false
+}
+
+const filteredFlowPickerItems = computed(() => {
+  if (!flowPicker.query) return flowPicker.items
+  const q = flowPicker.query.toLowerCase()
+  return flowPicker.items.filter((f) => (f.title || '').toLowerCase().includes(q))
+})
+
+function insertFlowEmbed(flow) {
+  const e = editor.value
+  if (!e) return
+  e.chain().focus().insertContent({
+    type: 'flowEmbed',
+    attrs: { flowchartId: flow.id, title: flow.title || 'Sem título' },
+  }).run()
+  closeFlowPicker()
 }
 
 // Extensão que intercepta "/" para abrir o menu
@@ -307,6 +404,7 @@ const editor = useEditor({
     Underline,
     Highlight,
     Typography,
+    FlowEmbed,
     SlashCommands,
   ],
   content: parseContent(props.modelValue),
