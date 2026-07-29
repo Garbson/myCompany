@@ -1,9 +1,9 @@
 <template>
-  <div class="flex gap-3 h-full -mx-4 md:-mx-6 -mt-3 md:mt-0 overflow-hidden" style="height: calc(100dvh - var(--header-offset, 0px))">
+  <div class="flow-workspace flex gap-3 h-full -mx-4 md:-mx-6 -mt-3 md:mt-0 overflow-hidden" style="height: calc(100dvh - var(--header-offset, 0px))">
 
     <!-- ── PAINEL ESQUERDO: pastas + fluxogramas ── -->
     <div
-      class="flex flex-col shrink-0 overflow-hidden transition-all duration-200"
+      class="workspace-index-postit flex flex-col shrink-0 overflow-hidden transition-all duration-200"
       :class="active && isMobile ? 'hidden' : 'w-full md:w-64 lg:w-72'"
     >
       <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--paper-border)] shrink-0">
@@ -164,7 +164,7 @@
     <div class="hidden md:block w-px bg-[var(--paper-border)]"></div>
 
     <!-- ── PAINEL DIREITO: canvas + título ── -->
-    <div class="flex-1 min-w-0 flex flex-col overflow-hidden" :class="{ 'hidden md:flex': !active }">
+    <div class="flow-board-postit flex-1 min-w-0 flex flex-col overflow-hidden" :class="{ 'hidden md:flex': !active }">
       <template v-if="active">
         <div
           ref="focusRootRef"
@@ -569,7 +569,7 @@ const FlowItem = defineComponent({
       draggable: true,
       onDragstart: (e) => e.dataTransfer.setData('flow-id', String(props.flow.id)),
       onClick: () => emit('click'),
-      class: `group relative flex items-center gap-2 px-3 py-1.5 mx-1 rounded-lg cursor-pointer transition-colors ${props.active ? 'bg-[var(--paper-surface-3)] text-ink-400' : 'hover:bg-[var(--paper-surface-2)] text-ink-100 hover:text-ink-300'}`,
+      class: `flow-postit group relative flex items-center gap-2 px-3 py-1.5 mx-1 cursor-pointer transition-colors ${props.active ? 'is-active text-ink-400' : 'text-ink-100 hover:text-ink-300'}`,
     }, [
       h('svg', { class: 'w-3.5 h-3.5 shrink-0 text-ink-50', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24', 'stroke-width': '1.75' }, [
         h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M4 6a2 2 0 012-2h4a2 2 0 012 2v4M4 14a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2V4zM14 14a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4z' })

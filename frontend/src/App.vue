@@ -1,8 +1,7 @@
 <template>
   <div
     v-if="auth.isLoggedIn"
-    class="flex h-screen overflow-hidden md:p-3 md:gap-3"
-    :class="{ 'notebook-shell': !isFlowPage }"
+    class="notebook-shell flex h-screen overflow-hidden md:p-3 md:gap-3"
   >
     <UpdateBanner />
     <Sidebar />
@@ -10,8 +9,7 @@
       <MobileHeader />
       <TabBar />
       <main
-        class="flex-1 min-w-0 overflow-auto px-4 pt-3 md:px-6 md:pt-0 pb-[calc(var(--safe-bottom)+4.75rem)] md:pb-6"
-        :class="{ 'organic-page': !isFlowPage }"
+        class="organic-page flex-1 min-w-0 overflow-auto px-4 pt-3 md:px-6 md:pt-0 pb-[calc(var(--safe-bottom)+4.75rem)] md:pb-6"
       >
         <router-view v-slot="{ Component }">
           <KeepAlive :include="tabsStore.keepAliveNames">
@@ -34,8 +32,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted } from "vue";
-import { useRoute } from "vue-router";
+import { onMounted, onUnmounted } from "vue";
 import Sidebar from "./components/layout/Sidebar.vue";
 import MobileHeader from "./components/layout/MobileHeader.vue";
 import BottomNav from "./components/layout/BottomNav.vue";
@@ -50,9 +47,6 @@ import { useAuthStore } from "./stores/auth";
 const auth = useAuthStore();
 const tabsStore = useTabsStore();
 const { start, stop } = useVersionCheck();
-const route = useRoute();
-const isFlowPage = computed(() => route.path.startsWith("/fluxogramas"));
-
 onMounted(() => {
   start();
   if (auth.isLoggedIn) {

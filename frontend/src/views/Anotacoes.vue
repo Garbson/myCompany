@@ -1,9 +1,9 @@
 <template>
-  <div class="flex gap-3 h-full -mx-4 md:-mx-6 -mt-3 md:mt-0 overflow-hidden" style="height: calc(100dvh - var(--header-offset, 0px))">
+  <div class="notes-workspace flex gap-3 h-full -mx-4 md:-mx-6 -mt-3 md:mt-0 overflow-hidden" style="height: calc(100dvh - var(--header-offset, 0px))">
 
     <!-- ── PAINEL ESQUERDO: pastas + notas ── -->
     <div
-      class="flex flex-col shrink-0 overflow-hidden transition-all duration-200"
+      class="workspace-index-postit flex flex-col shrink-0 overflow-hidden transition-all duration-200"
       :class="activeNote && isMobile ? 'hidden' : 'w-full md:w-64 lg:w-72'"
     >
       <!-- Cabeçalho -->
@@ -205,7 +205,7 @@
 
     <!-- ── PAINEL DIREITO: editor ── -->
     <div
-      class="flex-1 min-w-0 flex flex-col overflow-hidden"
+      class="notes-editor-postit flex-1 min-w-0 flex flex-col overflow-hidden"
       :class="!activeNote && isMobile ? 'hidden' : ''"
     >
       <template v-if="activeNote">
@@ -336,7 +336,7 @@ const NoteItem = defineComponent({
   emits: ['click', 'delete'],
   setup(props, { emit }) {
     return () => h('div', {
-      class: `group relative flex items-start gap-2 px-3 py-2 mx-1 rounded-lg cursor-pointer transition-colors ${props.active ? 'bg-[var(--paper-surface-3)] text-ink-400' : 'hover:bg-[var(--paper-surface-2)] text-ink-100 hover:text-ink-300'}`,
+      class: `note-postit group relative flex items-start gap-2 px-3 py-2 mx-1 cursor-pointer transition-colors ${props.active ? 'is-active text-ink-400' : 'text-ink-100 hover:text-ink-300'}`,
       draggable: true,
       onDragstart: (e) => {
         e.dataTransfer.setData('note-id', String(props.note.id))

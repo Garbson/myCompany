@@ -134,8 +134,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
 .glass-strong { @apply paper-strong; }
 .glass-light { @apply paper-light; }
 
-/* Páginas do caderno: superfícies irregulares e composição menos "dashboard".
- * A classe não é aplicada à rota de Fluxogramas, preservando o editor. */
+/* Páginas do caderno: o fundo é a folha; os conteúdos apoiados nela são post-its. */
 .organic-page {
   position: relative;
   isolation: auto;
@@ -162,20 +161,17 @@ h1, h2, h3, h4, h5, h6, .font-display {
     );
   background-size: 100% 32px;
   background-position: 0 8px;
-  border-radius: 5px 13px 7px 11px;
+  border-radius: 3px;
   border-color: rgba(112,91,48,.10);
-  clip-path: polygon(.4% .5%, 99.2% 0, 100% 97%, 97.8% 100%, .2% 99%);
+  clip-path: none;
   box-shadow:
     2px 3px 0 rgba(105,82,37,.06),
     0 12px 24px rgba(74,57,29,.12);
-  transform: rotate(-.08deg);
+  transform: none;
 }
 .organic-page .glass:nth-of-type(even),
 .organic-page .paper:nth-of-type(even) {
   --postit-color: rgba(237, 201, 174, .93);
-  border-radius: 12px 4px 14px 6px;
-  clip-path: polygon(0 1%, 98.8% .2%, 100% 99%, 2% 100%);
-  transform: rotate(.08deg);
 }
 .organic-page .glass:nth-child(4n + 3),
 .organic-page .paper:nth-child(4n + 3) {
@@ -192,19 +188,19 @@ h1, h2, h3, h4, h5, h6, .font-display {
     repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(44,74,92,.07) 31px, rgba(44,74,92,.07) 32px);
   background-size: 100% 32px;
   background-position: 0 8px;
-  border-radius: 4px 10px 5px 8px;
+  border-radius: 3px;
   border-style: dashed;
 }
 .organic-page .md-sticky-title {
   border: 0;
-  border-radius: 4px 12px 6px 9px;
+  border-radius: 3px;
   box-shadow: 0 10px 22px rgba(74,57,29,.10);
   background-color: rgba(255, 244, 194, .90);
   background-image:
     repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(44,74,92,.09) 31px, rgba(44,74,92,.09) 32px);
   background-size: 100% 32px;
   background-position: 0 8px;
-  transform: rotate(-.05deg);
+  transform: none;
 }
 .organic-page h1 {
   line-height: 2rem;
@@ -220,6 +216,62 @@ h1, h2, h3, h4, h5, h6, .font-display {
 .organic-page :where(.glass, .paper) :where(p, li, blockquote) {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+/* Anotações e fluxogramas: conjunto de post-its retos sobre a folha do caderno. */
+.notes-workspace,
+.flow-workspace {
+  padding: .75rem;
+}
+.workspace-index-postit,
+.notes-editor-postit,
+.flow-board-postit {
+  border: 1px solid rgba(112, 91, 48, .12);
+  border-radius: 3px;
+  box-shadow: 0 12px 26px rgba(74, 57, 29, .12);
+}
+.workspace-index-postit {
+  background: rgba(246, 229, 161, .95);
+}
+.notes-editor-postit {
+  background-color: rgba(255, 244, 194, .95);
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(44, 74, 92, .10) 31px, rgba(44, 74, 92, .10) 32px);
+  background-position: 0 8px;
+}
+.flow-board-postit {
+  background-color: rgba(205, 218, 177, .95);
+}
+.note-postit,
+.flow-postit {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  border: 1px solid rgba(112, 91, 48, .08);
+  border-radius: 2px;
+  background: rgba(255, 250, 220, .72);
+  box-shadow: 0 3px 7px rgba(74, 57, 29, .07);
+}
+.note-postit:hover,
+.flow-postit:hover {
+  background: rgba(255, 252, 231, .96);
+}
+.note-postit.is-active,
+.flow-postit.is-active {
+  background: rgba(237, 201, 174, .96);
+  border-color: rgba(184, 89, 61, .18);
+}
+.notes-editor-postit .prose-editor .ProseMirror,
+.notes-editor-postit .prose-editor .ProseMirror p,
+.notes-editor-postit .prose-editor .ProseMirror li {
+  line-height: 32px;
+}
+.flow-board-postit .flow-canvas-root,
+.flow-board-postit .flow-canvas {
+  background-color: transparent;
+}
+.flow-board-postit:has(.fullscreen-flow) {
+  border: 0;
+  box-shadow: none;
 }
 .notebook-sidebar {
   position: relative;
@@ -293,7 +345,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
   box-shadow:
     3px 5px 0 rgba(105,82,37,.06),
     0 16px 30px rgba(74,57,29,.16);
-  transform: translateY(-2px) rotate(0deg);
+  transform: translateY(-2px);
 }
 .glow-blue {
   box-shadow:
@@ -336,6 +388,10 @@ h1, h2, h3, h4, h5, h6, .font-display {
   .notebook-shell {
     background-attachment: scroll;
     background-position: center, center, left top, left top, left top;
+  }
+  .notes-workspace,
+  .flow-workspace {
+    padding: .35rem;
   }
 }
 
