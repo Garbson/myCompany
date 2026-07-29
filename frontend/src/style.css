@@ -55,6 +55,8 @@ body {
 .notebook-shell {
   position: relative;
   isolation: isolate;
+  width: 100%;
+  min-height: 100dvh;
   background-color: #e9dfca;
   background-image:
     linear-gradient(115deg, rgba(245, 239, 223, .16), rgba(93, 75, 44, .08)),
@@ -126,13 +128,16 @@ h1, h2, h3, h4, h5, h6, .font-display {
 .organic-page {
   position: relative;
   isolation: isolate;
-  background-color: rgba(253, 251, 245, .91);
+  background-color: transparent;
   background-image:
+    linear-gradient(rgba(253, 251, 245, .80), rgba(248, 242, 228, .84)),
     radial-gradient(circle at 10px 24px, rgba(72, 61, 39, .28) 0 3px, rgba(221, 211, 190, .95) 3.5px 5px, transparent 5.5px),
     linear-gradient(90deg, transparent 0, transparent 3.1rem, rgba(184, 89, 61, 0.08) 3.1rem, rgba(184, 89, 61, 0.08) 3.16rem, transparent 3.16rem),
-    repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, 0.035) 35px, rgba(44, 74, 92, 0.035) 36px);
-  background-size: 100% 48px, 100% 100%, 100% 100%;
-  background-repeat: repeat-y, no-repeat, repeat;
+    repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, 0.045) 35px, rgba(44, 74, 92, 0.045) 36px),
+    url('/mypaper-workspace.webp');
+  background-size: 100% 100%, 100% 48px, 100% 100%, 100% 100%, cover;
+  background-position: center, left top, left top, left top, center;
+  background-repeat: no-repeat, repeat-y, no-repeat, repeat, no-repeat;
   border: 1px solid rgba(94, 79, 45, .2);
   border-radius: 6px 15px 9px 5px;
   box-shadow:
@@ -157,6 +162,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
 }
 .organic-page .glass,
 .organic-page .paper {
+  background-color: rgba(253, 251, 245, .88);
   border-radius: 5px 13px 7px 11px;
   clip-path: polygon(.4% .5%, 99.2% 0, 100% 97%, 97.8% 100%, .2% 99%);
 }
@@ -167,6 +173,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
 }
 .organic-page .glass-light,
 .organic-page .paper-light {
+  background-color: rgba(247, 241, 225, .86);
   border-radius: 4px 10px 5px 8px;
   border-style: dashed;
 }
@@ -248,8 +255,13 @@ h1, h2, h3, h4, h5, h6, .font-display {
   .safe-pt-mobile { padding-top: var(--safe-top); }
   .safe-pb-mobile { padding-bottom: var(--safe-bottom); }
   .organic-page {
-    background-color: rgba(253, 251, 245, .96);
-    background-position: -2.1rem 0, 0 0;
+    background-image:
+      linear-gradient(rgba(253, 251, 245, .88), rgba(248, 242, 228, .91)),
+      radial-gradient(circle at 10px 24px, rgba(72, 61, 39, .22) 0 3px, rgba(221, 211, 190, .95) 3.5px 5px, transparent 5.5px),
+      linear-gradient(90deg, transparent 0, transparent 3.1rem, rgba(184, 89, 61, 0.08) 3.1rem, rgba(184, 89, 61, 0.08) 3.16rem, transparent 3.16rem),
+      repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, 0.04) 35px, rgba(44, 74, 92, 0.04) 36px),
+      url('/mypaper-workspace.webp');
+    background-position: center, -2.1rem 0, left top, left top, 58% center;
     border-width: 0;
     border-radius: 0;
     box-shadow: none;
