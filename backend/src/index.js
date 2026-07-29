@@ -14,6 +14,9 @@ import taskFlowRoutes from './routes/taskFlows.js'
 import noteRoutes from './routes/notes.js'
 import noteFolderRoutes from './routes/noteFolders.js'
 import flowchartRoutes from './routes/flowcharts.js'
+import searchRoutes from './routes/search.js'
+import uploadRoutes from './routes/uploads.js'
+import backlinkRoutes from './routes/backlinks.js'
 import aiRoutes from './routes/ai.js'
 import habitRoutes from './routes/habits.js'
 import { startReminderLoop } from './services/reminders.js'
@@ -39,6 +42,9 @@ app.use('/api', taskFlowRoutes)
 app.use('/api', noteRoutes)
 app.use('/api', noteFolderRoutes)
 app.use('/api', flowchartRoutes)
+app.use('/api', searchRoutes)
+app.use('/api', uploadRoutes)
+app.use('/api', backlinkRoutes)
 app.use('/api', aiRoutes)
 app.use('/api', habitRoutes)
 

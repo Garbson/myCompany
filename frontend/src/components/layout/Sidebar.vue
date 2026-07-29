@@ -13,6 +13,20 @@
       </div>
     </div>
 
+    <!-- Busca (atalho pro Command Palette) -->
+    <button
+      @click="openPalette"
+      class="mx-3 mt-3 mb-1 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--paper-surface-2)] border border-[var(--paper-border)] text-ink-100 hover:text-ink-300 hover:border-[var(--paper-border-strong)] transition-colors group"
+      title="Buscar (⌘K)"
+    >
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <circle cx="11" cy="11" r="7" />
+        <path d="M21 21l-4.35-4.35" stroke-linecap="round" />
+      </svg>
+      <span class="text-[12px] flex-1 text-left">Buscar…</span>
+      <kbd class="text-[10px] font-mono bg-[var(--paper-surface-3)] border border-[var(--paper-border)] rounded px-1.5 py-0 text-ink-50 group-hover:text-ink-200 transition-colors">⌘K</kbd>
+    </button>
+
     <!-- Menu -->
     <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto overflow-x-hidden scrollbar-slim">
       <template v-for="item in menu" :key="item.path || item.action">
@@ -147,6 +161,7 @@ import ConfirmDialog from "../ui/ConfirmDialog.vue";
 import BackgroundPicker from "../BackgroundPicker.vue";
 import { hapticLight } from "../../services/haptics";
 import { useBackground } from "../../composables/useBackground";
+import { useCommandPalette } from "../../composables/useCommandPalette";
 
 const appVersion = ref("");
 const showMenu = ref(false);
@@ -155,6 +170,7 @@ const showBgPicker = ref(false);
 
 const { currentId: currentBgId, isWeb } = useBackground();
 const isWebPlatform = computed(() => isWeb());
+const { show: openPalette } = useCommandPalette();
 
 onMounted(async () => {
   try {

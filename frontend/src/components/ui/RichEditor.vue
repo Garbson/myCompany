@@ -153,6 +153,7 @@ import TaskItem from '@tiptap/extension-task-item'
 import Underline from '@tiptap/extension-underline'
 import Highlight from '@tiptap/extension-highlight'
 import Typography from '@tiptap/extension-typography'
+import Image from '@tiptap/extension-image'
 import { FlowEmbed } from '../editor/FlowEmbedExtension.js'
 import api from '../../api'
 
@@ -197,6 +198,7 @@ const slashItems = [
   { id: 'code', label: 'Bloco de código', description: 'Código formatado', icon: '<svg class="w-4 h-4 text-ink-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', command: (e) => e.chain().focus().toggleCodeBlock().run() },
   { id: 'divider', label: 'Divisor', description: 'Linha horizontal', icon: '<svg class="w-4 h-4 text-ink-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>', command: (e) => e.chain().focus().setHorizontalRule().run() },
   { id: 'flow', label: 'Fluxograma', description: 'Embeda um fluxograma existente', icon: '<svg class="w-4 h-4 text-terra-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h4a2 2 0 012 2v4M4 14a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2V4zM14 14a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4z"/></svg>', custom: 'flowPicker' },
+  { id: 'image', label: 'Imagem', description: 'Escolher e inserir uma imagem', icon: '<svg class="w-4 h-4 text-olive-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5" fill="currentColor"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 15l-5-5-6 6-3-3-4 4"/></svg>', custom: 'imagePicker' },
   { id: 'bold', label: 'Negrito', description: 'Texto em negrito', icon: '<svg class="w-4 h-4 text-ink-200" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>', command: (e) => e.chain().focus().toggleBold().run() },
   { id: 'italic', label: 'Itálico', description: 'Texto em itálico', icon: '<svg class="w-4 h-4 text-ink-200" viewBox="0 0 24 24" fill="currentColor"><line x1="19" y1="4" x2="10" y2="4" stroke="currentColor" stroke-width="2"/><line x1="14" y1="20" x2="5" y2="20" stroke="currentColor" stroke-width="2"/><line x1="15" y1="4" x2="9" y2="20" stroke="currentColor" stroke-width="2"/></svg>', command: (e) => e.chain().focus().toggleItalic().run() },
   { id: 'underline', label: 'Sublinhado', description: 'Texto sublinhado', icon: '<svg class="w-4 h-4 text-ink-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" y1="20" x2="20" y2="20"/></svg>', command: (e) => e.chain().focus().toggleUnderline().run() },
@@ -256,6 +258,10 @@ function executeSlashItem(item) {
     openFlowPicker()
     return
   }
+  if (item.custom === 'imagePicker') {
+    openImagePicker()
+    return
+  }
 
   // Para comandos de bloco, restringe a seleção ao bloco atual
   const { $from } = e.state.selection
@@ -306,6 +312,82 @@ function insertFlowEmbed(flow) {
     attrs: { flowchartId: flow.id, title: flow.title || 'Sem título' },
   }).run()
   closeFlowPicker()
+}
+
+// ── Upload de imagem inline (via R2) ──
+const uploadingImage = ref(false)
+const fileInputRef = ref(null)
+
+function openImagePicker() {
+  if (!fileInputRef.value) {
+    // Cria input dinâmico se não existir
+    const el = document.createElement('input')
+    el.type = 'file'
+    el.accept = 'image/*'
+    el.style.display = 'none'
+    document.body.appendChild(el)
+    fileInputRef.value = el
+    el.addEventListener('change', onFileChosen)
+  }
+  fileInputRef.value.value = ''
+  fileInputRef.value.click()
+}
+
+async function onFileChosen(e) {
+  const file = e.target?.files?.[0]
+  if (file) await uploadAndInsertImage(file)
+}
+
+async function uploadAndInsertImage(file) {
+  if (!file || !file.type?.startsWith('image/')) return
+  const ed = editor.value
+  if (!ed) return
+  uploadingImage.value = true
+  try {
+    const { data: presign } = await api.post('/uploads/inline', {
+      filename: file.name,
+      contentType: file.type,
+      size: file.size,
+      scope: 'note',
+    })
+    const put = await fetch(presign.uploadUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': file.type },
+      body: file,
+    })
+    if (!put.ok) throw new Error('Upload failed')
+    ed.chain().focus().setImage({ src: presign.publicUrl, alt: file.name }).run()
+  } catch (err) {
+    console.error('[image upload]', err)
+    alert('Falha ao subir a imagem')
+  } finally {
+    uploadingImage.value = false
+  }
+}
+
+// Paste de imagem (Ctrl+V com print) e drop de arquivo
+function onEditorPaste(view, event) {
+  const items = event.clipboardData?.items
+  if (!items) return false
+  for (const item of items) {
+    if (item.type?.startsWith('image/')) {
+      const file = item.getAsFile()
+      if (file) {
+        uploadAndInsertImage(file)
+        return true
+      }
+    }
+  }
+  return false
+}
+function onEditorDrop(view, event) {
+  const file = event.dataTransfer?.files?.[0]
+  if (file?.type?.startsWith('image/')) {
+    event.preventDefault()
+    uploadAndInsertImage(file)
+    return true
+  }
+  return false
 }
 
 // Extensão que intercepta "/" para abrir o menu
@@ -404,6 +486,7 @@ const editor = useEditor({
     Underline,
     Highlight,
     Typography,
+    Image.configure({ inline: false, allowBase64: false, HTMLAttributes: { class: 'prose-img' } }),
     FlowEmbed,
     SlashCommands,
   ],
@@ -426,6 +509,10 @@ const editor = useEditor({
       showBubble.value = false
       closeSlashMenu()
     }, 200)
+  },
+  editorProps: {
+    handlePaste: onEditorPaste,
+    handleDrop: onEditorDrop,
   },
 })
 
@@ -545,4 +632,18 @@ onBeforeUnmount(() => editor.value?.destroy())
 }
 
 .prose-editor .ProseMirror ::selection { background: rgba(107, 122, 63, 0.28); color: #1F1B15; }
+
+.prose-editor .ProseMirror img.prose-img,
+.prose-editor .ProseMirror img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 0.5rem 0;
+  box-shadow: 0 2px 8px rgba(94, 79, 45, 0.10), 0 12px 28px rgba(94, 79, 45, 0.08);
+  border: 1px solid rgba(94, 79, 45, 0.12);
+  display: block;
+}
+.prose-editor .ProseMirror img.ProseMirror-selectednode {
+  outline: 2px solid rgba(184, 89, 61, 0.6);
+  outline-offset: 3px;
+}
 </style>

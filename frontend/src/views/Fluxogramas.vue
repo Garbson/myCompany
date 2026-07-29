@@ -223,6 +223,10 @@
               v-model="flowData"
               @change="onCanvasChange"
             />
+            <!-- Backlinks flutuantes -->
+            <div v-if="!fullscreen" class="absolute top-3 left-3 max-w-xs paper-strong rounded-xl px-3 py-2 pointer-events-auto" v-show="backlinksVisible">
+              <BacklinksPanelInline target-type="flowchart" :target-id="active.id" @count="onBacklinksCount" />
+            </div>
           </div>
         </div>
       </template>
@@ -275,6 +279,7 @@ import api from '../api'
 import { useToast } from '../composables/useToast'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import FlowCanvas from '../components/flow/FlowCanvas.vue'
+import BacklinksPanelInline from '../components/BacklinksPanelInline.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -305,6 +310,9 @@ const renameFolderInput = ref(null)
 
 const deleting = ref(null)
 const deletingFolder = ref(null)
+
+const backlinksVisible = ref(false)
+function onBacklinksCount(n) { backlinksVisible.value = n > 0 }
 
 // === Fullscreen (foco no fluxo) ===
 const focusRootRef = ref(null)

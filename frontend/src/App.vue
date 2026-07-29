@@ -26,6 +26,7 @@
     <router-view />
   </div>
   <Toaster />
+  <CommandPalette v-if="auth.isLoggedIn" />
 </template>
 
 <script setup>
@@ -37,6 +38,7 @@ import TabBar from "./components/layout/TabBar.vue";
 import { useTabsStore } from "./stores/tabs";
 import UpdateBanner from "./components/UpdateBanner.vue";
 import Toaster from "./components/ui/Toaster.vue";
+import CommandPalette from "./components/CommandPalette.vue";
 import VideoBackground from "./components/VideoBackground.vue";
 import { useVersionCheck } from "./services/versionCheck";
 import { useAuthStore } from "./stores/auth";

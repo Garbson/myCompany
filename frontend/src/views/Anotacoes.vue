@@ -276,6 +276,7 @@
             @input="debounceSave"
           />
           <RichEditor v-model="editContent" @update:modelValue="debounceSave" />
+          <BacklinksPanel target-type="note" :target-id="activeNote.id" />
         </div>
       </template>
 
@@ -321,6 +322,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { defineComponent, h } from 'vue'
 import api from '../api'
 import RichEditor from '../components/ui/RichEditor.vue'
+import BacklinksPanel from '../components/BacklinksPanel.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import { useToast } from '../composables/useToast'
 import { hapticLight, hapticSuccess } from '../services/haptics'
