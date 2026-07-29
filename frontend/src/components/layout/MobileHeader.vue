@@ -1,7 +1,7 @@
 <template>
   <header
-    class="md:hidden sticky top-0 z-30 border-b border-[var(--paper-border)]"
-    style="padding-top: var(--safe-top); padding-left: var(--safe-left); padding-right: var(--safe-right); background: var(--paper-surface); backdrop-filter: blur(12px);"
+    class="notebook-mobile-header md:hidden sticky top-0 z-30 border-b border-[var(--paper-border)]"
+    style="padding-top: var(--safe-top); padding-left: var(--safe-left); padding-right: var(--safe-right);"
   >
     <div class="flex items-center justify-between px-4 h-12">
       <div class="flex items-center gap-2 min-w-0">

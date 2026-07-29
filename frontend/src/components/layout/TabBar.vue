@@ -1,13 +1,13 @@
 <template>
-  <div class="hidden md:flex items-center gap-1 px-1 pt-1 shrink-0 min-w-0 overflow-x-auto scrollbar-none">
+  <div class="notebook-tabs hidden md:flex items-center gap-1 px-1 pt-1 shrink-0 min-w-0 overflow-x-auto scrollbar-none">
     <!-- Abas abertas -->
     <div
       v-for="tab in tabs"
       :key="tab.path"
       class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all shrink-0 max-w-[160px]"
       :class="isActive(tab.path)
-        ? 'bg-[var(--paper-surface)] text-ink-400 border border-[var(--paper-border)] shadow-paper'
-        : 'text-ink-100 hover:text-ink-300 hover:bg-[var(--paper-surface-2)]'"
+        ? 'notebook-tab-active text-ink-400 border border-[var(--paper-border)] shadow-paper'
+        : 'notebook-tab-idle text-ink-100 hover:text-ink-300'"
       @click="navigate(tab.path)"
     >
       <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">

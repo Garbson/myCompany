@@ -1,7 +1,7 @@
 <template>
   <nav
-    class="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--paper-border)]"
-    style="padding-bottom: var(--safe-bottom); padding-left: var(--safe-left); padding-right: var(--safe-right); background: var(--paper-surface); backdrop-filter: blur(12px);"
+    class="notebook-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--paper-border)]"
+    style="padding-bottom: var(--safe-bottom); padding-left: var(--safe-left); padding-right: var(--safe-right);"
   >
     <div class="flex items-stretch justify-around px-1 pt-1">
       <router-link

@@ -30,6 +30,9 @@
 }
 
 html, body {
+  width: 100%;
+  min-width: 100%;
+  min-height: 100%;
   background-color: var(--paper-bg);
   color: var(--ink-primary);
   color-scheme: light;
@@ -37,6 +40,11 @@ html, body {
   font-feature-settings: 'ss01', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+#app {
+  width: 100%;
+  min-width: 100%;
+  min-height: 100dvh;
 }
 
 body {
@@ -64,6 +72,7 @@ body {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 .notebook-shell::before {
   content: '';
@@ -130,14 +139,13 @@ h1, h2, h3, h4, h5, h6, .font-display {
   isolation: isolate;
   background-color: transparent;
   background-image:
-    linear-gradient(rgba(253, 251, 245, .80), rgba(248, 242, 228, .84)),
+    linear-gradient(rgba(253, 251, 245, .74), rgba(248, 242, 228, .79)),
     radial-gradient(circle at 10px 24px, rgba(72, 61, 39, .28) 0 3px, rgba(221, 211, 190, .95) 3.5px 5px, transparent 5.5px),
     linear-gradient(90deg, transparent 0, transparent 3.1rem, rgba(184, 89, 61, 0.08) 3.1rem, rgba(184, 89, 61, 0.08) 3.16rem, transparent 3.16rem),
-    repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, 0.045) 35px, rgba(44, 74, 92, 0.045) 36px),
-    url('/mypaper-workspace.webp');
-  background-size: 100% 100%, 100% 48px, 100% 100%, 100% 100%, cover;
-  background-position: center, left top, left top, left top, center;
-  background-repeat: no-repeat, repeat-y, no-repeat, repeat, no-repeat;
+    repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, 0.045) 35px, rgba(44, 74, 92, 0.045) 36px);
+  background-size: 100% 100%, 100% 48px, 100% 100%, 100% 100%;
+  background-position: center, left top, left top, left top;
+  background-repeat: no-repeat, repeat-y, no-repeat, repeat;
   border: 1px solid rgba(94, 79, 45, .2);
   border-radius: 6px 15px 9px 5px;
   box-shadow:
@@ -209,6 +217,32 @@ h1, h2, h3, h4, h5, h6, .font-display {
   pointer-events: none;
   background: linear-gradient(90deg, transparent, rgba(68, 52, 28, .09));
 }
+.notebook-shell .notebook-sidebar {
+  background:
+    linear-gradient(90deg, transparent 0, transparent 2.2rem, rgba(184,89,61,.12) 2.2rem, rgba(184,89,61,.12) 2.25rem, transparent 2.25rem),
+    repeating-linear-gradient(0deg, rgba(253,251,245,.79) 0, rgba(253,251,245,.79) 31px, rgba(220,211,190,.74) 31px, rgba(220,211,190,.74) 32px);
+  backdrop-filter: blur(10px) saturate(.82);
+}
+.notebook-shell .notebook-tabs {
+  background: transparent;
+}
+.notebook-tab-active {
+  background: var(--paper-surface);
+}
+.notebook-shell .notebook-tab-active {
+  background: rgba(253,251,245,.82);
+  backdrop-filter: blur(10px);
+}
+.notebook-shell .notebook-tab-idle:hover {
+  background: rgba(247,241,225,.62);
+  backdrop-filter: blur(8px);
+}
+.notebook-shell .notebook-mobile-header,
+.notebook-shell .notebook-bottom-nav {
+  background: rgba(253,251,245,.80);
+  backdrop-filter: blur(14px) saturate(.8);
+  -webkit-backdrop-filter: blur(14px) saturate(.8);
+}
 .notebook-sidebar nav,
 .notebook-sidebar > div {
   position: relative;
@@ -256,12 +290,11 @@ h1, h2, h3, h4, h5, h6, .font-display {
   .safe-pb-mobile { padding-bottom: var(--safe-bottom); }
   .organic-page {
     background-image:
-      linear-gradient(rgba(253, 251, 245, .88), rgba(248, 242, 228, .91)),
+      linear-gradient(rgba(253, 251, 245, .82), rgba(248, 242, 228, .87)),
       radial-gradient(circle at 10px 24px, rgba(72, 61, 39, .22) 0 3px, rgba(221, 211, 190, .95) 3.5px 5px, transparent 5.5px),
       linear-gradient(90deg, transparent 0, transparent 3.1rem, rgba(184, 89, 61, 0.08) 3.1rem, rgba(184, 89, 61, 0.08) 3.16rem, transparent 3.16rem),
-      repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, 0.04) 35px, rgba(44, 74, 92, 0.04) 36px),
-      url('/mypaper-workspace.webp');
-    background-position: center, -2.1rem 0, left top, left top, 58% center;
+      repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, 0.04) 35px, rgba(44, 74, 92, 0.04) 36px);
+    background-position: center, -2.1rem 0, left top, left top;
     border-width: 0;
     border-radius: 0;
     box-shadow: none;
