@@ -1,125 +1,132 @@
 <template>
-  <div v-if="workMode">
-    <!-- Hello header (desktop) -->
-    <div class="hidden md:flex items-end justify-between mb-6 md-sticky-title">
+  <div v-if="workMode" class="dashboard-notebook">
+    <header class="dashboard-heading">
       <div>
-        <h1 class="text-2xl font-bold text-ink-400 tracking-tight">{{ greeting }}, {{ firstName }}</h1>
-        <p class="text-sm text-ink-50 mt-0.5">{{ todayLabel }}</p>
+        <span class="eyebrow">{{ todayLabel }}</span>
+        <h1>{{ greeting }}, {{ firstName }}.</h1>
+        <p>Abra o caderno e escolha o que merece sua atenção hoje.</p>
       </div>
-    </div>
+      <div class="notebook-clock" aria-label="Horário atual">{{ clock.now }}</div>
+    </header>
 
-    <!-- Dashboard pessoal - frase + relógio -->
-    <div class="flex flex-col-reverse md:flex-row md:items-stretch gap-3 mb-4 md:mb-6">
-      <div class="flex-1 glass rounded-xl glow-hover p-4 md:p-5 flex flex-col justify-center">
-        <p class="text-sm text-ink-200 italic leading-relaxed">"{{ currentQuote.text }}"</p>
-        <p class="text-xs text-ink-50 mt-1.5">— {{ currentQuote.author }}</p>
-      </div>
-      <div class="paper-strong rounded-xl px-5 py-3 font-mono text-xl md:text-3xl font-bold text-ink-400 tabular-nums tracking-[0.18em] flex items-center justify-center shrink-0 md:min-w-[200px] relative overflow-hidden">
-        <span class="relative z-10 text-terra-600">{{ clock.now }}</span>
-      </div>
-    </div>
+    <div class="dashboard-canvas">
+      <section class="dashboard-main">
+        <div class="quote-note">
+          <span class="paper-tape" aria-hidden="true"></span>
+          <p>“{{ currentQuote.text }}”</p>
+          <small>— {{ currentQuote.author }}</small>
+        </div>
 
-    <!-- Cards de tarefas -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-      <div class="glass rounded-xl glow-hover p-4 hover:border-[var(--paper-border-strong)] transition-colors">
-        <p class="text-xs text-ink-50 font-medium uppercase tracking-wide">Total</p>
-        <p class="text-2xl font-bold text-ink-400 mt-1.5">{{ taskStore.tasks.length }}</p>
-      </div>
-      <div class="glass rounded-xl glow-hover p-4 hover:border-[#C89A3F]/30 transition-colors">
-        <p class="text-xs text-ink-50 font-medium uppercase tracking-wide">A fazer</p>
-        <p class="text-2xl font-bold text-[#C89A3F] mt-1.5">{{ tasksByStatus.todo }}</p>
-      </div>
-      <div class="glass rounded-xl glow-hover p-4 hover:border-terra-500/30 transition-colors">
-        <p class="text-xs text-ink-50 font-medium uppercase tracking-wide">Em andamento</p>
-        <p class="text-2xl font-bold text-terra-600 mt-1.5">{{ tasksByStatus.in_progress }}</p>
-      </div>
-      <div class="glass rounded-xl glow-hover p-4 hover:border-olive-500/30 transition-colors">
-        <p class="text-xs text-ink-50 font-medium uppercase tracking-wide">Concluídas</p>
-        <p class="text-2xl font-bold text-olive-500 mt-1.5">{{ tasksByStatus.done }}</p>
-      </div>
-    </div>
+        <div class="stat-strip" aria-label="Resumo das tarefas">
+          <div><strong>{{ taskStore.tasks.length }}</strong><span>anotadas</span></div>
+          <i></i>
+          <div><strong>{{ tasksByStatus.todo }}</strong><span>a fazer</span></div>
+          <i></i>
+          <div><strong>{{ tasksByStatus.in_progress }}</strong><span>em curso</span></div>
+          <i></i>
+          <div class="stat-done"><strong>{{ tasksByStatus.done }}</strong><span>concluídas</span></div>
+        </div>
 
-    <!-- Progresso + Dificuldade -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-      <div class="glass rounded-xl glow-hover p-4">
-        <h3 class="text-sm font-semibold text-ink-400 mb-4">Progresso</h3>
-        <div class="space-y-3">
-          <div v-for="s in statusBars" :key="s.key">
-            <div class="flex justify-between text-xs mb-1">
-              <span :class="s.color">{{ s.label }}</span>
-              <span class="text-ink-100">{{ s.count }}</span>
+        <section class="ruled-sheet">
+          <div class="sheet-title">
+            <div>
+              <span class="eyebrow">Minha lista</span>
+              <h2>Próximas tarefas</h2>
             </div>
-            <div class="w-full bg-[var(--paper-surface-2)] rounded-full h-2 overflow-hidden">
-              <div class="h-2 rounded-full transition-all" :class="s.barColor" :style="{ width: s.pct + '%' }"></div>
+            <span class="hand-note">{{ completionPct }}% feito</span>
+          </div>
+          <div class="task-lines">
+            <button
+              v-for="task in nextTasks"
+              :key="task.id"
+              class="task-line"
+              type="button"
+              @click="editTask(task)"
+            >
+              <span class="check-circle" :class="{ active: task.status === 'in_progress' }"></span>
+              <span class="task-copy">
+                <strong>{{ task.title }}</strong>
+                <small>
+                  {{ difficultyLabel(task.difficulty) }}
+                  <template v-if="task.project_name"> · {{ task.project_name }}</template>
+                  <template v-if="task.due_date"> · {{ shortDate(task.due_date) }}</template>
+                </small>
+              </span>
+              <span class="task-status" :class="`status-${task.status}`">{{ statusLabel(task.status) }}</span>
+            </button>
+            <p v-if="nextTasks.length === 0" class="empty-note">Tudo em dia. Que sensação boa.</p>
+          </div>
+        </section>
+
+        <section class="progress-sheet">
+          <div class="sheet-title compact">
+            <div>
+              <span class="eyebrow">Ritmo da semana</span>
+              <h2>Como as coisas estão andando</h2>
             </div>
+          </div>
+          <div class="progress-list">
+            <div v-for="s in statusBars" :key="s.key" class="progress-row">
+              <span>{{ s.label }}</span>
+              <div class="pencil-track"><i :class="s.barColor" :style="{ width: s.pct + '%' }"></i></div>
+              <strong>{{ s.count }}</strong>
+            </div>
+          </div>
+          <div class="difficulty-note">
+            <span><i class="dot easy"></i>{{ tasksByDifficulty.easy }} fáceis</span>
+            <span><i class="dot medium"></i>{{ tasksByDifficulty.medium }} médias</span>
+            <span><i class="dot hard"></i>{{ tasksByDifficulty.hard }} difíceis</span>
+          </div>
+        </section>
+      </section>
+
+      <aside class="calendar-sheet">
+        <span class="binder-hole hole-one" aria-hidden="true"></span>
+        <span class="binder-hole hole-two" aria-hidden="true"></span>
+        <div class="calendar-head">
+          <div>
+            <span class="eyebrow">Agenda</span>
+            <h2>{{ calendarMonthLabel }}</h2>
+          </div>
+          <div class="calendar-nav">
+            <button type="button" @click="changeMonth(-1)" aria-label="Mês anterior">←</button>
+            <button type="button" @click="goToToday">hoje</button>
+            <button type="button" @click="changeMonth(1)" aria-label="Próximo mês">→</button>
           </div>
         </div>
-      </div>
-      <div class="glass rounded-xl glow-hover p-4">
-        <h3 class="text-sm font-semibold text-ink-400 mb-4">Por dificuldade</h3>
-        <div class="space-y-3">
-          <div>
-            <div class="flex justify-between text-xs mb-1">
-              <span class="text-olive-500">Fácil</span>
-              <span class="text-ink-100">{{ tasksByDifficulty.easy }}</span>
-            </div>
-            <div class="w-full bg-[var(--paper-surface-2)] rounded-full h-2 overflow-hidden">
-              <div class="h-2 rounded-full bg-olive-500" :style="{ width: (tasksByDifficulty.easy / max(taskStore.tasks.length) * 100) + '%' }"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between text-xs mb-1">
-              <span class="text-[#C89A3F]">Médio</span>
-              <span class="text-ink-100">{{ tasksByDifficulty.medium }}</span>
-            </div>
-            <div class="w-full bg-[var(--paper-surface-2)] rounded-full h-2 overflow-hidden">
-              <div class="h-2 rounded-full bg-[#C89A3F]" :style="{ width: (tasksByDifficulty.medium / max(taskStore.tasks.length) * 100) + '%' }"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between text-xs mb-1">
-              <span class="text-terra-600">Difícil</span>
-              <span class="text-ink-100">{{ tasksByDifficulty.hard }}</span>
-            </div>
-            <div class="w-full bg-[var(--paper-surface-2)] rounded-full h-2 overflow-hidden">
-              <div class="h-2 rounded-full bg-red-500" :style="{ width: (tasksByDifficulty.hard / max(taskStore.tasks.length) * 100) + '%' }"></div>
-            </div>
-          </div>
+        <div class="calendar-weekdays">
+          <span v-for="day in weekDays" :key="day">{{ day }}</span>
         </div>
-      </div>
-    </div>
-
-    <!-- Próximas tarefas (ordenadas por dificuldade: fácil primeiro) -->
-    <div class="glass rounded-xl glow-hover p-4">
-      <h3 class="text-sm font-semibold text-ink-400 mb-3">Próximas tarefas</h3>
-      <div class="space-y-1">
-        <div
-          v-for="task in nextTasks"
-          :key="task.id"
-          class="flex items-center gap-3 px-3 py-2 glass-light rounded-lg cursor-pointer glow-hover"
-          @click="editTask(task)"
-        >
-          <span class="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0" :class="difficultyBadge(task.difficulty)">
-            {{ difficultyLabel(task.difficulty) }}
-          </span>
-          <span class="text-sm text-ink-300 flex-1 truncate" :class="{ 'line-through opacity-50': task.status === 'done' }">{{ task.title }}</span>
-          <span
-            v-if="task.dependency_id && task.dependency_status !== 'done'"
-            class="inline-flex items-center justify-center shrink-0 w-5 h-5 rounded bg-[#C89A3F]/20 text-[#C89A3F]"
-            :title="'Depende de: ' + task.dependency_title"
-            aria-label="Tem dependência"
+        <div class="calendar-grid">
+          <button
+            v-for="day in calendarDays"
+            :key="day.key"
+            type="button"
+            class="calendar-day"
+            :class="{ muted: !day.currentMonth, today: day.isToday, selected: day.key === selectedDate }"
+            @click="selectedDate = day.key"
           >
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-            </svg>
-          </span>
-          <span class="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0" :class="statusBadge(task.status)">
-            {{ statusLabel(task.status) }}
-          </span>
-          <span v-if="task.project_name" class="text-[10px] text-indigo_ink-500">{{ task.project_name }}</span>
+            <span>{{ day.number }}</span>
+            <i v-if="day.tasks.length" :title="`${day.tasks.length} tarefa(s)`">{{ day.tasks.length }}</i>
+          </button>
         </div>
-        <p v-if="nextTasks.length === 0" class="text-center text-ink-50 py-6 text-sm">Nenhuma tarefa — crie uma!</p>
-      </div>
+        <div class="day-agenda">
+          <div class="day-agenda-title">
+            <span>{{ selectedDateLabel }}</span>
+            <strong>{{ selectedDayTasks.length }}</strong>
+          </div>
+          <button
+            v-for="task in selectedDayTasks"
+            :key="task.id"
+            type="button"
+            @click="editTask(task)"
+          >
+            <i :class="`status-${task.status}`"></i>
+            <span>{{ task.title }}</span>
+          </button>
+          <p v-if="selectedDayTasks.length === 0">Nenhuma tarefa marcada para este dia.</p>
+        </div>
+      </aside>
     </div>
 
     <!-- Modal editar tarefa -->
@@ -150,6 +157,10 @@
               <option value="done">Concluído</option>
             </select>
           </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-ink-200 mb-1">Data</label>
+          <input v-model="taskForm.due_date" type="date" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo_ink-500" />
         </div>
         <div class="flex gap-3 pt-2">
           <button type="button" @click="deleteTaskFromDash" class="px-4 py-2 text-sm text-terra-600 hover:bg-terra-500/10 rounded-lg">Excluir</button>
@@ -252,7 +263,7 @@ const workMode = computed(() => !!auth.workMode)
 // Task editing modal (shared with Tarefas behavior)
 const showTaskModal = ref(false)
 const editingTask = ref(null)
-const taskForm = reactive({ title: '', description: '', difficulty: 'medium', status: 'todo' })
+const taskForm = reactive({ title: '', description: '', difficulty: 'medium', status: 'todo', due_date: '' })
 
 function editTask(task) {
   editingTask.value = task
@@ -260,6 +271,7 @@ function editTask(task) {
   taskForm.description = task.description || ''
   taskForm.difficulty = task.difficulty || 'medium'
   taskForm.status = task.status
+  taskForm.due_date = task.due_date || ''
   showTaskModal.value = true
 }
 
@@ -297,6 +309,61 @@ const todayLabel = computed(() =>
   new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
 )
 
+const calendarCursor = ref(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
+const selectedDate = ref(localDateKey(new Date()))
+const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
+
+function localDateKey(date) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+const calendarMonthLabel = computed(() =>
+  calendarCursor.value.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+)
+
+const calendarDays = computed(() => {
+  const start = new Date(calendarCursor.value.getFullYear(), calendarCursor.value.getMonth(), 1)
+  start.setDate(start.getDate() - start.getDay())
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(start)
+    date.setDate(start.getDate() + index)
+    const key = localDateKey(date)
+    return {
+      key,
+      number: date.getDate(),
+      currentMonth: date.getMonth() === calendarCursor.value.getMonth(),
+      isToday: key === localDateKey(new Date()),
+      tasks: taskStore.tasks.filter(task => task.due_date === key)
+    }
+  })
+})
+
+const selectedDayTasks = computed(() =>
+  taskStore.tasks.filter(task => task.due_date === selectedDate.value)
+)
+
+const selectedDateLabel = computed(() => {
+  const date = new Date(`${selectedDate.value}T00:00:00`)
+  return date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })
+})
+
+function changeMonth(offset) {
+  calendarCursor.value = new Date(calendarCursor.value.getFullYear(), calendarCursor.value.getMonth() + offset, 1)
+}
+
+function goToToday() {
+  const now = new Date()
+  calendarCursor.value = new Date(now.getFullYear(), now.getMonth(), 1)
+  selectedDate.value = localDateKey(now)
+}
+
+function shortDate(value) {
+  return new Date(`${value}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+}
+
 // Relógio digital
 const clock = reactive({ now: '' })
 let clockTimer = null
@@ -320,6 +387,7 @@ const tasksByDifficulty = computed(() => ({
 }))
 
 const total = computed(() => taskStore.tasks.length || 1)
+const completionPct = computed(() => Math.round(tasksByStatus.value.done / total.value * 100))
 
 const statusBars = computed(() => [
   { key: 'todo', label: 'A fazer', count: tasksByStatus.value.todo, color: 'text-[#C89A3F]', barColor: 'bg-yellow-500', pct: Math.round(tasksByStatus.value.todo / total.value * 100) },
@@ -441,7 +509,82 @@ onMounted(async () => {
   }
 })
 
+onUnmounted(() => {
+  if (clockTimer) clearInterval(clockTimer)
+  if (projInstance) projInstance.destroy()
+  if (revInstance) revInstance.destroy()
+})
+
 watch(() => dashboard.data, () => {
   if (!workMode.value) setTimeout(buildCharts, 100)
 })
 </script>
+
+<style scoped>
+.dashboard-notebook { max-width: 1440px; margin: 0 auto; padding-bottom: 2rem; }
+.dashboard-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:2rem; padding:1.25rem .5rem 1.5rem; }
+.dashboard-heading h1 { font-size:clamp(2rem,4vw,3.35rem); line-height:1; margin:.25rem 0 .55rem; font-weight:600; }
+.dashboard-heading p { color:var(--ink-muted); font-size:.92rem; }
+.eyebrow { color:var(--accent-terra); font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.16em; }
+.notebook-clock { font-family:'JetBrains Mono',monospace; color:var(--ink-faint); font-size:.9rem; letter-spacing:.08em; padding-bottom:.25rem; }
+.dashboard-canvas { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(320px,.72fr); gap:1.5rem; align-items:start; }
+.dashboard-main { display:flex; flex-direction:column; gap:1.25rem; }
+.quote-note { position:relative; background:#f1df9d; padding:1.5rem 1.75rem 1.25rem; width:min(92%,760px); transform:rotate(-.45deg); box-shadow:0 10px 25px rgba(83,66,26,.11); clip-path:polygon(0 3%,97% 0,100% 92%,96% 100%,2% 97%); }
+.quote-note p { font-family:'Fraunces',serif; font-size:1.08rem; line-height:1.55; color:#443b27; }
+.quote-note small { display:block; margin-top:.45rem; color:#716443; font-size:.72rem; }
+.paper-tape { position:absolute; width:92px; height:24px; top:-11px; left:48%; transform:translateX(-50%) rotate(2deg); background:rgba(211,176,139,.53); }
+.stat-strip { display:flex; align-items:center; gap:1.15rem; padding:.7rem .85rem; flex-wrap:wrap; }
+.stat-strip div { display:flex; align-items:baseline; gap:.45rem; }
+.stat-strip strong { font:600 1.65rem 'Fraunces',serif; color:var(--ink-heading); }
+.stat-strip span { color:var(--ink-muted); font-size:.78rem; }
+.stat-strip i { width:22px; height:1px; background:var(--paper-border-strong); transform:rotate(-12deg); }
+.stat-strip .stat-done strong { color:var(--accent-olive); }
+.ruled-sheet,.progress-sheet,.calendar-sheet { position:relative; background-color:#fdfbf5; box-shadow:0 16px 40px rgba(75,61,32,.1),0 2px 4px rgba(75,61,32,.08); }
+.ruled-sheet { padding:1.6rem 1.7rem 1.3rem 3.5rem; background-image:linear-gradient(90deg,transparent 0,transparent 2.45rem,rgba(184,89,61,.22) 2.45rem,rgba(184,89,61,.22) 2.52rem,transparent 2.52rem),repeating-linear-gradient(0deg,transparent 0,transparent 35px,rgba(44,74,92,.11) 35px,rgba(44,74,92,.11) 36px); clip-path:polygon(.4% 0,99.5% .7%,100% 98%,97% 100%,.5% 99.3%,0 2%); }
+.sheet-title { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:.9rem; }
+.sheet-title h2,.calendar-head h2 { font-size:1.35rem; font-weight:600; margin-top:.12rem; }
+.hand-note { font-family:'Fraunces',serif; font-style:italic; color:var(--accent-olive); transform:rotate(3deg); border-bottom:2px solid rgba(107,122,63,.35); }
+.task-line { width:100%; min-height:54px; display:flex; align-items:center; gap:.8rem; text-align:left; padding:.35rem .2rem; transition:transform .15s,color .15s; }
+.task-line:hover { transform:translateX(4px); }
+.check-circle { width:17px; height:17px; border:1.5px solid var(--ink-faint); border-radius:48% 52% 46% 54%; flex:none; }
+.check-circle.active { border-color:var(--accent-terra); box-shadow:inset 0 0 0 4px #fdfbf5; background:var(--accent-terra); }
+.task-copy { display:flex; flex-direction:column; min-width:0; flex:1; }
+.task-copy strong { font-size:.88rem; font-weight:600; color:var(--ink-primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.task-copy small { color:var(--ink-faint); font-size:.68rem; }
+.task-status { font-size:.62rem; padding:.18rem .48rem; transform:rotate(-1deg); color:var(--ink-muted); border:1px solid var(--paper-border-strong); }
+.task-status.status-in_progress { color:var(--accent-terra); border-color:rgba(184,89,61,.3); }
+.empty-note { padding:2.2rem 0; color:var(--ink-faint); font-family:'Fraunces',serif; font-style:italic; }
+.progress-sheet { padding:1.5rem 1.75rem; transform:rotate(.2deg); clip-path:polygon(0 1%,98% 0,100% 96%,97% 100%,1% 98%); }
+.sheet-title.compact { margin-bottom:1.2rem; }
+.progress-list { display:flex; flex-direction:column; gap:.8rem; }
+.progress-row { display:grid; grid-template-columns:90px 1fr 24px; align-items:center; gap:.75rem; font-size:.76rem; color:var(--ink-muted); }
+.pencil-track { height:5px; background:rgba(94,79,45,.1); transform:rotate(-.3deg); }
+.pencil-track i { display:block; height:100%; border-radius:40% 60% 45% 55%; opacity:.75; }
+.progress-row strong { font-family:'JetBrains Mono',monospace; font-size:.7rem; }
+.difficulty-note { display:flex; gap:1rem; flex-wrap:wrap; margin-top:1.15rem; padding-top:.8rem; border-top:1px dashed var(--paper-border-strong); font-size:.68rem; color:var(--ink-faint); }
+.difficulty-note span { display:flex; align-items:center; gap:.35rem; }
+.dot { width:7px; height:7px; border-radius:50%; }.dot.easy{background:var(--accent-olive)}.dot.medium{background:#c89a3f}.dot.hard{background:var(--accent-terra)}
+.calendar-sheet { position:sticky; top:1rem; padding:1.65rem 1.45rem 1.35rem 2rem; transform:rotate(.35deg); clip-path:polygon(2% 0,100% 1%,99% 97%,95% 100%,0 98%,1% 2%); }
+.binder-hole { position:absolute; left:.55rem; width:9px; height:9px; border-radius:50%; background:var(--paper-bg); box-shadow:inset 0 1px 2px rgba(53,42,20,.25); }.hole-one{top:30%}.hole-two{top:67%}
+.calendar-head { display:flex; justify-content:space-between; align-items:flex-start; gap:.75rem; margin-bottom:1rem; }
+.calendar-head h2 { text-transform:capitalize; }
+.calendar-nav { display:flex; align-items:center; gap:.2rem; }
+.calendar-nav button { color:var(--ink-muted); font-size:.7rem; padding:.25rem .38rem; border-bottom:1px solid transparent; }
+.calendar-nav button:hover { color:var(--accent-terra); border-color:var(--accent-terra); }
+.calendar-weekdays,.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); }
+.calendar-weekdays span { text-align:center; color:var(--ink-faint); font-size:.6rem; font-weight:700; padding:.35rem 0; }
+.calendar-day { position:relative; aspect-ratio:1; display:flex; align-items:center; justify-content:center; font:500 .7rem 'JetBrains Mono',monospace; color:var(--ink-primary); border-top:1px solid rgba(94,79,45,.08); }
+.calendar-day:hover { background:var(--paper-surface-2); }
+.calendar-day.muted { color:rgba(107,101,88,.35); }
+.calendar-day.today span { border-bottom:2px solid var(--accent-terra); }
+.calendar-day.selected { background:#efe3bc; border-radius:44% 56% 46% 54%; }
+.calendar-day i { position:absolute; right:2px; bottom:1px; width:12px; height:12px; display:grid; place-items:center; border-radius:50%; background:var(--accent-olive); color:white; font-size:.45rem; font-style:normal; }
+.day-agenda { margin-top:1.15rem; padding-top:.9rem; border-top:1px dashed var(--paper-border-strong); }
+.day-agenda-title { display:flex; justify-content:space-between; color:var(--ink-muted); font-size:.72rem; text-transform:capitalize; margin-bottom:.6rem; }
+.day-agenda-title strong { font-family:'JetBrains Mono',monospace; color:var(--accent-terra); }
+.day-agenda button { display:flex; align-items:center; gap:.55rem; width:100%; padding:.35rem 0; text-align:left; font-size:.73rem; color:var(--ink-primary); }
+.day-agenda button i { width:6px; height:6px; border-radius:50%; background:#c89a3f; flex:none; }.day-agenda button i.status-in_progress{background:var(--accent-terra)}.day-agenda button i.status-done{background:var(--accent-olive)}
+.day-agenda p { color:var(--ink-faint); font-size:.7rem; font-style:italic; padding:.45rem 0; }
+@media(max-width:1023px){.dashboard-canvas{grid-template-columns:1fr}.calendar-sheet{position:relative;top:auto;order:-1}.dashboard-main{display:contents}.quote-note{order:1}.stat-strip{order:2}.ruled-sheet{order:4}.progress-sheet{order:5}.calendar-sheet{order:3}}
+@media(max-width:767px){.dashboard-heading{padding:.8rem 0 1rem}.dashboard-heading h1{font-size:2rem}.dashboard-heading p{font-size:.8rem}.notebook-clock{display:none}.quote-note{width:96%;padding:1.25rem}.stat-strip{gap:.65rem}.stat-strip i{display:none}.stat-strip div{min-width:43%}.ruled-sheet{padding-left:2.6rem;padding-right:.8rem}.task-status{display:none}.calendar-sheet{padding-left:1.6rem}.progress-row{grid-template-columns:78px 1fr 20px}}
+</style>

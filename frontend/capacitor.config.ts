@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'com.zlabs.mycompany',
-  appName: 'myCompany',
+  appName: 'myPaper',
   webDir: 'dist',
   server: {
     url: 'https://mycompany.zlabs.com.br',
@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
     allowNavigation: ['mycompany.zlabs.com.br']
   },
   ios: {
-    scheme: 'myCompany',
+    scheme: 'myPaper',
     contentInset: 'automatic',
     limitsNavigationsToAppBoundDomains: true
   },

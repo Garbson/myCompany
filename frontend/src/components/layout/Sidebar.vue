@@ -1,6 +1,6 @@
 <template>
   <aside
-    class="hidden md:flex shrink-0 h-full paper-strong flex-col overflow-hidden rounded-2xl transition-[width] duration-200"
+    class="notebook-sidebar hidden md:flex shrink-0 h-full flex-col overflow-hidden transition-[width] duration-200"
     :class="collapsed ? 'w-16' : 'w-60'"
   >
     <!-- Brand + toggle -->
@@ -8,12 +8,10 @@
       class="pt-5 pb-4 flex items-center border-b border-[var(--paper-border)] relative"
       :class="collapsed ? 'px-3 justify-center' : 'px-5 gap-3'"
     >
-      <div class="w-9 h-9 rounded-lg bg-[var(--accent-terra)] text-[#FDFBF5] flex items-center justify-center shrink-0 shadow-paper">
-        <span class="font-serif font-semibold text-lg leading-none">m</span>
-      </div>
+      <PageLogo />
       <div v-if="!collapsed" class="min-w-0 flex-1">
-        <h1 class="font-serif text-lg font-semibold text-ink-400 tracking-tight leading-none">myCompany</h1>
-        <p class="text-[10px] text-ink-50 mt-1 uppercase tracking-widest">workspace</p>
+        <h1 class="font-serif text-lg font-semibold text-ink-400 tracking-tight leading-none">myPaper</h1>
+        <p class="text-[10px] text-ink-50 mt-1 uppercase tracking-widest">meu caderno</p>
       </div>
       <button
         v-if="!collapsed"
@@ -58,26 +56,8 @@
 
     <!-- Menu -->
     <nav class="flex-1 p-2 space-y-0.5 overflow-y-auto overflow-x-hidden scrollbar-slim">
-      <template v-for="item in menu" :key="item.path || item.action">
-        <!-- Item de ação -->
-        <button
-          v-if="item.action"
-          @click="handleAction(item.action)"
-          class="group w-full flex items-center rounded-lg text-[13px] text-ink-100 hover:bg-[var(--paper-surface-3)] hover:text-ink-400 transition-colors whitespace-nowrap"
-          :class="collapsed ? 'h-9 justify-center' : 'gap-3 px-3 py-2'"
-          :title="collapsed ? item.label : null"
-        >
-          <span class="shrink-0 flex items-center justify-center w-4 h-4 text-ink-50 group-hover:text-ink-200">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
-              <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
-            </svg>
-          </span>
-          <span v-if="!collapsed" class="font-medium">{{ item.label }}</span>
-          <span v-if="!collapsed && item.action === 'bg' && currentBgId !== 'none'" class="ml-auto w-1.5 h-1.5 rounded-full bg-olive-500"></span>
-        </button>
-        <!-- Item de rota -->
+      <template v-for="item in menu" :key="item.path">
         <router-link
-          v-else
           :to="item.path"
           class="group flex items-center rounded-lg text-[13px] text-ink-100 hover:bg-[var(--paper-surface-3)] hover:text-ink-400 transition-colors whitespace-nowrap relative"
           :class="[
@@ -185,7 +165,6 @@
     @cancel="showConfirm = false"
   />
 
-  <BackgroundPicker :show="showBgPicker" @close="showBgPicker = false" />
 </template>
 
 <script setup>
@@ -193,18 +172,13 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import ConfirmDialog from "../ui/ConfirmDialog.vue";
-import BackgroundPicker from "../BackgroundPicker.vue";
+import PageLogo from "../brand/PageLogo.vue";
 import { hapticLight } from "../../services/haptics";
-import { useBackground } from "../../composables/useBackground";
 import { useCommandPalette } from "../../composables/useCommandPalette";
 
 const appVersion = ref("");
 const showMenu = ref(false);
 const showConfirm = ref(false);
-const showBgPicker = ref(false);
-
-const { currentId: currentBgId, isWeb } = useBackground();
-const isWebPlatform = computed(() => isWeb());
 const { show: openPalette } = useCommandPalette();
 
 // Sidebar colapsada (persistida)
@@ -248,31 +222,15 @@ const allMenu = [
   { path: "/configuracoes", label: "Configurações", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z" },
 ];
 
-const bgMenuItem = {
-  action: "bg",
-  label: "Fundo",
-  icon: "M3 5h18a0 0 0 010 0v14a0 0 0 010 0H3a0 0 0 010 0V5a0 0 0 010 0zM3 17l5-5 4 4 3-3 6 6M9 11.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z",
-};
-
 const menu = computed(() => {
-  let items = workMode.value
+  return workMode.value
     ? allMenu.filter((m) => !["/leads", "/freelas"].includes(m.path))
     : allMenu.filter((m) => !m.workOnly);
-  if (isWebPlatform.value) {
-    const idx = items.findIndex((m) => m.path === "/configuracoes");
-    if (idx >= 0) items.splice(idx, 0, bgMenuItem);
-    else items.push(bgMenuItem);
-  }
-  return items;
 });
 
 function isActive(path) {
   if (path === "/") return route.path === "/";
   return route.path.startsWith(path);
-}
-
-function handleAction(action) {
-  if (action === "bg") showBgPicker.value = true;
 }
 
 const userInitial = computed(

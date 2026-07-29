@@ -22,7 +22,7 @@
       class="fixed inset-0 z-[200] bg-[var(--paper-bg)]/95 backdrop-blur-2xl flex items-center justify-center p-6"
     >
       <div class="text-center max-w-sm glass-strong gradient-border rounded-2xl p-8">
-        <img src="/logo.svg" alt="myCompany" class="w-16 h-16 mx-auto mb-6 rounded-xl" />
+        <img src="/logo.svg" alt="myPaper" class="w-16 h-16 mx-auto mb-6" />
         <h2 class="text-ink-400 text-xl font-bold mb-2">Atualização necessária</h2>
         <p class="text-ink-100 text-sm mb-6">
           A versão {{ updateInfo?.minVersion }} é obrigatória.

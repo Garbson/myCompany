@@ -5,9 +5,7 @@
   >
     <div class="flex items-center justify-between px-4 h-12">
       <div class="flex items-center gap-2 min-w-0">
-        <div class="w-7 h-7 rounded-md bg-terra-500 text-[#FDFBF5] flex items-center justify-center shrink-0">
-          <span class="font-serif font-semibold text-sm leading-none">m</span>
-        </div>
+        <PageLogo size="sm" />
         <h1 class="font-serif text-base font-semibold text-ink-400 truncate">{{ title }}</h1>
       </div>
       <button
@@ -110,6 +108,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import ConfirmDialog from '../ui/ConfirmDialog.vue'
 import { hapticLight } from '../../services/haptics'
+import PageLogo from '../brand/PageLogo.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -135,7 +134,7 @@ const title = computed(() => {
   const path = route.path
   if (path === '/') return titles['/']
   const match = Object.keys(titles).find(p => p !== '/' && path.startsWith(p))
-  return match ? titles[match] : 'myCompany'
+  return match ? titles[match] : 'myPaper'
 })
 
 function confirmLogout() {

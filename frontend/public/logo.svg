@@ -1,19 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="512" y2="512">
-      <stop offset="0%" stop-color="#2563EB"/>
-      <stop offset="100%" stop-color="#7C3AED"/>
-    </linearGradient>
-  </defs>
-  <!-- Rounded square background -->
-  <rect x="32" y="32" width="448" height="448" rx="96" fill="url(#g)"/>
-  <!-- Building icon -->
-  <g transform="translate(156,120)">
-    <rect x="40" y="80" width="120" height="160" rx="6" fill="white"/>
-    <polygon points="100,16 40,80 160,80" fill="white"/>
-    <rect x="80" y="170" width="40" height="70" rx="5" fill="#2563EB"/>
-    <rect x="55" y="100" width="22" height="28" rx="4" fill="#7C3AED"/>
-    <rect x="88" y="100" width="24" height="28" rx="4" fill="#7C3AED"/>
-    <rect x="123" y="100" width="22" height="28" rx="4" fill="#7C3AED"/>
-  </g>
+  <rect width="512" height="512" rx="112" fill="#F5EFDF"/>
+  <path d="M139 78C139 67 148 58 159 58H333L399 126V435C399 447 389 456 377 456H159C148 456 139 447 139 436V78Z" fill="#FFFDF7" stroke="#2E2A22" stroke-width="16"/>
+  <path d="M333 58V113C333 123 341 131 351 131H399" fill="#EAD9B9"/>
+  <path d="M333 58V113C333 123 341 131 351 131H399" stroke="#2E2A22" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M195 212C237 207 282 207 337 211" stroke="#B8593D" stroke-width="16" stroke-linecap="round"/>
+  <path d="M195 274C250 269 293 272 345 274" stroke="#6B7A3F" stroke-width="16" stroke-linecap="round"/>
+  <path d="M195 338C233 334 264 336 304 338" stroke="#2C4A5C" stroke-width="16" stroke-linecap="round"/>
 </svg>

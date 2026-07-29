@@ -1,12 +1,10 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center p-4">
-    <div class="paper-strong gradient-border p-8 rounded-2xl w-full max-w-md">
+  <div class="login-notebook min-h-screen flex items-center justify-center p-4">
+    <div class="login-sheet paper-strong p-8 w-full max-w-md">
       <div class="text-center mb-8">
-        <div class="w-14 h-14 rounded-xl bg-terra-500 text-[#FDFBF5] flex items-center justify-center mx-auto mb-4 shadow-paper">
-          <span class="font-serif font-semibold text-3xl leading-none">m</span>
-        </div>
-        <h1 class="font-serif text-3xl font-semibold text-ink-400 tracking-tight">myCompany</h1>
-        <p class="text-ink-100 mt-2 text-sm">Documente. Diagrame. Entregue.</p>
+        <PageLogo size="lg" class="mx-auto mb-5" />
+        <h1 class="font-serif text-3xl font-semibold text-ink-400 tracking-tight">myPaper</h1>
+        <p class="text-ink-100 mt-2 text-sm">Ideias, planos e trabalho no mesmo caderno.</p>
       </div>
 
       <form @submit.prevent="handleLogin" class="space-y-4">
@@ -89,6 +87,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import PageLogo from '../components/brand/PageLogo.vue'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -128,3 +127,27 @@ async function handleRegister() {
   }
 }
 </script>
+
+<style scoped>
+.login-notebook {
+  background-image:
+    linear-gradient(90deg, transparent 0, transparent 12%, rgba(184, 89, 61, .12) 12%, rgba(184, 89, 61, .12) calc(12% + 1px), transparent calc(12% + 1px)),
+    repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, .06) 35px, rgba(44, 74, 92, .06) 36px);
+}
+.login-sheet {
+  position: relative;
+  border-radius: 5px 15px 8px 12px;
+  clip-path: polygon(1% 0, 98% 1%, 100% 97%, 96% 100%, 0 99%);
+  transform: rotate(-.2deg);
+}
+.login-sheet::before {
+  content: '';
+  position: absolute;
+  width: 105px;
+  height: 25px;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(2deg);
+  background: rgba(211, 176, 139, .48);
+}
+</style>
