@@ -1,5 +1,15 @@
 <template>
   <BaseEdge :id="id" :path="edgePath[0]" :style="mergedStyle" :marker-end="markerEnd" />
+  <!-- Path invisível grosso pra capturar dblclick em qualquer ponto da linha -->
+  <path
+    :d="edgePath[0]"
+    fill="none"
+    stroke="transparent"
+    stroke-width="22"
+    class="bpmn-edge-hit"
+    @dblclick.stop="placeLabelAt($event)"
+    style="pointer-events: stroke; cursor: text;"
+  />
   <EdgeLabelRenderer>
     <div
       :style="{
@@ -62,8 +72,28 @@ const props = defineProps({
   data: Object,
 })
 
-const { findEdge, getViewport } = useVueFlow()
+const { findEdge, getViewport, screenToFlowCoordinate, project } = useVueFlow()
 const onDirty = inject('onFlowDirty', null)
+
+// Converte coord do viewport pro sistema de coordenadas do canvas.
+// Vue Flow expõe screenToFlowCoordinate na v1.34+, e project na v0.x.
+function toFlowCoord(clientX, clientY) {
+  if (typeof screenToFlowCoordinate === 'function') {
+    return screenToFlowCoordinate({ x: clientX, y: clientY })
+  }
+  if (typeof project === 'function') {
+    return project({ x: clientX, y: clientY })
+  }
+  // Fallback manual — pega o viewport pane e calcula
+  const pane = document.querySelector('.vue-flow__viewport')
+  if (!pane) return { x: clientX, y: clientY }
+  const rect = pane.getBoundingClientRect()
+  const vp = getViewport()
+  return {
+    x: (clientX - rect.left - vp.x) / (vp.zoom || 1),
+    y: (clientY - rect.top - vp.y) / (vp.zoom || 1),
+  }
+}
 
 const edgePath = computed(() =>
   getSmoothStepPath({
@@ -169,6 +199,22 @@ async function startEdit() {
   await nextTick()
   inputRef.value?.focus()
   inputRef.value?.select()
+}
+
+// Duplo clique em qualquer ponto da linha: reposiciona o label ali e abre editor
+async function placeLabelAt(e) {
+  const flowPos = toFlowCoord(e.clientX, e.clientY)
+  const newOffset = {
+    x: Math.round(flowPos.x - labelPos.value.x),
+    y: Math.round(flowPos.y - labelPos.value.y),
+  }
+  const edge = findEdge(props.id)
+  if (edge) {
+    edge.data = { ...(edge.data || {}), labelOffset: newOffset }
+  }
+  onDirty?.()
+  await nextTick()
+  await startEdit()
 }
 
 function commit() {
