@@ -130,14 +130,13 @@ async function handleRegister() {
 
 <style scoped>
 .login-notebook {
-  background-color: #e9dfca;
+  background-color: #f8f1df;
   background-image:
-    linear-gradient(rgba(245, 239, 223, .2), rgba(245, 239, 223, .2)),
-    url('/mypaper-workspace.webp'),
-    linear-gradient(90deg, transparent 0, transparent 12%, rgba(184, 89, 61, .12) 12%, rgba(184, 89, 61, .12) calc(12% + 1px), transparent calc(12% + 1px)),
-    repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, .06) 35px, rgba(44, 74, 92, .06) 36px);
-  background-size: cover, cover, 100% 100%, 100% 100%;
-  background-position: center;
+    radial-gradient(ellipse 90% 60% at 18% 0%, rgba(255,255,255,.42), transparent 62%),
+    linear-gradient(90deg, transparent 0, transparent 74px, rgba(184,89,61,.20) 74px, rgba(184,89,61,.20) 75px, transparent 75px),
+    repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(44,74,92,.105) 31px, rgba(44,74,92,.105) 32px);
+  background-size: 100% 100%, 100% 100%, 100% 32px;
+  background-position: center, left top, left top;
 }
 .login-sheet {
   position: relative;
