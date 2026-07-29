@@ -467,48 +467,50 @@ onBeforeUnmount(() => editor.value?.destroy())
 .prose-editor .ProseMirror {
   outline: none;
   min-height: 200px;
-  color: #e2e8f0;
+  color: #2E2A22;
   font-size: 0.9375rem;
   line-height: 1.75;
 }
 
 .prose-editor .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  color: #4b5563;
+  color: #8A8172;
   pointer-events: none;
   float: left;
   height: 0;
 }
 
-.prose-editor .ProseMirror h1 { font-size: 1.75rem; font-weight: 700; color: #fff; margin: 1rem 0 0.5rem; line-height: 1.3; }
-.prose-editor .ProseMirror h2 { font-size: 1.35rem; font-weight: 600; color: #fff; margin: 0.875rem 0 0.4rem; line-height: 1.35; }
-.prose-editor .ProseMirror h3 { font-size: 1.1rem; font-weight: 600; color: #e2e8f0; margin: 0.75rem 0 0.35rem; line-height: 1.4; }
+.prose-editor .ProseMirror h1 { font-family: 'Fraunces', Georgia, serif; font-size: 1.9rem; font-weight: 700; color: #1F1B15; margin: 1.25rem 0 0.5rem; line-height: 1.2; letter-spacing: -0.015em; }
+.prose-editor .ProseMirror h2 { font-family: 'Fraunces', Georgia, serif; font-size: 1.45rem; font-weight: 600; color: #1F1B15; margin: 1rem 0 0.4rem; line-height: 1.3; letter-spacing: -0.01em; }
+.prose-editor .ProseMirror h3 { font-family: 'Fraunces', Georgia, serif; font-size: 1.15rem; font-weight: 600; color: #1F1B15; margin: 0.85rem 0 0.35rem; line-height: 1.4; }
 
 .prose-editor .ProseMirror ul { list-style: disc; padding-left: 1.5rem; margin: 0.25rem 0; }
 .prose-editor .ProseMirror ol { list-style: decimal; padding-left: 1.5rem; margin: 0.25rem 0; }
-.prose-editor .ProseMirror li { margin: 0.1rem 0; color: #cbd5e1; }
+.prose-editor .ProseMirror li { margin: 0.1rem 0; color: #2E2A22; }
 .prose-editor .ProseMirror li p { margin: 0; }
+.prose-editor .ProseMirror ul li::marker,
+.prose-editor .ProseMirror ol li::marker { color: #8A8172; }
 
 .prose-editor .ProseMirror ul[data-type="taskList"] { list-style: none; padding-left: 0.25rem; }
 .prose-editor .ProseMirror ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 0.5rem; }
 .prose-editor .ProseMirror ul[data-type="taskList"] li > label { flex-shrink: 0; margin-top: 0.2rem; }
 .prose-editor .ProseMirror ul[data-type="taskList"] li > label input[type="checkbox"] {
-  width: 1rem; height: 1rem; accent-color: #3b82f6; cursor: pointer;
+  width: 1rem; height: 1rem; accent-color: #B8593D; cursor: pointer;
 }
 .prose-editor .ProseMirror ul[data-type="taskList"] li[data-checked="true"] > div { opacity: 0.5; text-decoration: line-through; }
 .prose-editor .ProseMirror ul[data-type="taskList"] ul[data-type="taskList"] { padding-left: 1.5rem; }
 
 .prose-editor .ProseMirror blockquote {
-  border-left: 3px solid #3b82f6;
+  border-left: 3px solid #B8593D;
   padding-left: 1rem;
-  color: #94a3b8;
+  color: #6B6558;
   font-style: italic;
   margin: 0.5rem 0;
 }
 
 .prose-editor .ProseMirror code {
-  background: rgba(255,255,255,0.08);
-  color: #93c5fd;
+  background: rgba(94, 79, 45, 0.10);
+  color: #7A3927;
   padding: 0.1em 0.35em;
   border-radius: 0.25rem;
   font-size: 0.85em;
@@ -516,29 +518,31 @@ onBeforeUnmount(() => editor.value?.destroy())
 }
 
 .prose-editor .ProseMirror pre {
-  background: rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(31, 27, 21, 0.92);
+  color: #F7F1E1;
+  border: 1px solid rgba(94, 79, 45, 0.30);
   border-radius: 0.5rem;
   padding: 1rem;
   margin: 0.5rem 0;
   overflow-x: auto;
 }
-.prose-editor .ProseMirror pre code { background: none; padding: 0; color: #a5f3fc; }
+.prose-editor .ProseMirror pre code { background: none; padding: 0; color: #F7F1E1; }
 
-.prose-editor .ProseMirror mark { background: rgba(234, 179, 8, 0.25); color: #fde68a; border-radius: 2px; padding: 0 2px; }
+.prose-editor .ProseMirror mark { background: rgba(200, 154, 63, 0.35); color: #1F1B15; border-radius: 2px; padding: 0 2px; }
 
-.prose-editor .ProseMirror strong { color: #fff; font-weight: 700; }
-.prose-editor .ProseMirror em { color: #cbd5e1; }
-.prose-editor .ProseMirror s { color: #6b7280; }
+.prose-editor .ProseMirror strong { color: #1F1B15; font-weight: 700; }
+.prose-editor .ProseMirror em { color: #2E2A22; }
+.prose-editor .ProseMirror s { color: #8A8172; }
+.prose-editor .ProseMirror a { color: #2C4A5C; text-decoration: underline; text-underline-offset: 2px; }
 
 .prose-editor .ProseMirror > * + * { margin-top: 0.35rem; }
-.prose-editor .ProseMirror p { margin: 0; color: #cbd5e1; }
+.prose-editor .ProseMirror p { margin: 0; color: #2E2A22; }
 
 .prose-editor .ProseMirror hr {
   border: none;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(94, 79, 45, 0.22);
   margin: 1rem 0;
 }
 
-.prose-editor .ProseMirror ::selection { background: rgba(59,130,246,0.3); }
+.prose-editor .ProseMirror ::selection { background: rgba(107, 122, 63, 0.28); color: #1F1B15; }
 </style>
