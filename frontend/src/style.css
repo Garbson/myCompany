@@ -136,37 +136,15 @@ h1, h2, h3, h4, h5, h6, .font-display {
  * A classe não é aplicada à rota de Fluxogramas, preservando o editor. */
 .organic-page {
   position: relative;
-  isolation: isolate;
-  background-color: transparent;
-  background-image:
-    linear-gradient(rgba(253, 251, 245, .74), rgba(248, 242, 228, .79)),
-    radial-gradient(circle at 10px 24px, rgba(72, 61, 39, .28) 0 3px, rgba(221, 211, 190, .95) 3.5px 5px, transparent 5.5px),
-    linear-gradient(90deg, transparent 0, transparent 3.1rem, rgba(184, 89, 61, 0.08) 3.1rem, rgba(184, 89, 61, 0.08) 3.16rem, transparent 3.16rem),
-    repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, 0.045) 35px, rgba(44, 74, 92, 0.045) 36px);
-  background-size: 100% 100%, 100% 48px, 100% 100%, 100% 100%;
-  background-position: center, left top, left top, left top;
-  background-repeat: no-repeat, repeat-y, no-repeat, repeat;
-  border: 1px solid rgba(94, 79, 45, .2);
-  border-radius: 6px 15px 9px 5px;
-  box-shadow:
-    -5px 3px 0 rgba(239, 231, 210, .92),
-    -9px 6px 0 rgba(255, 253, 247, .72),
-    0 18px 46px rgba(65, 48, 22, .18);
-  backdrop-filter: blur(2px);
+  isolation: auto;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 .organic-page::after {
-  content: '';
-  position: sticky;
-  z-index: 30;
-  display: block;
-  width: 48px;
-  height: 48px;
-  margin-left: auto;
-  bottom: 0;
-  right: 0;
-  pointer-events: none;
-  background: linear-gradient(135deg, transparent 49%, rgba(211, 195, 161, .82) 50%, #f8f2e5 72%);
-  filter: drop-shadow(-2px -2px 2px rgba(75, 59, 31, .08));
+  content: none;
 }
 .organic-page .glass,
 .organic-page .paper {
@@ -289,12 +267,6 @@ h1, h2, h3, h4, h5, h6, .font-display {
   .safe-pt-mobile { padding-top: var(--safe-top); }
   .safe-pb-mobile { padding-bottom: var(--safe-bottom); }
   .organic-page {
-    background-image:
-      linear-gradient(rgba(253, 251, 245, .82), rgba(248, 242, 228, .87)),
-      radial-gradient(circle at 10px 24px, rgba(72, 61, 39, .22) 0 3px, rgba(221, 211, 190, .95) 3.5px 5px, transparent 5.5px),
-      linear-gradient(90deg, transparent 0, transparent 3.1rem, rgba(184, 89, 61, 0.08) 3.1rem, rgba(184, 89, 61, 0.08) 3.16rem, transparent 3.16rem),
-      repeating-linear-gradient(0deg, transparent 0, transparent 35px, rgba(44, 74, 92, 0.04) 35px, rgba(44, 74, 92, 0.04) 36px);
-    background-position: center, -2.1rem 0, left top, left top;
     border-width: 0;
     border-radius: 0;
     box-shadow: none;
