@@ -85,6 +85,32 @@ const migrations = [
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
   `ALTER TABLE notes ADD COLUMN folder_id INT DEFAULT NULL`,
   `ALTER TABLE notes ADD CONSTRAINT fk_notes_folder FOREIGN KEY (folder_id) REFERENCES note_folders(id) ON DELETE SET NULL`,
+  `CREATE TABLE IF NOT EXISTS flowchart_folders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    company_id INT,
+    name VARCHAR(255) NOT NULL,
+    position INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_ff_user (user_id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  `CREATE TABLE IF NOT EXISTS flowcharts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    company_id INT,
+    folder_id INT DEFAULT NULL,
+    title VARCHAR(255) NOT NULL DEFAULT 'Sem título',
+    data JSON,
+    position INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (folder_id) REFERENCES flowchart_folders(id) ON DELETE SET NULL,
+    INDEX idx_fc_user (user_id),
+    INDEX idx_fc_folder (folder_id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 ]
 
 const IGNORABLE_CODES = new Set([

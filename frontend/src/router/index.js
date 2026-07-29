@@ -44,6 +44,12 @@ const routes = [
     meta: { auth: true }
   },
   {
+    path: '/fluxogramas',
+    name: 'Fluxogramas',
+    component: () => import('../views/Fluxogramas.vue'),
+    meta: { auth: true }
+  },
+  {
     path: '/configuracoes',
     name: 'Configurações',
     component: () => import('../views/Configuracoes.vue'),

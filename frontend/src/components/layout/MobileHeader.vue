@@ -125,6 +125,7 @@ const titles = {
   '/tarefas': 'Tarefas',
   '/projetos': 'Projetos',
   '/anotacoes': 'Anotações',
+  '/fluxogramas': 'Fluxogramas',
   '/leads': 'Leads',
   '/freelas': 'Freelas',
   '/configuracoes': 'Configurações',
