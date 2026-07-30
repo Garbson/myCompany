@@ -154,6 +154,7 @@ import api from '../api'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from '../composables/useToast'
 import { hapticLight, hapticSuccess } from '../services/haptics'
+import { useRealtimeRefresh } from '../composables/useRealtimeRefresh'
 
 const auth = useAuthStore()
 const toast = useToast()
@@ -280,5 +281,6 @@ async function changePassword() {
   }
 }
 
+useRealtimeRefresh(load, ['/api/auth/profile'])
 onMounted(load)
 </script>

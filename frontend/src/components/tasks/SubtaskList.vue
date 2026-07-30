@@ -72,6 +72,7 @@ import { ref, computed, watch } from 'vue'
 import api from '../../api'
 import { hapticLight, hapticSuccess } from '../../services/haptics'
 import { useToast } from '../../composables/useToast'
+import { useRealtimeRefresh } from '../../composables/useRealtimeRefresh'
 
 const props = defineProps({ taskId: { type: [Number, String], required: true } })
 const toast = useToast()
@@ -130,5 +131,6 @@ async function remove(s) {
   }
 }
 
+useRealtimeRefresh(load, ['/api/tasks/', '/api/subtasks/'])
 watch(() => props.taskId, load, { immediate: true })
 </script>

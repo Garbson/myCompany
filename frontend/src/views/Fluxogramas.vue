@@ -299,6 +299,7 @@ import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import FlowCanvas from '../components/flow/FlowCanvas.vue'
 import BacklinksPanelInline from '../components/BacklinksPanelInline.vue'
 import RelationsPanel from '../components/RelationsPanel.vue'
+import { useRealtimeRefresh } from '../composables/useRealtimeRefresh'
 
 const route = useRoute()
 const router = useRouter()
@@ -637,6 +638,21 @@ async function openById(id) {
     toast.error('Fluxograma não encontrado')
   }
 }
+
+async function refreshFlowsFromAnotherDevice() {
+  const activeId = active.value?.id
+  await loadAll()
+  if (activeId && !dirty.value && !saving.value) {
+    const listItem = flows.value.find((flow) => flow.id === activeId)
+    if (listItem) await openFlow(listItem)
+    else {
+      active.value = null
+      flowData.value = { nodes: [], edges: [] }
+    }
+  }
+}
+
+useRealtimeRefresh(refreshFlowsFromAnotherDevice, ['/api/flowcharts', '/api/flowchart-folders'])
 
 // === Lifecycle ===
 onMounted(async () => {

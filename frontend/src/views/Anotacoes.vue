@@ -328,6 +328,7 @@ import RelationsPanel from '../components/RelationsPanel.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import { useToast } from '../composables/useToast'
 import { hapticLight, hapticSuccess } from '../services/haptics'
+import { useRealtimeRefresh } from '../composables/useRealtimeRefresh'
 
 const route = useRoute()
 const router = useRouter()
@@ -462,7 +463,10 @@ async function createNote(folderId) {
 
 function debounceSave() {
   clearTimeout(saveTimer)
-  saveTimer = setTimeout(saveNote, 800)
+  saveTimer = setTimeout(() => {
+    saveTimer = null
+    saveNote()
+  }, 800)
 }
 
 async function saveNote() {
@@ -638,6 +642,17 @@ async function openById(id) {
     router.replace({ path: '/anotacoes', query: {} })
   }
 }
+
+async function refreshNotesFromAnotherDevice() {
+  const activeId = activeNote.value?.id
+  await load()
+  if (!activeId || savingNote.value || saveTimer) return
+  const updated = notes.value.find((note) => note.id === activeId)
+  if (updated) openNote(updated)
+  else activeNote.value = null
+}
+
+useRealtimeRefresh(refreshNotesFromAnotherDevice, ['/api/notes', '/api/note-folders'])
 
 onMounted(async () => {
   await load()

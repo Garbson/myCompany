@@ -139,6 +139,7 @@ import api from '../api'
 import { useTaskStore } from '../stores/tasks'
 import { useToast } from '../composables/useToast'
 import { hapticSuccess } from '../services/haptics'
+import { useRealtimeRefresh } from '../composables/useRealtimeRefresh'
 
 const router = useRouter()
 const taskStore = useTaskStore()
@@ -210,6 +211,23 @@ async function saveCapture() {
   }
 }
 function onInboxChanged() { loadInbox() }
+
+async function refreshTodayFromAnotherDevice() {
+  const [inboxRes, eventsRes, projectsRes] = await Promise.all([
+    api.get('/workspace/inbox'),
+    api.get('/workspace/events', { params: { from: todayKey, to: todayKey } }),
+    api.get('/projects'),
+  ])
+  inbox.value = inboxRes.data
+  events.value = eventsRes.data
+  projects.value = projectsRes.data
+}
+
+useRealtimeRefresh(refreshTodayFromAnotherDevice, [
+  '/api/workspace/inbox',
+  '/api/workspace/events',
+  '/api/projects',
+])
 
 onMounted(async () => {
   window.addEventListener('inbox:changed', onInboxChanged)

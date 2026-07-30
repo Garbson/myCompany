@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, watch } from "vue";
 import Sidebar from "./components/layout/Sidebar.vue";
 import MobileHeader from "./components/layout/MobileHeader.vue";
 import BottomNav from "./components/layout/BottomNav.vue";
@@ -45,15 +45,69 @@ import CommandPalette from "./components/CommandPalette.vue";
 import QuickCapture from "./components/QuickCapture.vue";
 import { useVersionCheck } from "./services/versionCheck";
 import { useAuthStore } from "./stores/auth";
+import { useTaskStore } from "./stores/tasks";
+import { useProjectStore } from "./stores/projects";
+import { useDashboardStore } from "./stores/dashboard";
+import { useLeadStore } from "./stores/leads";
+import { startRealtimeSync, stopRealtimeSync } from "./services/realtimeSync";
 
 const auth = useAuthStore();
 const tabsStore = useTabsStore();
+const taskStore = useTaskStore();
+const projectStore = useProjectStore();
+const dashboardStore = useDashboardStore();
+const leadStore = useLeadStore();
 const { start, stop } = useVersionCheck();
+
+let syncTimer = null;
+const pendingSyncPaths = new Set();
+function refreshSharedData(change) {
+  pendingSyncPaths.add(change?.path || "");
+  if (syncTimer) window.clearTimeout(syncTimer);
+  syncTimer = window.setTimeout(() => {
+    const paths = [...pendingSyncPaths];
+    pendingSyncPaths.clear();
+    const refreshes = [];
+    const matches = (prefix) => paths.some((path) => path.startsWith(prefix));
+    const broadWorkspaceChange = matches("/api/workspace/inbox/") || matches("/api/workspace/templates/");
+
+    if (matches("/api/tasks") || matches("/api/subtasks") || matches("/api/comments") || broadWorkspaceChange) {
+      refreshes.push(taskStore.fetch());
+    }
+    if (matches("/api/projects") || broadWorkspaceChange) refreshes.push(projectStore.fetch());
+    if (matches("/api/leads")) refreshes.push(leadStore.fetch());
+    if (
+      matches("/api/tasks") ||
+      matches("/api/projects") ||
+      matches("/api/leads") ||
+      broadWorkspaceChange
+    ) {
+      refreshes.push(dashboardStore.fetch());
+    }
+    if (matches("/api/auth/profile")) refreshes.push(auth.refreshMe());
+    Promise.allSettled(refreshes);
+  }, 150);
+}
+
+function startAccountSync() {
+  if (!auth.isLoggedIn) return;
+  startRealtimeSync(refreshSharedData);
+}
+
 onMounted(() => {
   start();
   if (auth.isLoggedIn) {
     auth.refreshMe();
+    startAccountSync();
   }
 });
-onUnmounted(() => stop());
+watch(() => auth.isLoggedIn, (loggedIn) => {
+  if (loggedIn) startAccountSync();
+  else stopRealtimeSync();
+});
+onUnmounted(() => {
+  stop();
+  stopRealtimeSync();
+  if (syncTimer) window.clearTimeout(syncTimer);
+});
 </script>

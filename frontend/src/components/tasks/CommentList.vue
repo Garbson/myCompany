@@ -59,6 +59,7 @@ import api from '../../api'
 import { useAuthStore } from '../../stores/auth'
 import { hapticLight } from '../../services/haptics'
 import { useToast } from '../../composables/useToast'
+import { useRealtimeRefresh } from '../../composables/useRealtimeRefresh'
 
 const props = defineProps({ taskId: { type: [Number, String], required: true } })
 const auth = useAuthStore()
@@ -116,5 +117,6 @@ async function remove(c) {
   }
 }
 
+useRealtimeRefresh(load, ['/api/tasks/', '/api/comments/'])
 watch(() => props.taskId, load, { immediate: true })
 </script>

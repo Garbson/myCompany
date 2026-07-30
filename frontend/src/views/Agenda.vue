@@ -154,6 +154,7 @@ import api from '../api'
 import Modal from '../components/ui/Modal.vue'
 import { useTaskStore } from '../stores/tasks'
 import { useToast } from '../composables/useToast'
+import { useRealtimeRefresh } from '../composables/useRealtimeRefresh'
 
 const router = useRouter()
 const taskStore = useTaskStore()
@@ -233,6 +234,7 @@ async function loadEvents() {
   const { data } = await api.get('/workspace/events', { params: { from, to } })
   events.value = data
 }
+useRealtimeRefresh(loadEvents, ['/api/workspace/events'])
 function startDrag(event, type, id) {
   event.dataTransfer.setData('application/x-mypaper-item', JSON.stringify({ type, id }))
   event.dataTransfer.effectAllowed = 'move'

@@ -67,6 +67,7 @@ import { useRouter } from 'vue-router'
 import api from '../api'
 import { useToast } from '../composables/useToast'
 import { hapticSuccess } from '../services/haptics'
+import { useRealtimeRefresh } from '../composables/useRealtimeRefresh'
 
 const router = useRouter()
 const toast = useToast()
@@ -125,6 +126,7 @@ function formatDate(value) {
   return new Date(value).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 function onChanged() { if (!showProcessed.value) load() }
+useRealtimeRefresh(load, ['/api/workspace/inbox'])
 onMounted(() => { load(); window.addEventListener('inbox:changed', onChanged) })
 onBeforeUnmount(() => window.removeEventListener('inbox:changed', onChanged))
 </script>

@@ -186,6 +186,7 @@ import '@vue-flow/minimap/dist/style.css'
 import api from '../../api'
 import { useToast } from '../../composables/useToast'
 import { hapticLight, hapticSuccess } from '../../services/haptics'
+import { useRealtimeRefresh } from '../../composables/useRealtimeRefresh'
 
 const props = defineProps({
   show: Boolean,
@@ -469,7 +470,10 @@ function onChange() {
 
 function scheduleAutosave() {
   if (saveTimer) clearTimeout(saveTimer)
-  saveTimer = setTimeout(() => saveNow(), 1500)
+  saveTimer = setTimeout(() => {
+    saveTimer = null
+    saveNow()
+  }, 1500)
 }
 
 // Carrega a lista de abas e ativa a primeira (ou a já ativa)
@@ -643,6 +647,15 @@ function clearAll() {
   dirty.value = true
   scheduleAutosave()
 }
+
+async function refreshFlowFromAnotherDevice(event) {
+  if (!props.show || dirty.value || saving.value || !apiBaseUrl.value) return
+  const relativePath = event?.path?.replace('/api', '') || ''
+  if (!relativePath.startsWith(apiBaseUrl.value)) return
+  await loadTabs(true)
+}
+
+useRealtimeRefresh(refreshFlowFromAnotherDevice, ['/api/projects/', '/api/tasks/'])
 
 watch(
   () => props.show,

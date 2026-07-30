@@ -151,7 +151,17 @@
         </div>
       </Transition>
 
-      <p v-if="!collapsed" class="text-[9px] text-ink-50 text-center mt-2 font-mono">{{ versionText }}</p>
+      <div v-if="!collapsed" class="flex items-center justify-center gap-2 mt-2 text-[9px] text-ink-50 font-mono">
+        <span class="inline-flex items-center gap-1" :title="syncStatusTitle">
+          <i
+            class="w-1.5 h-1.5 rounded-full"
+            :class="syncStatus === 'online' ? 'bg-olive-500' : 'bg-amber-500 animate-pulse'"
+          ></i>
+          {{ syncStatus === 'online' ? 'sincronizado' : 'conectando' }}
+        </span>
+        <span>·</span>
+        <span>{{ versionText }}</span>
+      </div>
     </div>
 
     <!-- Click outside catcher -->
@@ -188,6 +198,7 @@ const appVersion = ref("");
 const showMenu = ref(false);
 const showConfirm = ref(false);
 const inboxCount = ref(0);
+const syncStatus = ref('connecting');
 const { show: openPalette } = useCommandPalette();
 
 // Sidebar colapsada (persistida)
@@ -209,8 +220,13 @@ async function loadInboxCount() {
   }
 }
 
+function onSyncStatus(event) {
+  syncStatus.value = event.detail?.status || 'reconnecting'
+}
+
 onMounted(async () => {
   window.addEventListener('inbox:changed', loadInboxCount)
+  window.addEventListener('mypaper:sync-status', onSyncStatus)
   try {
     const r = await fetch("/version.json", { cache: "no-cache" });
     const d = await r.json();
@@ -221,9 +237,17 @@ onMounted(async () => {
   }
   loadInboxCount()
 });
-onBeforeUnmount(() => window.removeEventListener('inbox:changed', loadInboxCount))
+onBeforeUnmount(() => {
+  window.removeEventListener('inbox:changed', loadInboxCount)
+  window.removeEventListener('mypaper:sync-status', onSyncStatus)
+})
 
 const versionText = computed(() => appVersion.value);
+const syncStatusTitle = computed(() =>
+  syncStatus.value === 'online'
+    ? 'Alterações sincronizadas entre seus dispositivos'
+    : 'Reconectando a sincronização'
+);
 
 const route = useRoute();
 const router = useRouter();

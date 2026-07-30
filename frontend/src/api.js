@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { realtimeClientId } from './services/realtimeSync'
 
 const api = axios.create({
   baseURL: '/api'
@@ -9,6 +10,7 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  config.headers['X-MyPaper-Client'] = realtimeClientId
   return config
 })
 

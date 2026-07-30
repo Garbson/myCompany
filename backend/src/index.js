@@ -20,17 +20,21 @@ import backlinkRoutes from './routes/backlinks.js'
 import aiRoutes from './routes/ai.js'
 import habitRoutes from './routes/habits.js'
 import workspaceRoutes from './routes/workspace.js'
+import realtimeRoutes from './routes/realtime.js'
 import { startReminderLoop } from './services/reminders.js'
 import { startRecurrenceLoop } from './services/recurrence.js'
 import { runMigrations } from './database/migrations.js'
+import { realtimeMutationObserver } from './services/realtime.js'
 
 dotenv.config()
 
 const app = express()
 app.use(cors())
 app.use(express.json({ limit: '2mb' }))
+app.use(realtimeMutationObserver)
 
 app.use('/api/auth', authRoutes)
+app.use('/api', realtimeRoutes)
 app.use('/api/tasks', taskRoutes)
 app.use('/api/leads', leadRoutes)
 app.use('/api/projects', projectRoutes)

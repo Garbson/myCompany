@@ -67,6 +67,7 @@ import { ref, watch } from 'vue'
 import api from '../../api'
 import { useToast } from '../../composables/useToast'
 import { hapticLight, hapticSuccess } from '../../services/haptics'
+import { useRealtimeRefresh } from '../../composables/useRealtimeRefresh'
 
 const props = defineProps({
   entityType: { type: String, default: 'task' },
@@ -160,5 +161,6 @@ function formatSize(b) {
   return (b / 1024 / 1024).toFixed(1) + ' MB'
 }
 
+useRealtimeRefresh(load, ['/api/task/', '/api/project/', '/api/attachments/'])
 watch(() => props.entityId, load, { immediate: true })
 </script>

@@ -66,6 +66,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api'
 import { useToast } from '../composables/useToast'
+import { useRealtimeRefresh } from '../composables/useRealtimeRefresh'
 
 const props = defineProps({
   entityType: { type: String, required: true },
@@ -154,6 +155,7 @@ function typeLabel(type) {
   return { task: 'Tarefa', note: 'Anotação', project: 'Projeto', flowchart: 'Fluxograma' }[type] || type
 }
 
+useRealtimeRefresh(load, ['/api/workspace/relations'])
 watch(() => [props.entityType, props.entityId], load)
 onMounted(async () => {
   await Promise.all([load(), loadTargets()])

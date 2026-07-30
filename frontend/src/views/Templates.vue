@@ -97,6 +97,7 @@ import { useRouter } from 'vue-router'
 import api from '../api'
 import Modal from '../components/ui/Modal.vue'
 import { useToast } from '../composables/useToast'
+import { useRealtimeRefresh } from '../composables/useRealtimeRefresh'
 
 const router = useRouter()
 const toast = useToast()
@@ -191,6 +192,7 @@ async function remove(template) {
   templates.value = templates.value.filter((item) => item.id !== template.id)
 }
 function typeLabel(type) { return { note: 'Anotação', task: 'Tarefa', project: 'Projeto', flowchart: 'Fluxograma' }[type] || type }
+useRealtimeRefresh(load, ['/api/workspace/templates'])
 onMounted(load)
 </script>
 
