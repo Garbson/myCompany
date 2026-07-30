@@ -19,6 +19,7 @@
       </main>
     </div>
     <BottomNav />
+    <QuickCapture />
   </div>
   <div
     v-else
@@ -41,6 +42,7 @@ import { useTabsStore } from "./stores/tabs";
 import UpdateBanner from "./components/UpdateBanner.vue";
 import Toaster from "./components/ui/Toaster.vue";
 import CommandPalette from "./components/CommandPalette.vue";
+import QuickCapture from "./components/QuickCapture.vue";
 import { useVersionCheck } from "./services/versionCheck";
 import { useAuthStore } from "./stores/auth";
 

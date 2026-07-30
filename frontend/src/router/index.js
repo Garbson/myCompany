@@ -14,6 +14,30 @@ const routes = [
     meta: { auth: true }
   },
   {
+    path: '/hoje',
+    name: 'Hoje',
+    component: () => import('../views/Hoje.vue'),
+    meta: { auth: true }
+  },
+  {
+    path: '/agenda',
+    name: 'Agenda',
+    component: () => import('../views/Agenda.vue'),
+    meta: { auth: true }
+  },
+  {
+    path: '/inbox',
+    name: 'Inbox',
+    component: () => import('../views/Inbox.vue'),
+    meta: { auth: true }
+  },
+  {
+    path: '/templates',
+    name: 'Templates',
+    component: () => import('../views/Templates.vue'),
+    meta: { auth: true }
+  },
+  {
     path: '/tarefas',
     name: 'Tarefas',
     component: () => import('../views/Tarefas.vue'),

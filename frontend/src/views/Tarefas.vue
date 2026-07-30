@@ -201,7 +201,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useTaskStore } from '../stores/tasks'
 import { useAuthStore } from '../stores/auth'
 import api from '../api'
@@ -212,6 +213,8 @@ import { useToast } from '../composables/useToast'
 import { hapticLight, hapticMedium, hapticSuccess } from '../services/haptics'
 
 const toast = useToast()
+const route = useRoute()
+const router = useRouter()
 
 const taskStore = useTaskStore()
 const auth = useAuthStore()
@@ -376,13 +379,23 @@ function applyProjectFilter() {
   activeFilter.value = 'all'
 }
 
+async function openById(id) {
+  const task = taskStore.tasks.find((item) => item.id === Number(id))
+  if (!task) return
+  editTask(task)
+  if (route.query.open) router.replace({ path: '/tarefas', query: {} })
+}
+
 onMounted(async () => {
-  taskStore.fetch()
+  await taskStore.fetch()
   const [usersRes, projectsRes] = await Promise.all([
     api.get('/auth/users'),
     api.get('/projects')
   ])
   users.value = usersRes.data
   projects.value = projectsRes.data
+  if (route.query.open) openById(route.query.open)
 })
+
+watch(() => route.query.open, (value) => { if (value) openById(value) })
 </script>

@@ -203,6 +203,16 @@
               Salvo
             </span>
             <button
+              @click="relationsVisible = !relationsVisible"
+              class="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-indigo_ink-500 bg-white/45 border border-[var(--paper-border)] rounded-[3px]"
+              title="Relacionar conteúdos"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+              </svg>
+              <span class="hidden xl:inline">Conexões</span>
+            </button>
+            <button
               @click="toggleFullscreen"
               class="flow-fullscreen-button shrink-0 inline-flex items-center gap-2 px-2.5 py-1.5 transition-all"
               :title="fullscreen ? 'Sair da tela cheia (Esc)' : 'Tela cheia'"
@@ -218,6 +228,10 @@
                 {{ fullscreen ? 'Sair' : 'Tela cheia' }}
               </span>
             </button>
+          </div>
+
+          <div v-if="relationsVisible && !fullscreen" class="shrink-0 p-3 border-b border-[var(--paper-border)] bg-white/20">
+            <RelationsPanel entity-type="flowchart" :entity-id="active.id" />
           </div>
 
           <!-- Canvas -->
@@ -284,6 +298,7 @@ import { useToast } from '../composables/useToast'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import FlowCanvas from '../components/flow/FlowCanvas.vue'
 import BacklinksPanelInline from '../components/BacklinksPanelInline.vue'
+import RelationsPanel from '../components/RelationsPanel.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -316,6 +331,7 @@ const deleting = ref(null)
 const deletingFolder = ref(null)
 
 const backlinksVisible = ref(false)
+const relationsVisible = ref(false)
 function onBacklinksCount(n) { backlinksVisible.value = n > 0 }
 
 // === Fullscreen (foco no fluxo) ===

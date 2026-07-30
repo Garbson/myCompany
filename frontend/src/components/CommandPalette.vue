@@ -184,6 +184,10 @@ const allCommands = [
       } catch {}
     } },
   { key: 'nav-dash', label: 'Ir para Dashboard', icon: iconArrow(), match: ['dashboard', 'inicio', 'home'], run: () => { close(); router.push('/') } },
+  { key: 'nav-hoje', label: 'Ir para Hoje', icon: iconArrow(), match: ['hoje', 'today', 'foco'], run: () => { close(); router.push('/hoje') } },
+  { key: 'nav-agenda', label: 'Ir para Agenda', icon: iconArrow(), match: ['agenda', 'calendário', 'calendar'], run: () => { close(); router.push('/agenda') } },
+  { key: 'nav-inbox', label: 'Ir para Caixa de entrada', icon: iconArrow(), match: ['inbox', 'capturas', 'caixa de entrada'], run: () => { close(); router.push('/inbox') } },
+  { key: 'nav-templates', label: 'Ir para Templates', icon: iconArrow(), match: ['templates', 'modelos'], run: () => { close(); router.push('/templates') } },
   { key: 'nav-tarefas', label: 'Ir para Tarefas', icon: iconArrow(), match: ['tarefas', 'tasks'], run: () => { close(); router.push('/tarefas') } },
   { key: 'nav-projetos', label: 'Ir para Projetos', icon: iconArrow(), match: ['projetos', 'projects'], run: () => { close(); router.push('/projetos') } },
   { key: 'nav-anotacoes', label: 'Ir para Anotações', icon: iconArrow(), match: ['anotações', 'notas', 'notes'], run: () => { close(); router.push('/anotacoes') } },

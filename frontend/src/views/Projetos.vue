@@ -135,6 +135,7 @@
               Nenhuma tarefa vinculada — clique em <span class="text-terra-600">Nova tarefa</span> pra começar
             </p>
           </div>
+          <RelationsPanel class="mt-4" entity-type="project" :entity-id="project.id" />
         </div>
       </div>
 
@@ -228,7 +229,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useTaskStore } from '../stores/tasks'
 import { useAuthStore } from '../stores/auth'
 import api from '../api'
@@ -238,12 +240,15 @@ import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import AttachmentList from '../components/tasks/AttachmentList.vue'
 import ProjectFlowModal from '../components/projects/ProjectFlowModal.vue'
 import TaskFormModal from '../components/tasks/TaskFormModal.vue'
+import RelationsPanel from '../components/RelationsPanel.vue'
 import { useToast } from '../composables/useToast'
 import { hapticLight } from '../services/haptics'
 
 const taskStore = useTaskStore()
 const auth = useAuthStore()
 const toast = useToast()
+const route = useRoute()
+const router = useRouter()
 const expanded = ref(null)
 const projects = ref([])
 const users = ref([])
@@ -465,5 +470,16 @@ async function toggleTaskStatus(task) {
   hapticLight()
 }
 
-onMounted(() => loadProjects())
+function openProjectById(id) {
+  const project = projects.value.find((item) => item.id === Number(id))
+  if (!project) return
+  expanded.value = project.id
+  if (route.query.open) router.replace({ path: '/projetos', query: {} })
+}
+
+onMounted(async () => {
+  await loadProjects()
+  if (route.query.open) openProjectById(route.query.open)
+})
+watch(() => route.query.open, (value) => { if (value) openProjectById(value) })
 </script>

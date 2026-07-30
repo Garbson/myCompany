@@ -76,8 +76,15 @@
           </span>
           <span v-if="!collapsed" class="font-medium">{{ item.label }}</span>
           <span
+            v-if="!collapsed && item.path === '/inbox' && inboxCount"
+            class="ml-auto min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-terra-500 text-white text-[9px] font-bold"
+          >
+            {{ inboxCount > 99 ? '99+' : inboxCount }}
+          </span>
+          <span
             v-if="!collapsed && isActive(item.path)"
-            class="ml-auto w-1 h-4 rounded-sm bg-terra-500"
+            class="w-1 h-4 rounded-sm bg-terra-500"
+            :class="item.path === '/inbox' && inboxCount ? '' : 'ml-auto'"
           ></span>
           <!-- Barra ativa lateral quando colapsado -->
           <span
@@ -168,17 +175,19 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import ConfirmDialog from "../ui/ConfirmDialog.vue";
 import PageLogo from "../brand/PageLogo.vue";
 import { hapticLight } from "../../services/haptics";
 import { useCommandPalette } from "../../composables/useCommandPalette";
+import api from "../../api";
 
 const appVersion = ref("");
 const showMenu = ref(false);
 const showConfirm = ref(false);
+const inboxCount = ref(0);
 const { show: openPalette } = useCommandPalette();
 
 // Sidebar colapsada (persistida)
@@ -191,7 +200,17 @@ function toggleCollapsed() {
   hapticLight();
 }
 
+async function loadInboxCount() {
+  try {
+    const { data } = await api.get('/workspace/inbox')
+    inboxCount.value = data.length
+  } catch {
+    inboxCount.value = 0
+  }
+}
+
 onMounted(async () => {
+  window.addEventListener('inbox:changed', loadInboxCount)
   try {
     const r = await fetch("/version.json", { cache: "no-cache" });
     const d = await r.json();
@@ -200,7 +219,9 @@ onMounted(async () => {
   } catch {
     appVersion.value = "";
   }
+  loadInboxCount()
 });
+onBeforeUnmount(() => window.removeEventListener('inbox:changed', loadInboxCount))
 
 const versionText = computed(() => appVersion.value);
 
@@ -212,11 +233,15 @@ const user = computed(() => auth.user);
 const workMode = computed(() => !!auth.workMode);
 
 const allMenu = [
+  { path: "/hoje", label: "Hoje", icon: "M12 3v2m0 14v2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42M3 12h2m14 0h2M5.64 18.36l1.42-1.42m9.88-9.88 1.42-1.42M16 12a4 4 0 11-8 0 4 4 0 018 0z" },
   { path: "/", label: "Dashboard", icon: "M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3v-6h6v6h3a1 1 0 001-1V10" },
+  { path: "/agenda", label: "Agenda", icon: "M8 7V3m8 4V3M5 11h14M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" },
+  { path: "/inbox", label: "Caixa de entrada", icon: "M4 4h16v12H4V4zm0 8h4l2 3h4l2-3h4M8 8h8" },
   { path: "/tarefas", label: "Tarefas", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" },
   { path: "/projetos", label: "Projetos", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
   { path: "/anotacoes", label: "Anotações", icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" },
   { path: "/fluxogramas", label: "Fluxogramas", icon: "M4 6a2 2 0 012-2h4a2 2 0 012 2v4M4 14a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2V4zM14 14a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4z" },
+  { path: "/templates", label: "Templates", icon: "M7 3h10a2 2 0 012 2v14l-7-3-7 3V5a2 2 0 012-2zM9 8h6m-6 4h4" },
   { path: "/leads", label: "Leads", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" },
   { path: "/freelas", label: "Freelas", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
   { path: "/configuracoes", label: "Configurações", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z" },

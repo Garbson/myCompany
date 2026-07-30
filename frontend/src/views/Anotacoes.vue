@@ -277,6 +277,7 @@
           />
           <RichEditor v-model="editContent" @update:modelValue="debounceSave" />
           <BacklinksPanel target-type="note" :target-id="activeNote.id" />
+          <RelationsPanel class="mt-5" entity-type="note" :entity-id="activeNote.id" />
         </div>
       </template>
 
@@ -323,6 +324,7 @@ import { defineComponent, h } from 'vue'
 import api from '../api'
 import RichEditor from '../components/ui/RichEditor.vue'
 import BacklinksPanel from '../components/BacklinksPanel.vue'
+import RelationsPanel from '../components/RelationsPanel.vue'
 import ConfirmDialog from '../components/ui/ConfirmDialog.vue'
 import { useToast } from '../composables/useToast'
 import { hapticLight, hapticSuccess } from '../services/haptics'

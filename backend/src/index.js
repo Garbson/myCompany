@@ -19,6 +19,7 @@ import uploadRoutes from './routes/uploads.js'
 import backlinkRoutes from './routes/backlinks.js'
 import aiRoutes from './routes/ai.js'
 import habitRoutes from './routes/habits.js'
+import workspaceRoutes from './routes/workspace.js'
 import { startReminderLoop } from './services/reminders.js'
 import { startRecurrenceLoop } from './services/recurrence.js'
 import { runMigrations } from './database/migrations.js'
@@ -47,11 +48,19 @@ app.use('/api', uploadRoutes)
 app.use('/api', backlinkRoutes)
 app.use('/api', aiRoutes)
 app.use('/api', habitRoutes)
+app.use('/api', workspaceRoutes)
 
 const PORT = process.env.PORT || 3000
-app.listen(PORT, async () => {
-  console.log(`API rodando na porta ${PORT}`)
+async function start() {
   await runMigrations()
-  startReminderLoop()
-  startRecurrenceLoop()
+  app.listen(PORT, () => {
+    console.log(`API rodando na porta ${PORT}`)
+    startReminderLoop()
+    startRecurrenceLoop()
+  })
+}
+
+start().catch((error) => {
+  console.error('Falha ao iniciar API:', error)
+  process.exit(1)
 })

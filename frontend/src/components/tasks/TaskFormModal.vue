@@ -57,6 +57,13 @@
           <div v-if="editing" class="pt-1">
             <CommentList :task-id="editing.id" />
           </div>
+
+          <RelationsPanel
+            v-if="editing"
+            class="mt-2"
+            entity-type="task"
+            :entity-id="editing.id"
+          />
         </div>
 
         <!-- ===== Sidebar de metadados ===== -->
@@ -240,6 +247,7 @@ import SubtaskList from './SubtaskList.vue'
 import CommentList from './CommentList.vue'
 import AttachmentList from './AttachmentList.vue'
 import ProjectFlowModal from '../projects/ProjectFlowModal.vue'
+import RelationsPanel from '../RelationsPanel.vue'
 import { useTaskStore } from '../../stores/tasks'
 
 const props = defineProps({

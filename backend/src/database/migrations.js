@@ -111,6 +111,62 @@ const migrations = [
     INDEX idx_fc_user (user_id),
     INDEX idx_fc_folder (folder_id)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  `CREATE TABLE IF NOT EXISTS inbox_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    company_id INT,
+    content TEXT NOT NULL,
+    kind ENUM('capture','task','note') NOT NULL DEFAULT 'capture',
+    processed TINYINT(1) NOT NULL DEFAULT 0,
+    processed_type VARCHAR(30),
+    processed_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_inbox_user (user_id, processed, created_at)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  `CREATE TABLE IF NOT EXISTS calendar_events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    company_id INT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    event_date DATE NOT NULL,
+    event_time TIME,
+    color ENUM('terra','olive','blue','amber') NOT NULL DEFAULT 'terra',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_events_user_date (user_id, event_date)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  `CREATE TABLE IF NOT EXISTS content_templates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    company_id INT,
+    name VARCHAR(120) NOT NULL,
+    description VARCHAR(255),
+    target_type ENUM('task','note','project','flowchart') NOT NULL,
+    payload JSON NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_templates_user (user_id, target_type)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  `CREATE TABLE IF NOT EXISTS entity_relations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    company_id INT,
+    source_type ENUM('task','note','project','flowchart') NOT NULL,
+    source_id INT NOT NULL,
+    target_type ENUM('task','note','project','flowchart') NOT NULL,
+    target_id INT NOT NULL,
+    label VARCHAR(80),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_entity_relation (user_id, source_type, source_id, target_type, target_id),
+    INDEX idx_rel_source (user_id, source_type, source_id),
+    INDEX idx_rel_target (user_id, target_type, target_id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 ]
 
 const IGNORABLE_CODES = new Set([
