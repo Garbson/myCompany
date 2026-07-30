@@ -174,6 +174,7 @@ const IGNORABLE_CODES = new Set([
   'ER_DUP_KEYNAME',
   'ER_DUP_ENTRY',
   'ER_TABLE_EXISTS_ERROR',
+  'ER_FK_DUP_NAME',
 ])
 
 export async function runMigrations() {
