@@ -268,9 +268,9 @@ const editingProject = ref(null)
 const projectForm = reactive({ name: '', description: '', priority: 'medium' })
 
 const priorityOptions = [
-  { value: 'low',    label: 'Baixa', activeClass: 'bg-slate-500/30 text-ink-300 ring-1 ring-slate-400/40' },
-  { value: 'medium', label: 'Média', activeClass: 'bg-amber-500/30 text-amber-200 ring-1 ring-amber-400/40' },
-  { value: 'high',   label: 'Alta',  activeClass: 'bg-red-500/30 text-red-200 ring-1 ring-red-400/40' },
+  { value: 'low',    label: 'Baixa', activeClass: 'bg-[#E1DDD2] text-[#312D26] ring-1 ring-[#8A8172]' },
+  { value: 'medium', label: 'Média', activeClass: 'bg-[#F2D99B] text-[#674A0B] ring-1 ring-[#B88627]' },
+  { value: 'high',   label: 'Alta',  activeClass: 'bg-[#F0BDB2] text-[#722C20] ring-1 ring-[#B8593D]' },
 ]
 
 function priorityBadge(p) {

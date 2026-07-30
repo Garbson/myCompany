@@ -275,21 +275,21 @@ const weekDays = [
 ]
 
 const statusOptions = [
-  { value: 'todo',        label: 'A fazer',       activeClass: 'bg-gray-500/30 text-ink-300 ring-1 ring-gray-400/40' },
-  { value: 'in_progress', label: 'Em andamento',  activeClass: 'bg-blue-500/30 text-blue-200 ring-1 ring-blue-400/40' },
-  { value: 'done',        label: 'Concluído',     activeClass: 'bg-green-500/30 text-green-200 ring-1 ring-green-400/40' },
+  { value: 'todo',        label: 'A fazer',       activeClass: 'bg-[#E1DDD2] text-[#312D26] ring-1 ring-[#8A8172]' },
+  { value: 'in_progress', label: 'Em andamento',  activeClass: 'bg-[#C7D8DC] text-[#233F4D] ring-1 ring-[#5E7D8C]' },
+  { value: 'done',        label: 'Concluído',     activeClass: 'bg-[#C5DFC0] text-[#2F5428] ring-1 ring-[#6B7A3F]' },
 ]
 
 const difficultyOptions = [
-  { value: 'easy',   label: 'Fácil',  activeClass: 'bg-green-500/30 text-green-200 ring-1 ring-green-400/40' },
-  { value: 'medium', label: 'Médio',  activeClass: 'bg-yellow-500/30 text-yellow-200 ring-1 ring-yellow-400/40' },
-  { value: 'hard',   label: 'Difícil', activeClass: 'bg-red-500/30 text-red-200 ring-1 ring-red-400/40' },
+  { value: 'easy',   label: 'Fácil',   activeClass: 'bg-[#C5DFC0] text-[#2F5428] ring-1 ring-[#6B7A3F]' },
+  { value: 'medium', label: 'Médio',   activeClass: 'bg-[#F2D99B] text-[#674A0B] ring-1 ring-[#B88627]' },
+  { value: 'hard',   label: 'Difícil', activeClass: 'bg-[#F0BDB2] text-[#722C20] ring-1 ring-[#B8593D]' },
 ]
 
 const priorityOptions = [
-  { value: 'low',    label: 'Baixa',  activeClass: 'bg-slate-500/30 text-ink-300 ring-1 ring-slate-400/40' },
-  { value: 'medium', label: 'Média',  activeClass: 'bg-amber-500/30 text-amber-200 ring-1 ring-amber-400/40' },
-  { value: 'high',   label: 'Alta',   activeClass: 'bg-red-500/30 text-red-200 ring-1 ring-red-400/40' },
+  { value: 'low',    label: 'Baixa', activeClass: 'bg-[#E1DDD2] text-[#312D26] ring-1 ring-[#8A8172]' },
+  { value: 'medium', label: 'Média', activeClass: 'bg-[#F2D99B] text-[#674A0B] ring-1 ring-[#B88627]' },
+  { value: 'high',   label: 'Alta',  activeClass: 'bg-[#F0BDB2] text-[#722C20] ring-1 ring-[#B8593D]' },
 ]
 
 const form = reactive({
