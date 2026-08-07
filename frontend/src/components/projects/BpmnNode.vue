@@ -827,12 +827,14 @@ function startResize(e) {
 }
 
 /* === Handles (4 lados) — maiores e mais visíveis === */
+/* Cada posição tem 2 Handle (source + target) no mesmo local pra permitir
+ * conexões nas duas direções — o TARGET fica visualmente invisível mas
+ * espacialmente ativo, e o SOURCE por cima é o que aparece pro usuário. */
 :global(.bpmn-handle) {
   width: 14px !important;
   height: 14px !important;
   background: rgba(184, 89, 61, 0.95) !important;
   border: 2px solid rgba(253, 251, 245, 0.85) !important;
-  opacity: 0.35;
   transition: opacity 0.15s, box-shadow 0.15s, transform 0.15s, background 0.15s;
   box-shadow: 0 1px 3px rgba(94, 79, 45, 0.30);
 }
@@ -844,28 +846,26 @@ function startResize(e) {
   border-radius: 50%;
   background: transparent;
 }
-.bpmn-node:hover :global(.bpmn-handle) {
+
+/* Target: sempre invisível (só espacial pra receber conexão) */
+.bpmn-node :global(.vue-flow__handle.target) {
+  opacity: 0 !important;
+  z-index: 1;
+}
+
+/* Source: aparece um único ponto por lado */
+.bpmn-node :global(.vue-flow__handle.source) {
+  opacity: 0.4;
+  z-index: 2;
+}
+.bpmn-node:hover :global(.vue-flow__handle.source),
+.bpmn-node.is-selected :global(.vue-flow__handle.source) {
   opacity: 1;
 }
-.bpmn-node.is-selected :global(.bpmn-handle) {
-  opacity: 1;
-}
-.bpmn-node :global(.bpmn-handle:hover) {
+.bpmn-node :global(.vue-flow__handle.source:hover) {
   opacity: 1 !important;
   transform: scale(1.35);
   background: rgba(184, 89, 61, 1) !important;
   box-shadow: 0 0 0 4px rgba(184, 89, 61, 0.20), 0 2px 8px rgba(94, 79, 45, 0.40);
-}
-/* Quando o Vue Flow está desenhando uma conexão, mostra TODOS os handles */
-:global(.vue-flow.vue-flow--connecting) :global(.bpmn-handle),
-:global(.vue-flow__pane.connecting) :global(.bpmn-handle) {
-  opacity: 0.9 !important;
-}
-/* Source e target ficam sobrepostos em cada lado (target invisível por baixo) */
-.bpmn-node :global(.vue-flow__handle.target) {
-  z-index: 1;
-}
-.bpmn-node :global(.vue-flow__handle.source) {
-  z-index: 2;
 }
 </style>
