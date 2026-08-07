@@ -111,7 +111,7 @@
 
 <script setup>
 import { ref, reactive, watch, markRaw, provide, computed } from 'vue'
-import { VueFlow } from '@vue-flow/core'
+import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
@@ -131,6 +131,9 @@ const props = defineProps({
   },
 })
 const emit = defineEmits(['update:modelValue', 'change'])
+
+// Vue Flow instance (viewport, coord conversion, findEdge)
+const { screenToFlowCoordinate, project, getViewport, findEdge } = useVueFlow()
 
 const nodes = ref([])
 const edges = ref([])
@@ -231,10 +234,45 @@ function genId() {
   return `n${Date.now().toString(36)}-${nextId}`
 }
 
+// Calcula posição de um novo nó centralizada no viewport atual (respeita pan/zoom).
+// Aplica um pequeno stagger pra evitar sobreposição total quando o usuário clica
+// vários botões seguidos sem mover o mouse.
+let addNodeStagger = 0
+function centerOfCurrentView(kind) {
+  // Estimativa de tamanho do nó pra descontar (centralizar de fato o box, não o topo-esquerdo)
+  const w = kind === 'text' ? 240 : 140
+  const h = kind === 'text' ? 80 : 60
+  const pane = document.querySelector('.flow-canvas .vue-flow__viewport')?.parentElement
+    || document.querySelector('.vue-flow__pane')
+    || document.querySelector('.vue-flow')
+  if (pane) {
+    const r = pane.getBoundingClientRect()
+    const cx = r.left + r.width / 2
+    const cy = r.top + r.height / 2
+    try {
+      if (typeof screenToFlowCoordinate === 'function') {
+        const p = screenToFlowCoordinate({ x: cx, y: cy })
+        return { x: Math.round(p.x - w / 2), y: Math.round(p.y - h / 2) }
+      }
+      if (typeof project === 'function') {
+        const p = project({ x: cx, y: cy })
+        return { x: Math.round(p.x - w / 2), y: Math.round(p.y - h / 2) }
+      }
+      const vp = typeof getViewport === 'function' ? getViewport() : viewport.value
+      return {
+        x: Math.round((cx - r.left - vp.x) / (vp.zoom || 1) - w / 2),
+        y: Math.round((cy - r.top - vp.y) / (vp.zoom || 1) - h / 2),
+      }
+    } catch {}
+  }
+  return { x: 80, y: 100 }
+}
+
 function addNode(kind) {
   const id = genId()
-  const offsetX = 80 + (nodes.value.length % 4) * 40
-  const offsetY = 100 + (nodes.value.length % 3) * 40
+  const base = centerOfCurrentView(kind)
+  addNodeStagger = (addNodeStagger + 1) % 6
+  const jitter = addNodeStagger * 24
   const defaultLabel = labelByKind[kind] ?? 'Nó'
   const data = { label: defaultLabel, kind }
   if (kind === 'text') {
@@ -244,7 +282,7 @@ function addNode(kind) {
   }
   nodes.value.push({
     id, type: 'bpmn',
-    position: { x: offsetX, y: offsetY },
+    position: { x: base.x + jitter, y: base.y + jitter },
     data,
   })
   hapticLight()

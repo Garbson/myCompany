@@ -826,22 +826,40 @@ function startResize(e) {
   max-width: 110px;
 }
 
-/* === Handles (4 lados) === */
+/* === Handles (4 lados) — maiores e mais visíveis === */
 :global(.bpmn-handle) {
-  width: 10px !important;
-  height: 10px !important;
-  background: rgba(96, 165, 250, 0.95) !important;
-  border: 2px solid rgba(255, 255, 255, 0.4) !important;
-  opacity: 0;
-  transition: opacity 0.15s, box-shadow 0.15s, transform 0.15s;
+  width: 14px !important;
+  height: 14px !important;
+  background: rgba(184, 89, 61, 0.95) !important;
+  border: 2px solid rgba(253, 251, 245, 0.85) !important;
+  opacity: 0.35;
+  transition: opacity 0.15s, box-shadow 0.15s, transform 0.15s, background 0.15s;
+  box-shadow: 0 1px 3px rgba(94, 79, 45, 0.30);
+}
+/* Área invisível maior em torno do handle pra facilitar pegar (26x26) */
+:global(.bpmn-handle)::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: transparent;
 }
 .bpmn-node:hover :global(.bpmn-handle) {
-  opacity: 0.9;
+  opacity: 1;
+}
+.bpmn-node.is-selected :global(.bpmn-handle) {
+  opacity: 1;
 }
 .bpmn-node :global(.bpmn-handle:hover) {
   opacity: 1 !important;
-  transform: scale(1.4);
-  box-shadow: 0 0 12px rgba(96, 165, 250, 0.9);
+  transform: scale(1.35);
+  background: rgba(184, 89, 61, 1) !important;
+  box-shadow: 0 0 0 4px rgba(184, 89, 61, 0.20), 0 2px 8px rgba(94, 79, 45, 0.40);
+}
+/* Quando o Vue Flow está desenhando uma conexão, mostra TODOS os handles */
+:global(.vue-flow.vue-flow--connecting) :global(.bpmn-handle),
+:global(.vue-flow__pane.connecting) :global(.bpmn-handle) {
+  opacity: 0.9 !important;
 }
 /* Source e target ficam sobrepostos em cada lado (target invisível por baixo) */
 .bpmn-node :global(.vue-flow__handle.target) {
