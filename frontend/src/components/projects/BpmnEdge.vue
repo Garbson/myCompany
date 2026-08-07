@@ -1,10 +1,27 @@
 <template>
+  <!-- Marker customizado do START (só existe quando bidirecional):
+       usa orient="auto-start-reverse" pra apontar pra fora do path,
+       como uma seta de verdade — igual ao BPMN association bidirecional. -->
+  <defs v-if="bidirectional">
+    <marker
+      :id="startMarkerId"
+      viewBox="0 0 10 10"
+      refX="5"
+      refY="5"
+      markerWidth="7"
+      markerHeight="7"
+      orient="auto-start-reverse"
+      markerUnits="strokeWidth"
+    >
+      <path d="M 0 0 L 10 5 L 0 10 z" :fill="strokeColor" />
+    </marker>
+  </defs>
   <BaseEdge
     :id="id"
     :path="edgePath[0]"
     :style="mergedStyle"
     :marker-end="markerEnd"
-    :marker-start="bidirectional ? computedMarkerStart : undefined"
+    :marker-start="bidirectional ? `url(#${startMarkerId})` : undefined"
   />
   <!-- Path invisível grosso pra capturar dblclick em qualquer ponto da linha -->
   <path
@@ -110,13 +127,14 @@ const hitPathRef = ref(null)
 const hasLabel = computed(() => !!(props.label && props.label.trim()))
 const bidirectional = computed(() => !!props.data?.bidirectional)
 
-// Deriva um marker-start similar ao marker-end (para bidirecional)
-const computedMarkerStart = computed(() => {
-  const base = { type: 'arrowclosed', color: 'rgba(44, 74, 92, 0.9)' }
-  if (props.markerEnd && typeof props.markerEnd === 'object') {
-    return { ...base, ...props.markerEnd }
-  }
-  return base
+// ID único do marker do início (bidirecional). Precisa ser único no documento.
+const startMarkerId = computed(() => `bpmn-arrow-start-${props.id}`)
+
+// Cor do stroke resolvida (usada tanto no path quanto no marker de start)
+const strokeColor = computed(() => {
+  if (props.selected) return 'rgba(184, 89, 61, 0.95)'
+  if (typeof props.style === 'object' && props.style?.stroke) return props.style.stroke
+  return 'rgba(44, 74, 92, 0.9)'
 })
 
 function toggleBidirectional() {
