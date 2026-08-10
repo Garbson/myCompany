@@ -838,14 +838,6 @@ function startResize(e) {
   transition: opacity 0.15s, box-shadow 0.15s, transform 0.15s, background 0.15s;
   box-shadow: 0 1px 3px rgba(94, 79, 45, 0.30);
 }
-/* Área invisível maior em torno do handle pra facilitar pegar (26x26) */
-:global(.bpmn-handle)::before {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  background: transparent;
-}
 
 /* Target: sempre invisível (só espacial pra receber conexão) */
 .bpmn-node :global(.vue-flow__handle.target) {
