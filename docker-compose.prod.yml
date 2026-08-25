@@ -31,6 +31,7 @@ services:
     networks:
       - default
       - mycompany-net
+      - zlabs-nginx-proxy
 
   frontend:
     build: ./frontend
@@ -45,10 +46,13 @@ services:
     networks:
       - default
       - mycompany-net
+      - zlabs-nginx-proxy
 
 volumes:
   mysql_data:
 
 networks:
   mycompany-net:
+    external: true
+  zlabs-nginx-proxy:
     external: true
