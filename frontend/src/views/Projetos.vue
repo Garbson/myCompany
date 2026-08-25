@@ -16,6 +16,20 @@
       <p class="text-xs text-ink-50 mt-1">— {{ currentQuote.author }}</p>
     </div>
 
+    <!-- Filtro Claro / Freelance -->
+    <div class="flex gap-2 mb-4">
+      <button
+        v-for="c in categoryFilters"
+        :key="c.key"
+        @click="categoryFilter = c.key"
+        class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+        :class="categoryFilter === c.key ? c.activeClass : 'glass-light text-ink-100 hover:text-ink-400'"
+      >
+        {{ c.label }}
+        <span class="ml-1 opacity-60">({{ categoryCount(c.key) }})</span>
+      </button>
+    </div>
+
     <div class="space-y-3">
       <div v-for="project in projectTasks" :key="project.id" class="glass rounded-xl glow-hover overflow-hidden">
         <div class="p-4 cursor-pointer hover:bg-[var(--paper-surface-2)] transition-colors" @click="toggle(project.id)">
@@ -302,6 +316,23 @@ const showProjectModal = ref(false)
 const editingProject = ref(null)
 const projectForm = reactive({ name: '', description: '', priority: 'medium', is_freela: false })
 
+const categoryFilter = ref('all') // 'all' | 'claro' | 'freelance'
+const categoryFilters = [
+  { key: 'all',       label: 'Todos',     activeClass: 'bg-terra-500 text-white shadow-paper' },
+  { key: 'claro',     label: 'Claro',     activeClass: 'bg-indigo_ink-500 text-white shadow-paper' },
+  { key: 'freelance', label: 'Freelance', activeClass: 'bg-terra-500 text-white shadow-paper' },
+]
+function categoryCount(key) {
+  const all = projects.value
+  if (key === 'all') return all.length
+  if (key === 'claro') return all.filter(p => !p.is_freela).length
+  return all.filter(p => p.is_freela).length
+}
+function matchesCategory(p) {
+  if (categoryFilter.value === 'all') return true
+  return categoryFilter.value === 'freelance' ? !!p.is_freela : !p.is_freela
+}
+
 const priorityOptions = [
   { value: 'low',    label: 'Baixa', activeClass: 'bg-[#E1DDD2] text-[#312D26] ring-1 ring-[#8A8172]' },
   { value: 'medium', label: 'Média', activeClass: 'bg-[#F2D99B] text-[#674A0B] ring-1 ring-[#B88627]' },
@@ -362,8 +393,8 @@ async function saveProject() {
 const PRIORITY_RANK = { high: 0, medium: 1, low: 2 }
 
 const projectTasks = computed(() => {
-  // Mostra TODOS os projetos (Claro + Freelance) — a distinção é feita pelo badge no card
   return projects.value
+    .filter(matchesCategory)
     .map(p => {
       const all = taskStore.tasks.filter(t => t.project_id === p.id)
       const open = all.filter(t => t.status !== 'done')
