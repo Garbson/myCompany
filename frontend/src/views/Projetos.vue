@@ -362,8 +362,8 @@ async function saveProject() {
 const PRIORITY_RANK = { high: 0, medium: 1, low: 2 }
 
 const projectTasks = computed(() => {
+  // Mostra TODOS os projetos (Claro + Freelance) — a distinção é feita pelo badge no card
   return projects.value
-    .filter(p => !p.is_freela)
     .map(p => {
       const all = taskStore.tasks.filter(t => t.project_id === p.id)
       const open = all.filter(t => t.status !== 'done')
