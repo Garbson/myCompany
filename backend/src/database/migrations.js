@@ -167,6 +167,8 @@ const migrations = [
     INDEX idx_rel_source (user_id, source_type, source_id),
     INDEX idx_rel_target (user_id, target_type, target_id)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  // Auto-classifica projetos com nome contendo "gestao avancada" ou "rgc" como Claro (is_freela=0)
+  `UPDATE projects SET is_freela = 0 WHERE name LIKE '%gestao avancada%' OR name LIKE '%gestão avançada%' OR name LIKE '%RGC%' OR name LIKE '%rgc%'`,
 ]
 
 const IGNORABLE_CODES = new Set([

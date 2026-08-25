@@ -64,6 +64,14 @@
                 </svg>
               </button>
               <span
+                class="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                :class="project.is_freela
+                  ? 'bg-terra-500/15 text-terra-600 ring-1 ring-terra-500/30'
+                  : 'bg-indigo_ink-500/15 text-indigo_ink-500 ring-1 ring-indigo_ink-500/30'"
+              >
+                {{ project.is_freela ? 'Freelance' : 'Claro' }}
+              </span>
+              <span
                 class="text-[10px] px-2 py-0.5 rounded-full font-medium hidden sm:inline-block"
                 :class="priorityBadge(project.priority)"
               >
@@ -154,6 +162,28 @@
         <div>
           <label class="block text-sm font-medium text-ink-200 mb-1">Descrição</label>
           <textarea v-model="projectForm.description" rows="2" class="w-full px-3 py-2 bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-ink-200 mb-1.5">Categoria</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              @click="projectForm.is_freela = false"
+              class="px-3 py-2 text-xs font-semibold rounded-lg transition-colors"
+              :class="!projectForm.is_freela
+                ? 'bg-indigo_ink-500/15 text-indigo_ink-500 ring-1 ring-indigo_ink-500/40'
+                : 'glass-light text-ink-100 hover:text-ink-400 hover:bg-[var(--paper-surface-3)]'"
+            >Claro</button>
+            <button
+              type="button"
+              @click="projectForm.is_freela = true"
+              class="px-3 py-2 text-xs font-semibold rounded-lg transition-colors"
+              :class="projectForm.is_freela
+                ? 'bg-terra-500/15 text-terra-600 ring-1 ring-terra-500/40'
+                : 'glass-light text-ink-100 hover:text-ink-400 hover:bg-[var(--paper-surface-3)]'"
+            >Freelance</button>
+          </div>
         </div>
 
         <div>
@@ -270,7 +300,7 @@ const currentQuote = ref(getQuote('quote-proj'))
 // Criar/editar projeto
 const showProjectModal = ref(false)
 const editingProject = ref(null)
-const projectForm = reactive({ name: '', description: '', priority: 'medium' })
+const projectForm = reactive({ name: '', description: '', priority: 'medium', is_freela: false })
 
 const priorityOptions = [
   { value: 'low',    label: 'Baixa', activeClass: 'bg-[#E1DDD2] text-[#312D26] ring-1 ring-[#8A8172]' },
@@ -301,6 +331,7 @@ function openCreateProject() {
   projectForm.name = ''
   projectForm.description = ''
   projectForm.priority = 'medium'
+  projectForm.is_freela = false
   showProjectModal.value = true
 }
 
@@ -309,6 +340,7 @@ function openEditProject(project) {
   projectForm.name = project.name
   projectForm.description = project.description || ''
   projectForm.priority = project.priority || 'medium'
+  projectForm.is_freela = !!project.is_freela
   showProjectModal.value = true
 }
 
@@ -321,7 +353,7 @@ async function saveProject() {
   if (editingProject.value) {
     await api.put(`/projects/${editingProject.value.id}`, { ...projectForm })
   } else {
-    await api.post('/projects', { ...projectForm, payment_type: 'pagamento_unico', status: 'ativo', is_freela: false })
+    await api.post('/projects', { ...projectForm, payment_type: 'pagamento_unico', status: 'ativo' })
   }
   closeProjectModal()
   await loadProjects()

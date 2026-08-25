@@ -59,14 +59,38 @@
           </svg>
           {{ showCompleted ? 'Ocultar concluídas' : 'Mostrar concluídas' }}
         </button>
+        <!-- Filtro Claro / Freelance -->
+        <div class="hidden md:flex md:ml-auto items-center gap-1">
+          <button
+            v-for="c in categoryFilters"
+            :key="c.key"
+            @click="categoryFilter = c.key"
+            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+            :class="categoryFilter === c.key ? c.activeClass : 'glass-light text-ink-100 hover:text-ink-400'"
+          >
+            {{ c.label }}
+          </button>
+        </div>
         <select
           v-model="projectFilter"
-          class="hidden md:block md:ml-auto px-3 py-1.5 text-xs bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-200 focus:outline-none focus:border-indigo_ink-500"
+          class="hidden md:block px-3 py-1.5 text-xs bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-200 focus:outline-none focus:border-indigo_ink-500"
           @change="applyProjectFilter"
         >
           <option value="">Todos os projetos</option>
           <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
         </select>
+      </div>
+      <!-- Mobile: filtro categoria + projeto -->
+      <div class="md:hidden flex gap-2">
+        <button
+          v-for="c in categoryFilters"
+          :key="c.key"
+          @click="categoryFilter = c.key"
+          class="flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors"
+          :class="categoryFilter === c.key ? c.activeClass : 'glass-light text-ink-100'"
+        >
+          {{ c.label }}
+        </button>
       </div>
       <select
         v-model="projectFilter"
@@ -225,7 +249,29 @@ const users = ref([])
 const projects = ref([])
 const activeFilter = ref('all')
 const projectFilter = ref('')
+const categoryFilter = ref('all') // 'all' | 'claro' | 'freelance'
 const showCompleted = ref(false)
+
+const categoryFilters = [
+  { key: 'all', label: 'Todas', activeClass: 'bg-terra-500 text-ink-400 shadow-lg shadow-paper' },
+  { key: 'claro', label: 'Claro', activeClass: 'bg-indigo_ink-500 text-white shadow-lg shadow-paper' },
+  { key: 'freelance', label: 'Freelance', activeClass: 'bg-terra-500 text-white shadow-lg shadow-paper' },
+]
+
+// Mapa rápido: project_id -> is_freela (0/1). Recomputa quando projects muda.
+const projectIsFreela = computed(() => {
+  const m = new Map()
+  for (const p of projects.value) m.set(p.id, !!p.is_freela)
+  return m
+})
+
+function matchesCategory(task) {
+  if (categoryFilter.value === 'all') return true
+  const isFreela = projectIsFreela.value.get(task.project_id)
+  // Tasks sem projeto: só aparecem em 'all'
+  if (isFreela === undefined) return false
+  return categoryFilter.value === 'freelance' ? isFreela : !isFreela
+}
 
 const workMode = computed(() => !!auth.workMode)
 const defaultUserId = computed(() => auth.user?.id || null)
@@ -233,7 +279,7 @@ const defaultUserId = computed(() => auth.user?.id || null)
 const currentQuote = ref(getQuote('quote-tasks'))
 
 const filters = computed(() => {
-  let tasks = taskStore.tasks
+  let tasks = taskStore.tasks.filter(matchesCategory)
   if (projectFilter.value) tasks = tasks.filter(t => t.project_id === Number(projectFilter.value))
   // Contagem ignora concluídas (a menos que o toggle esteja ativo)
   const visible = showCompleted.value ? tasks : tasks.filter(t => t.status !== 'done')
@@ -244,18 +290,38 @@ const filters = computed(() => {
   ]
 })
 
+// Índice de status por id — usado pra saber se dependência foi resolvida
+const taskStatusById = computed(() => {
+  const m = new Map()
+  for (const t of taskStore.tasks) m.set(t.id, t.status)
+  return m
+})
+
+function isBlocked(task) {
+  if (!task.dependency_id) return false
+  const depStatus = taskStatusById.value.get(task.dependency_id) || task.dependency_status
+  return depStatus && depStatus !== 'done'
+}
+
 const filteredTasks = computed(() => {
-  let tasks = [...taskStore.tasks]
+  let tasks = [...taskStore.tasks].filter(matchesCategory)
   if (projectFilter.value) tasks = tasks.filter(t => t.project_id === Number(projectFilter.value))
   if (activeFilter.value !== 'all') tasks = tasks.filter(t => t.status === activeFilter.value)
   // Por padrão oculta concluídas; toggle "Concluídas" libera
   if (!showCompleted.value) tasks = tasks.filter(t => t.status !== 'done')
-  // Sort: done at bottom, then by difficulty (easy first), blocked tasks stay visible
+  // Ordenação:
+  // 1) done sempre embaixo
+  // 2) bloqueadas por dependência ficam embaixo dos não-bloqueados
+  // 3) entre iguais, por dificuldade (fácil primeiro)
+  const diffRank = { easy: 0, medium: 1, hard: 2 }
   tasks.sort((a, b) => {
-    if (a.status === 'done' && b.status !== 'done') return 1
-    if (a.status !== 'done' && b.status === 'done') return -1
-    const diff = { easy: 0, medium: 1, hard: 2 }
-    return (diff[a.difficulty] || 1) - (diff[b.difficulty] || 1)
+    const doneA = a.status === 'done' ? 1 : 0
+    const doneB = b.status === 'done' ? 1 : 0
+    if (doneA !== doneB) return doneA - doneB
+    const blockA = isBlocked(a) ? 1 : 0
+    const blockB = isBlocked(b) ? 1 : 0
+    if (blockA !== blockB) return blockA - blockB
+    return (diffRank[a.difficulty] ?? 1) - (diffRank[b.difficulty] ?? 1)
   })
   return tasks
 })

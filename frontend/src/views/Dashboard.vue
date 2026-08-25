@@ -395,12 +395,28 @@ const statusBars = computed(() => [
   { key: 'done', label: 'Concluídas', count: tasksByStatus.value.done, color: 'text-olive-500', barColor: 'bg-green-500', pct: Math.round(tasksByStatus.value.done / total.value * 100) }
 ])
 
+// Índice de status por id — usado pra detectar dependências ainda pendentes
+const _statusById = computed(() => {
+  const m = new Map()
+  for (const t of taskStore.tasks) m.set(t.id, t.status)
+  return m
+})
+function _isBlocked(task) {
+  if (!task.dependency_id) return false
+  const dep = _statusById.value.get(task.dependency_id) || task.dependency_status
+  return dep && dep !== 'done'
+}
+
 const nextTasks = computed(() => {
+  const diffOrder = { easy: 0, medium: 1, hard: 2 }
   return [...taskStore.tasks]
     .filter(t => t.status !== 'done')
     .sort((a, b) => {
-      const diffOrder = { easy: 0, medium: 1, hard: 2 }
-      return (diffOrder[a.difficulty] || 1) - (diffOrder[b.difficulty] || 1)
+      // Bloqueadas (dependência pendente) vão pro fundo — não podem ser "a próxima"
+      const blockA = _isBlocked(a) ? 1 : 0
+      const blockB = _isBlocked(b) ? 1 : 0
+      if (blockA !== blockB) return blockA - blockB
+      return (diffOrder[a.difficulty] ?? 1) - (diffOrder[b.difficulty] ?? 1)
     })
     .slice(0, 10)
 })
