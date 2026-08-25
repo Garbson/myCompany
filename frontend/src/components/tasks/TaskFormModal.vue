@@ -44,8 +44,55 @@
           </div>
 
           <!-- Subtarefas: logo abaixo da descrição -->
-          <div v-if="editing" class="pt-1">
-            <SubtaskList :task-id="editing.id" />
+          <div class="pt-1">
+            <SubtaskList v-if="editing" :task-id="editing.id" />
+            <!-- Modo "nova tarefa": lista in-memory de subtarefas planejadas -->
+            <div v-else>
+              <h4 class="text-xs font-semibold text-ink-100 uppercase tracking-wide mb-2">
+                Subtarefas
+                <span v-if="pendingSubtasks.length" class="ml-1 text-ink-50 normal-case font-normal">
+                  {{ pendingSubtasks.length }}
+                </span>
+              </h4>
+              <ul v-if="pendingSubtasks.length" class="space-y-1 mb-2">
+                <li
+                  v-for="(t, i) in pendingSubtasks"
+                  :key="i"
+                  class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[var(--paper-surface-2)] group"
+                >
+                  <span class="w-4 h-4 rounded border border-[var(--paper-border-strong)] shrink-0"></span>
+                  <span class="flex-1 text-sm text-ink-300 break-words">{{ t }}</span>
+                  <button
+                    type="button"
+                    @click="pendingSubtasks.splice(i, 1)"
+                    class="opacity-0 group-hover:opacity-100 text-ink-50 hover:text-terra-600 transition-opacity"
+                    aria-label="Remover"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </li>
+              </ul>
+              <form @submit.prevent="addPendingSubtask" class="flex gap-2">
+                <input
+                  v-model="pendingSubtaskTitle"
+                  type="text"
+                  placeholder="+ Adicionar subtarefa"
+                  class="flex-1 px-3 py-1.5 text-sm bg-[var(--paper-surface)] border border-[var(--paper-border)] rounded-lg text-ink-400 placeholder-gray-500 focus:outline-none focus:border-indigo_ink-500 transition-colors"
+                />
+                <button
+                  v-if="pendingSubtaskTitle.trim()"
+                  type="submit"
+                  class="px-3 py-1.5 text-xs font-semibold bg-terra-500/12 text-terra-600 hover:bg-terra-500/20 rounded-lg transition-colors"
+                >
+                  Adicionar
+                </button>
+              </form>
+              <p v-if="pendingSubtasks.length" class="text-[11px] text-ink-50 mt-2">
+                Serão criadas junto com a tarefa ao salvar.
+              </p>
+            </div>
           </div>
 
           <!-- Anexos -->
@@ -265,6 +312,25 @@ const taskStore = useTaskStore()
 const descRef = ref(null)
 const showFlow = ref(false)
 
+// === Subtarefas planejadas ANTES da task existir (modo "nova tarefa") ===
+const pendingSubtasks = ref([])
+const pendingSubtaskTitle = ref('')
+
+function addPendingSubtask() {
+  const t = pendingSubtaskTitle.value.trim()
+  if (!t) return
+  pendingSubtasks.value.push(t)
+  pendingSubtaskTitle.value = ''
+}
+
+// Limpa lista quando o modal abre em modo novo, ou quando alterna pra edição
+watch(() => [props.show, props.editing], ([show, editing]) => {
+  if (!show || editing) {
+    pendingSubtasks.value = []
+    pendingSubtaskTitle.value = ''
+  }
+})
+
 function autoResize() {
   const ta = descRef.value
   if (!ta) return
@@ -387,6 +453,10 @@ function save() {
     due_date: form.due_date || null,
     is_recurring: form.is_recurring ? 1 : 0,
     recurrence_days: form.is_recurring && form.recurrence_days.length ? form.recurrence_days.join(',') : null,
+    // Só passa quando estamos criando (o parent cria via API depois de criar a task)
+    __pendingSubtasks: !props.editing && pendingSubtasks.value.length
+      ? [...pendingSubtasks.value]
+      : undefined,
   })
 }
 </script>

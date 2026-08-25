@@ -315,6 +315,10 @@ function closeModal() { showModal.value = false; editing.value = null }
 
 async function save(payload) {
   try {
+    // Extrai subtarefas planejadas do payload (só existem em modo "nova tarefa")
+    const pending = payload.__pendingSubtasks
+    delete payload.__pendingSubtasks
+
     if (editing.value) {
       await taskStore.update(editing.value.id, payload)
       toast.success('Tarefa atualizada')
@@ -323,9 +327,23 @@ async function save(payload) {
     } else {
       const newTask = await taskStore.create(payload)
       hapticMedium()
-      toast.success('Tarefa criada — adicione subtarefas, anexos, comentários…')
-      // Mantém o modal aberto em modo edição pra completar a tarefa
-      // sem precisar fechar/reabrir
+      // Cria as subtarefas planejadas em paralelo
+      if (Array.isArray(pending) && pending.length) {
+        try {
+          const api = (await import('../api')).default
+          await Promise.all(
+            pending.map((title) =>
+              api.post(`/tasks/${newTask.id}/subtasks`, { title })
+            )
+          )
+          toast.success(`Tarefa criada com ${pending.length} subtarefa${pending.length > 1 ? 's' : ''}`)
+        } catch {
+          toast.error('Tarefa criada, mas falhou ao adicionar algumas subtarefas')
+        }
+      } else {
+        toast.success('Tarefa criada — adicione subtarefas, anexos, comentários…')
+      }
+      // Mantém o modal aberto em modo edição
       editing.value = newTask
     }
   } catch (e) {
